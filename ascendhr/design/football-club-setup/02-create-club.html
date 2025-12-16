@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Your Club | AscendHR</title>
+  <style>
+    /* === Design System Variables === */
+    :root {
+      --primary: #3B82F6;
+      --primary-light: #EFF6FF;
+      --primary-dark: #1E40AF;
+      --secondary: #F1F5F9;
+      --accent: #22C55E;
+      --destructive: #EF4444;
+      --warning: #FACC15;
+      --background: #F8FAFC;
+      --foreground: #334155;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --card: #FFFFFF;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-soft: 0 2px 8px -2px rgba(51,65,85,0.08);
+      --shadow-medium: 0 4px 16px -4px rgba(51,65,85,0.12);
+      --gradient-primary: linear-gradient(135deg, #3B82F6, #7C3AED);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--foreground);
+      background: var(--background);
+      min-height: 100vh;
+    }
+
+    /* === Wizard Layout === */
+    .wizard-container {
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    .wizard-sidebar {
+      width: 320px;
+      background: var(--gradient-primary);
+      padding: 40px;
+      color: white;
+    }
+    
+    .wizard-logo {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 48px;
+    }
+    
+    .wizard-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .step-number.active {
+      background: white;
+      color: var(--primary);
+    }
+    
+    .step-number.completed {
+      background: rgba(255,255,255,0.3);
+      color: white;
+    }
+    
+    .step-number.pending {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6);
+    }
+    
+    .step-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .step-content p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .step-content.pending { opacity: 0.5; }
+    
+    .wizard-main {
+      flex: 1;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .wizard-header {
+      margin-bottom: 32px;
+    }
+    
+    .wizard-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+    
+    .wizard-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .wizard-form {
+      flex: 1;
+      max-width: 560px;
+    }
+    
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--foreground);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    
+    .form-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    
+    .form-error {
+      font-size: 12px;
+      color: var(--destructive);
+      margin-top: 4px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .wizard-footer {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--foreground);
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    /* === Logo Upload === */
+    .logo-upload {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    
+    .logo-upload:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .logo-upload-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .logo-upload-text {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .logo-upload-text strong {
+      color: var(--primary);
+    }
+
+    /* === Color Picker === */
+    .color-picker-group {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .color-picker-item {
+      flex: 1;
+    }
+    
+    .color-picker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+    
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .color-value {
+      font-size: 14px;
+      font-family: monospace;
+      color: var(--foreground);
+    }
+
+    /* === Player Card Preview === */
+    .preview-section {
+      margin-top: 32px;
+      padding: 24px;
+      background: var(--secondary);
+      border-radius: var(--radius-lg);
+    }
+    
+    .preview-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    
+    .preview-card {
+      width: 200px;
+      background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .preview-card-header {
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .preview-card-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin: 0 auto 8px;
+    }
+    
+    .preview-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .preview-card-role {
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+    }
+    
+    .preview-card-stats {
+      display: flex;
+      justify-content: space-around;
+      padding: 12px;
+      background: #F8FAFC;
+    }
+    
+    .preview-stat {
+      text-align: center;
+    }
+    
+    .preview-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .preview-stat-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* === Section Divider === */
+    .section-divider {
+      background: var(--secondary);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* === Success Screen === */
+    .success-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+      padding: 40px;
+    }
+    
+    .success-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+      max-width: 480px;
+      box-shadow: 0 16px 64px -16px rgba(0,0,0,0.3);
+    }
+    
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: #F0FDF4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 24px;
+    }
+    
+    .success-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .success-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    
+    .success-club-card {
+      background: var(--secondary);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .success-club-logo {
+      width: 64px;
+      height: 64px;
+      background: var(--gradient-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 12px;
+    }
+    
+    .success-club-name {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .success-club-industry {
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Create Your Club Wizard
+    User Story: US-0.0.2
+    Flow: Basic Info → Branding → Club Created Success
+  -->
+
+  <!-- ============================================ -->
+  <!-- SCREEN 1: Wizard Step 1 - Basic Info         -->
+  <!-- ============================================ -->
+  <div class="wizard-container">
+    <aside class="wizard-sidebar">
+      <div class="wizard-logo">⚽ AscendHR</div>
+      <div class="wizard-steps">
+        <div class="step-item">
+          <div class="step-number active">1</div>
+          <div class="step-content">
+            <h4>Basic Info</h4>
+            <p>Club name, industry, size</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number pending">2</div>
+          <div class="step-content pending">
+            <h4>Branding</h4>
+            <p>Logo and club colors</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number pending">3</div>
+          <div class="step-content pending">
+            <h4>Your Player Card</h4>
+            <p>Set up your profile</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <main class="wizard-main">
+      <header class="wizard-header">
+        <h1 class="wizard-title">🏟️ Create Your Club</h1>
+        <p class="wizard-subtitle">Set up your organization like a football club manager</p>
+      </header>
+      
+      <div class="wizard-form">
+        <div class="form-group">
+          <label class="form-label">Club Name (Company Name)</label>
+          <input type="text" class="form-input" placeholder="e.g., Manchester Tech FC" value="Acme Corporation">
+          <p class="form-hint">This will be your club's identity. Choose something memorable!</p>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Industry</label>
+            <select class="form-input">
+              <option>Technology</option>
+              <option>Finance</option>
+              <option>Healthcare</option>
+              <option>Retail</option>
+              <option>Manufacturing</option>
+              <option>Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Squad Size</label>
+            <select class="form-input">
+              <option>1-10 players</option>
+              <option>11-50 players</option>
+              <option selected>51-200 players</option>
+              <option>200+ players</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="wizard-footer">
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary">Next: Branding →</button>
+      </footer>
+    </main>
+  </div>
+
+  <div class="section-divider">↓ Step 2: Branding ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 2: Wizard Step 2 - Branding           -->
+  <!-- ============================================ -->
+  <div class="wizard-container">
+    <aside class="wizard-sidebar">
+      <div class="wizard-logo">⚽ AscendHR</div>
+      <div class="wizard-steps">
+        <div class="step-item">
+          <div class="step-number completed">✓</div>
+          <div class="step-content">
+            <h4>Basic Info</h4>
+            <p>Acme Corporation</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number active">2</div>
+          <div class="step-content">
+            <h4>Branding</h4>
+            <p>Logo and club colors</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number pending">3</div>
+          <div class="step-content pending">
+            <h4>Your Player Card</h4>
+            <p>Set up your profile</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <main class="wizard-main">
+      <header class="wizard-header">
+        <h1 class="wizard-title">🎨 Club Branding</h1>
+        <p class="wizard-subtitle">Make your club look professional with custom branding</p>
+      </header>
+      
+      <div class="wizard-form">
+        <div class="form-group">
+          <label class="form-label">Club Logo (Optional)</label>
+          <div class="logo-upload">
+            <div class="logo-upload-icon">📷</div>
+            <p class="logo-upload-text">
+              <strong>Click to upload</strong> or drag and drop<br>
+              PNG, JPG, or SVG (max 2MB)
+            </p>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Club Colors</label>
+          <div class="color-picker-group">
+            <div class="color-picker-item">
+              <p style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Primary Color</p>
+              <div class="color-picker">
+                <div class="color-swatch" style="background: #3B82F6;"></div>
+                <span class="color-value">#3B82F6</span>
+              </div>
+            </div>
+            <div class="color-picker-item">
+              <p style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Secondary Color</p>
+              <div class="color-picker">
+                <div class="color-swatch" style="background: #7C3AED;"></div>
+                <span class="color-value">#7C3AED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="preview-section">
+          <p class="preview-label">Player Card Preview</p>
+          <div class="preview-card">
+            <div class="preview-card-header" style="background: linear-gradient(135deg, #3B82F6, #7C3AED);">
+              <div class="preview-card-avatar" style="background: white;"></div>
+              <div class="preview-card-name">Your Name</div>
+              <div class="preview-card-role">CEO</div>
+            </div>
+            <div class="preview-card-stats">
+              <div class="preview-stat">
+                <div class="preview-stat-value" style="color: #22C55E;">--</div>
+                <div class="preview-stat-label">Current</div>
+              </div>
+              <div class="preview-stat">
+                <div class="preview-stat-value" style="color: #3B82F6;">--</div>
+                <div class="preview-stat-label">Potential</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="wizard-footer">
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary">Create Club 🎉</button>
+      </footer>
+    </main>
+  </div>
+
+  <div class="section-divider">↓ Club Created Success ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 3: Club Created Success               -->
+  <!-- ============================================ -->
+  <div class="success-container">
+    <div class="success-card">
+      <div class="success-icon">🏆</div>
+      <h2 class="success-title">Club Created!</h2>
+      <p class="success-subtitle">Congratulations! Your club is ready. Now let's set up your player card.</p>
+      
+      <div class="success-club-card">
+        <div class="success-club-logo">🏢</div>
+        <div class="success-club-name">Acme Corporation</div>
+        <div class="success-club-industry">Technology • 51-200 players</div>
+      </div>
+      
+      <button class="btn-primary" style="width: 100%;">
+        🎮 Set Up Your Player Card →
+      </button>
+    </div>
+  </div>
+
+</body>
+</html>

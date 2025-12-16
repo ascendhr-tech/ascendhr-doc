@@ -1,0 +1,16 @@
+graph TD
+    A((Start)) --> B[Edit Employee Profile]
+    B --> C[Show Roles Field]
+    C --> D[/Click Role Multi-Select/]
+    D --> E[Display Available Roles]
+    
+    E --> F{Permission Check}
+    F -->|No Access| G[Role Disabled/Hidden]
+    F -->|Has Access| H[/Select or Deselect Roles/]
+    
+    H --> I[Update Selection]
+    I --> J[/Click Save/]
+    J --> K[Assign Roles to User]
+    K --> L[Update User Permissions]
+    L --> M[Log to Audit Trail]
+    M --> N((End))

@@ -1,0 +1,52 @@
+graph TD
+    A((Start: After Email Verified)) --> B[Land on Create Club Wizard]
+    
+    subgraph Step1["Step 1: Basic Info"]
+        B --> C[/Enter Club Name/]
+        C --> D{Name Unique?}
+        D -->|No| D1[Show 'Name already in use']
+        D1 --> D2[Suggest alternatives]
+        D2 --> C
+        D -->|Yes| E[Generate slug automatically]
+        E --> F[/Select Industry/]
+        F --> G[/Select Company Size/]
+        G --> H[Click Next]
+    end
+    
+    H --> I
+    
+    subgraph Step2["Step 2: Branding"]
+        I[Show Branding Form] --> J[/Upload Logo - Optional/]
+        J --> K{Logo Valid?}
+        K -->|Too Large| K1[Show 'Logo must be under 2MB']
+        K1 --> J
+        K -->|Invalid Format| K2[Show 'Upload PNG, JPG, or SVG']
+        K2 --> J
+        K -->|Valid or Skip| L[/Choose Primary Color/]
+        L --> M[/Choose Secondary Color/]
+        M --> N[Preview Sample Card]
+        N --> O[Click 'Create Club']
+    end
+    
+    O --> P
+    
+    subgraph CreateClub["System Processing"]
+        P[Create company record] --> Q[Assign user as Club Owner]
+        Q --> R[Create default departments]
+        R --> S[Create default positions]
+    end
+    
+    S --> T
+    
+    subgraph Success["Club Created"]
+        T[Show success screen] --> U[Display club info summary]
+        U --> V[Show next step CTA]
+    end
+    
+    V --> W((End: Setup Player Card))
+
+    style A fill:#4CAF50,color:white
+    style W fill:#2196F3,color:white
+    style D1 fill:#f44336,color:white
+    style K1 fill:#f44336,color:white
+    style K2 fill:#f44336,color:white

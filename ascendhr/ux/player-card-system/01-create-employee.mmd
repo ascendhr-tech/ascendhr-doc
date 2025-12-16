@@ -1,0 +1,34 @@
+graph TD
+    A((Start)) --> B[Click Add Employee]
+    B --> C[Display Create Form]
+    
+    subgraph Form["Create Employee Form"]
+        C --> D[/Fill Name, Email, Dept, Position/]
+        D --> E{Valid?}
+        E -->|No| F[Show Field Errors]
+        F --> D
+        E -->|Yes| G[/Upload Photo - Optional/]
+        G --> H{Photo Valid?}
+        H -->|Size > 5MB| I[Show Size Error]
+        I --> G
+        H -->|Yes| J[/Select Reports To/]
+    end
+    
+    subgraph Attributes["Attribute Rating Panel"]
+        J --> K[/Rate 10 Attributes 1-20/]
+        K --> L[Calculate Current Ability]
+        L --> M[/Set Potential Ability/]
+        M --> N{Potential >= Current?}
+        N -->|No| O[Show Potential Error]
+        O --> M
+    end
+    
+    N -->|Yes| P[Click Create Player]
+    P --> Q{All Valid?}
+    Q -->|No| R[Highlight Errors]
+    R --> D
+    Q -->|Yes| S[Create Employee Record]
+    S --> T[Auto-Create User Account]
+    T --> U[Send Invitation Email]
+    U --> V[Show Success + Player Card Preview]
+    V --> W((End))

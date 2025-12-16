@@ -1,0 +1,18 @@
+graph TD
+    A((Start)) --> B[Edit Employee Profile]
+    B --> C[Show Reports To Field]
+    C --> D[/Click Manager Dropdown/]
+    D --> E[Display Searchable Manager List]
+    E --> F[/Search and Select Manager/]
+    
+    F --> G{Valid Selection?}
+    G -->|Select Self| H[Show Self-Reference Error]
+    H --> F
+    G -->|Circular Ref| I[Show Circular Error]
+    I --> F
+    
+    G -->|Valid| J[/Click Save/]
+    J --> K[Update Hierarchy]
+    K --> L[Validate No Circular Ref]
+    L --> M[Show Updated Org Info]
+    M --> N((End))

@@ -1,0 +1,19 @@
+graph TD
+    A((Start)) --> B[Login]
+    B --> C[Dashboard]
+    C --> D[Squad Page]
+    
+    D --> E[Player Gallery]
+    D --> F[Employee List]
+    D --> G[Import Wizard]
+    
+    E --> H[Player Card Detail]
+    F --> H
+    
+    H --> I[Edit Player]
+    H --> J[Change Status]
+    H --> K[View History]
+    
+    E --> L[Compare Players]
+    
+    G --> M[Import Summary]

@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Your Player Card | AscendHR</title>
+  <!-- Chart.js for Radar Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* === Design System Variables === */
+    :root {
+      --primary: #3B82F6;
+      --primary-light: #EFF6FF;
+      --primary-dark: #1E40AF;
+      --secondary: #F1F5F9;
+      --accent: #22C55E;
+      --destructive: #EF4444;
+      --warning: #FACC15;
+      --background: #F8FAFC;
+      --foreground: #334155;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --card: #FFFFFF;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-soft: 0 2px 8px -2px rgba(51,65,85,0.08);
+      --shadow-medium: 0 4px 16px -4px rgba(51,65,85,0.12);
+      --gradient-primary: linear-gradient(135deg, #3B82F6, #7C3AED);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--foreground);
+      background: var(--background);
+      min-height: 100vh;
+    }
+
+    /* === Main Layout === */
+    .page-container {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      min-height: 100vh;
+    }
+    
+    .form-section {
+      padding: 48px;
+      overflow-y: auto;
+    }
+    
+    .preview-section {
+      background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    /* === Header === */
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* === Form Styles === */
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--foreground);
+    }
+    
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      background: white;
+    }
+    
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* === Photo Upload === */
+    .photo-upload {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .photo-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      border: 2px dashed var(--border);
+    }
+    
+    .photo-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    /* === Attributes Section === */
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .attributes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    .attribute-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+    }
+    
+    .attribute-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    
+    .attribute-name {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .attribute-value {
+      font-size: 14px;
+      font-weight: 700;
+      min-width: 24px;
+      text-align: right;
+    }
+    
+    .attribute-value.excellent { color: #22C55E; }
+    .attribute-value.good { color: #3B82F6; }
+    .attribute-value.average { color: #FACC15; }
+    .attribute-value.weak { color: #EF4444; }
+    
+    .attribute-slider {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    .attribute-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+    }
+
+    /* === Ability Summary === */
+    .ability-summary {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-top: 24px;
+    }
+    
+    .ability-item {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .ability-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .ability-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    
+    .ability-value.current { color: var(--accent); }
+    .ability-value.potential { color: var(--primary); }
+    
+    .ability-input {
+      width: 80px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px;
+      color: var(--primary);
+    }
+
+    /* === FM-Style Player Card Preview (Dark Theme) === */
+    .preview-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    
+    .player-card-fm {
+      width: 100%;
+      max-width: 380px;
+      background: linear-gradient(145deg, #334155 0%, #1E293B 100%);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .card-header {
+      display: flex;
+      padding: 20px;
+      gap: 16px;
+      background: linear-gradient(135deg, #3B82F6, #7C3AED);
+    }
+    
+    .card-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    
+    .card-info {
+      flex: 1;
+      color: white;
+    }
+    
+    .card-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .card-role {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    
+    .card-meta {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .meta-item {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    
+    .card-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    /* === Spider/Radar Chart Container === */
+    .radar-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .radar-chart {
+      width: 200px;
+      height: 200px;
+    }
+    
+    /* === Ability Ratings === */
+    .ability-ratings {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .rating-item {
+      text-align: center;
+    }
+    
+    .rating-value {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    
+    .rating-value.current { color: #22C55E; }
+    .rating-value.potential { color: #3B82F6; }
+    
+    .rating-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    
+    /* === Attributes List (FM Style) === */
+    .attributes-section {
+      margin-bottom: 16px;
+    }
+    
+    .attributes-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .attr-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    
+    .attr-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+    }
+    
+    .attr-name {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .attr-score {
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 20px;
+      text-align: right;
+    }
+    
+    .attr-score.excellent { color: #22C55E; }
+    .attr-score.good { color: #3B82F6; }
+    .attr-score.average { color: #FACC15; }
+    .attr-score.weak { color: #EF4444; }
+
+    /* === Footer === */
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      margin-top: 32px;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--foreground);
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    /* === Section Divider === */
+    .section-divider {
+      background: var(--secondary);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* === Success Screen === */
+    .success-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+      padding: 40px;
+    }
+    
+    .success-content {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+    }
+    
+    .success-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    .success-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .success-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    
+    .success-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Setup Owner's Player Card (FM Style with Spider Chart)
+    User Story: US-0.0.3
+    Flow: Player Card Form with Attributes → Success with FM-style card display
+  -->
+
+  <!-- ============================================ -->
+  <!-- SCREEN 1: Player Card Setup Form             -->
+  <!-- ============================================ -->
+  <div class="page-container">
+    <main class="form-section">
+      <header class="page-header">
+        <h1 class="page-title">🎮 Setup Your Player Card</h1>
+        <p class="page-subtitle">Create your profile like a Football Manager player. Rate your own abilities!</p>
+      </header>
+      
+      <form>
+        <!-- Basic Info -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Position / Title</label>
+            <select class="form-select">
+              <option>CEO</option>
+              <option selected>Founder</option>
+              <option>CTO</option>
+              <option>COO</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Department / Team</label>
+            <select class="form-select">
+              <option selected>Leadership</option>
+              <option>Engineering</option>
+              <option>Product</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Profile Photo (Optional)</label>
+          <div class="photo-upload">
+            <div class="photo-preview">👤</div>
+            <div class="photo-actions">
+              <button type="button" class="btn-outline">📷 Upload Photo</button>
+              <span style="font-size: 12px; color: var(--muted);">PNG, JPG (max 2MB)</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Attributes Section -->
+        <div style="margin-top: 32px;">
+          <h3 class="section-title">⚡ Rate Your Attributes (1-20)</h3>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
+            Be honest! These ratings help identify team strengths and gaps.
+          </p>
+          
+          <div class="attributes-grid">
+            <!-- Technical -->
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Technical</span>
+                <span class="attribute-value excellent">17</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="17">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Leadership</span>
+                <span class="attribute-value excellent">18</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="18">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Communication</span>
+                <span class="attribute-value excellent">16</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="16">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Creativity</span>
+                <span class="attribute-value excellent">15</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="15">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Adaptability</span>
+                <span class="attribute-value good">14</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="14">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Teamwork</span>
+                <span class="attribute-value excellent">16</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="16">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Determination</span>
+                <span class="attribute-value excellent">19</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="19">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Decision Making</span>
+                <span class="attribute-value excellent">16</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="16">
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-header">
+                <span class="attribute-name">Problem Solving</span>
+                <span class="attribute-value excellent">17</span>
+              </div>
+              <input type="range" class="attribute-slider" min="1" max="20" value="17">
+            </div>
+          </div>
+          
+          <div class="ability-summary">
+            <div class="ability-item">
+              <div class="ability-label">Current Ability</div>
+              <div class="ability-value current">85</div>
+              <div style="font-size: 12px; color: var(--muted);">Auto-calculated</div>
+            </div>
+            <div class="ability-item">
+              <div class="ability-label">Potential Ability</div>
+              <input type="number" class="ability-input" value="92" min="85" max="99">
+              <div style="font-size: 12px; color: var(--muted);">Must be ≥ Current</div>
+            </div>
+          </div>
+        </div>
+        
+        <footer class="form-footer">
+          <button type="button" class="btn-secondary">← Back</button>
+          <button type="submit" class="btn-primary">Create My Player Card 🎉</button>
+        </footer>
+      </form>
+    </main>
+    
+    <!-- FM-Style Preview Panel (Dark Theme) -->
+    <aside class="preview-section">
+      <p class="preview-label">Live Preview</p>
+      
+      <div class="player-card-fm">
+        <div class="card-header">
+          <div class="card-photo">👤</div>
+          <div class="card-info">
+            <div class="card-name">John Smith</div>
+            <div class="card-role">Founder • Leadership</div>
+            <div class="card-meta">
+              <span class="meta-item">🏢 Acme Corp</span>
+              <span class="meta-item">🇹🇭 Thailand</span>
+            </div>
+            <div class="card-tier">👑 Legend</div>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <!-- Spider/Radar Chart -->
+          <div class="radar-container">
+            <canvas id="radarChart" class="radar-chart"></canvas>
+          </div>
+          
+          <!-- Ability Ratings -->
+          <div class="ability-ratings">
+            <div class="rating-item">
+              <div class="rating-value current">85</div>
+              <div class="rating-label">Current</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value potential">92</div>
+              <div class="rating-label">Potential</div>
+            </div>
+          </div>
+          
+          <!-- Technical Attributes -->
+          <div class="attributes-section">
+            <div class="attributes-title">🛠️ Technical</div>
+            <div class="attr-grid">
+              <div class="attr-item">
+                <span class="attr-name">Coding</span>
+                <span class="attr-score excellent">17</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Design</span>
+                <span class="attr-score good">12</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Data Analysis</span>
+                <span class="attr-score excellent">16</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Problem Solving</span>
+                <span class="attr-score excellent">17</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mental Attributes -->
+          <div class="attributes-section">
+            <div class="attributes-title">🧠 Mental</div>
+            <div class="attr-grid">
+              <div class="attr-item">
+                <span class="attr-name">Leadership</span>
+                <span class="attr-score excellent">18</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Determination</span>
+                <span class="attr-score excellent">19</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Creativity</span>
+                <span class="attr-score excellent">15</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Decision Making</span>
+                <span class="attr-score excellent">16</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Soft Skills Attributes -->
+          <div class="attributes-section">
+            <div class="attributes-title">💬 Soft Skills</div>
+            <div class="attr-grid">
+              <div class="attr-item">
+                <span class="attr-name">Communication</span>
+                <span class="attr-score excellent">16</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Teamwork</span>
+                <span class="attr-score excellent">16</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Adaptability</span>
+                <span class="attr-score good">14</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Mentoring</span>
+                <span class="attr-score good">13</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="section-divider">↓ After clicking "Create My Player Card" ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 2: Player Card Created Success        -->
+  <!-- ============================================ -->
+  <div class="success-container">
+    <div class="success-content">
+      <div class="player-card-fm" style="transform: scale(1.05);">
+        <div class="card-header">
+          <div class="card-photo">👤</div>
+          <div class="card-info">
+            <div class="card-name">John Smith</div>
+            <div class="card-role">Founder • Leadership</div>
+            <div class="card-meta">
+              <span class="meta-item">🏢 Acme Corp</span>
+              <span class="meta-item">🇹🇭 Thailand</span>
+            </div>
+            <div class="card-tier">👑 Legend</div>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <!-- Spider/Radar Chart (Success) -->
+          <div class="radar-container">
+            <canvas id="radarChart2" class="radar-chart"></canvas>
+          </div>
+          
+          <!-- Ability Ratings -->
+          <div class="ability-ratings">
+            <div class="rating-item">
+              <div class="rating-value current">85</div>
+              <div class="rating-label">Current</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-value potential">92</div>
+              <div class="rating-label">Potential</div>
+            </div>
+          </div>
+          
+          <!-- Attributes List -->
+          <div class="attributes-section">
+            <div class="attributes-title">🛠️ Technical</div>
+            <div class="attr-grid">
+              <div class="attr-item">
+                <span class="attr-name">Coding</span>
+                <span class="attr-score excellent">17</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Design</span>
+                <span class="attr-score good">12</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Data Analysis</span>
+                <span class="attr-score excellent">16</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Problem Solving</span>
+                <span class="attr-score excellent">17</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="attributes-section">
+            <div class="attributes-title">🧠 Mental</div>
+            <div class="attr-grid">
+              <div class="attr-item">
+                <span class="attr-name">Leadership</span>
+                <span class="attr-score excellent">18</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Determination</span>
+                <span class="attr-score excellent">19</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Creativity</span>
+                <span class="attr-score excellent">15</span>
+              </div>
+              <div class="attr-item">
+                <span class="attr-name">Decision Making</span>
+                <span class="attr-score excellent">16</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="success-card">
+        <div class="success-icon">🎉</div>
+        <h2 class="success-title">You're Ready!</h2>
+        <p class="success-subtitle">
+          Your Player Card is live. Now invite your team and start building your championship squad!
+        </p>
+        
+        <div class="success-actions">
+          <button class="btn-primary" style="width: 100%;">
+            👥 Invite Your Squad
+          </button>
+          <button class="btn-secondary" style="width: 100%;">
+            📊 Explore Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Radar Chart Configuration (FM Style)
+    const radarConfig = {
+      type: 'radar',
+      data: {
+        labels: ['Technical', 'Leadership', 'Communication', 'Creativity', 'Adaptability', 'Teamwork'],
+        datasets: [{
+          label: 'Current',
+          data: [17, 18, 16, 15, 14, 16],
+          fill: true,
+          backgroundColor: 'rgba(34, 197, 94, 0.3)',
+          borderColor: '#22C55E',
+          borderWidth: 2,
+          pointBackgroundColor: '#22C55E',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#22C55E',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        scales: {
+          r: {
+            beginAtZero: true,
+            min: 0,
+            max: 20,
+            ticks: {
+              stepSize: 5,
+              color: 'rgba(255,255,255,0.3)',
+              backdropColor: 'transparent'
+            },
+            grid: {
+              color: 'rgba(255,255,255,0.1)'
+            },
+            angleLines: {
+              color: 'rgba(255,255,255,0.1)'
+            },
+            pointLabels: {
+              color: 'rgba(255,255,255,0.7)',
+              font: {
+                size: 10
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        elements: {
+          line: {
+            tension: 0.1
+          }
+        }
+      }
+    };
+
+    // Initialize first radar chart
+    const ctx1 = document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx1, radarConfig);
+
+    // Initialize second radar chart (success screen)
+    const ctx2 = document.getElementById('radarChart2').getContext('2d');
+    new Chart(ctx2, radarConfig);
+  </script>
+</body>
+</html>

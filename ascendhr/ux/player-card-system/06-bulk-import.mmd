@@ -1,0 +1,41 @@
+graph TD
+    A((Start)) --> B[Click Import Employees]
+    B --> C[[Open Import Wizard]]
+    
+    subgraph Step1["Step 1: Template"]
+        C --> D[Show Template Section]
+        D --> E[/Click Download Template/]
+        E --> F[Download CSV File]
+    end
+    
+    subgraph Step2["Step 2: Upload"]
+        D --> G[Show Upload Zone]
+        F --> G
+        G --> H[/Drag-Drop or Select CSV/]
+        H --> I{Valid Format?}
+        I -->|No| J[Show Format Error]
+        J --> H
+    end
+    
+    subgraph Step3["Step 3: Validate"]
+        I -->|Yes| K[Parse CSV]
+        K --> L[Validate Each Row]
+        L --> M[Show Preview Table]
+        M --> N[Green = Valid, Red = Invalid]
+        N --> O[/Click Row for Error Details/]
+    end
+    
+    subgraph Step4["Step 4: Import"]
+        N --> P{All Invalid?}
+        P -->|Yes| Q[Disable Import Button]
+        Q --> R[Review and Fix Errors]
+        R --> H
+        
+        P -->|No| S[/Click Import Valid Rows/]
+        S --> T[Create Employee Records]
+        T --> U[Send Invitation Emails]
+        U --> V[Show Import Summary]
+    end
+    
+    V --> W[X Created, Y Skipped, Z Errors]
+    W --> X((End))

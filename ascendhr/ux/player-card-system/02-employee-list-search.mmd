@@ -1,0 +1,26 @@
+graph TD
+    A((Start)) --> B[Navigate to Squad]
+    B --> C[Display Employee List]
+    
+    subgraph List["Employee List"]
+        C --> D[/Type in Search Box/]
+        D --> E[Filter by Name/Email/ID]
+        E --> F{Results Found?}
+        F -->|No| G[Show No Results Message]
+        G --> D
+        F -->|Yes| H[/Apply Filters/]
+        H --> I[Filter by Dept/Status/Role]
+        I --> J[/Sort by Column/]
+        J --> K[Reorder Results]
+    end
+    
+    K --> L[/Click Employee Row/]
+    L --> M{Quick Action?}
+    M -->|Yes| N[Show Quick Menu]
+    N --> O{Select Action}
+    O -->|View| P[Go to Player Card]
+    O -->|Edit| Q[Go to Edit Mode]
+    O -->|Status| R[Open Status Modal]
+    M -->|No| P
+    
+    P --> S((End))

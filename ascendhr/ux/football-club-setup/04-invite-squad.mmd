@@ -1,0 +1,52 @@
+graph TD
+    A((Start: After Player Card)) --> B[Click 'Invite Team Members']
+    
+    subgraph InviteModal["Invite Team Modal"]
+        B --> C[[Open Invite Modal]]
+        C --> D[/Enter Email Addresses/]
+        D --> E{Emails Valid?}
+        E -->|Invalid Format| E1[Show format error]
+        E1 --> D
+        E -->|Email Exists| E2[Show 'Already a member']
+        E2 --> D
+        E -->|Valid| F[/Select Role for Invitees/]
+        F --> G[/Add Personal Message - Optional/]
+        G --> H{Send or Skip?}
+        H -->|Skip| H1[Close modal]
+        H1 --> I[Continue to Dashboard]
+        H -->|Send| J[Click 'Send Invitations']
+    end
+    
+    J --> K
+    
+    subgraph SendInvites["System Processing"]
+        K[Send invitation emails] --> L[Track pending invitations]
+        L --> M[Show 'Invitations sent' summary]
+    end
+    
+    M --> N((Owner Flow End))
+    
+    subgraph InviteeFlow["Invitee Accept Flow"]
+        O((Invitee Receives Email)) --> P[Click invitation link]
+        P --> Q{Link Valid?}
+        Q -->|Expired 7+ days| Q1[Show 'Invitation expired']
+        Q1 --> Q2[Contact Owner to resend]
+        Q -->|Valid| R[Show Accept Invitation page]
+        R --> S[/Set Password/]
+        S --> T[/Confirm Password/]
+        T --> U[Click 'Join the Club']
+        U --> V[Create user account]
+        V --> W[Assign role from invitation]
+        W --> X[Redirect to Setup Player Card]
+    end
+    
+    X --> Y((Invitee: Setup Their Player Card))
+    I --> Z((End: Dashboard))
+
+    style A fill:#4CAF50,color:white
+    style N fill:#2196F3,color:white
+    style Y fill:#9C27B0,color:white
+    style Z fill:#2196F3,color:white
+    style E1 fill:#f44336,color:white
+    style E2 fill:#f44336,color:white
+    style Q1 fill:#f44336,color:white

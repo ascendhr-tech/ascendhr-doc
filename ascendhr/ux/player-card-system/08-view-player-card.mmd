@@ -1,0 +1,19 @@
+graph TD
+    A((Start)) --> B[Navigate to Player Gallery]
+    B --> C[Display Card Grid]
+    C --> D[/Search or Filter/]
+    D --> E[Update Grid]
+    E --> F[/Click on Player Card/]
+    
+    subgraph CardView["Player Card Full View"]
+        F --> G[Open Full Card View]
+        G --> H[View Photo + Basic Info]
+        H --> I[View Radar Chart - 10 Attributes]
+        I --> J[View Current vs Potential Ability]
+    end
+    
+    J --> K{View History?}
+    K -->|Yes| L[/Click History Tab/]
+    L --> M[Display Attribute Timeline]
+    K -->|No| N((End))
+    M --> N

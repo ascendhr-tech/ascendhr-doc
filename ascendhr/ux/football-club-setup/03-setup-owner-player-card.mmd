@@ -1,0 +1,52 @@
+graph TD
+    A((Start: After Club Created)) --> B[Show 'Set up your Player Card' prompt]
+    
+    subgraph PlayerCardForm["Player Card Setup Form"]
+        B --> C[/Select Position/Title/]
+        C --> D[/Select or Create Department/]
+        D --> E[Show attribute sliders panel]
+        
+        subgraph Attributes["Rate Your Attributes"]
+            E --> F[/Rate Technical Skills - 5 sliders/]
+            F --> G[/Rate Mental Skills - 5 sliders/]
+            G --> H{At least 3 rated?}
+            H -->|No| H1[Show 'Rate at least 3 attributes']
+            H1 --> F
+        end
+        
+        H -->|Yes| I[Calculate Current Ability]
+        I --> J[Update Radar Chart Preview]
+        J --> K[/Set Potential Ability/]
+        K --> L{Potential >= Current?}
+        L -->|No| L1[Show 'Potential must be >= Current']
+        L1 --> K
+        L -->|Yes| M[/Upload Photo - Optional/]
+        M --> N[Preview Player Card]
+        N --> O[Click 'Create My Player Card']
+    end
+    
+    O --> P
+    
+    subgraph CreateCard["System Processing"]
+        P[Create Employee record] --> Q[Create Player Card with attributes]
+        Q --> R[Link to Club Owner user]
+    end
+    
+    R --> S
+    
+    subgraph Success["Player Card Created"]
+        S[Show FM-style Player Card] --> T[Display Radar Chart]
+        T --> U[Show 'You are ready!' message]
+        U --> V{Choose next step}
+        V -->|Invite Team| W[Go to Invite Squad]
+        V -->|Explore| X[Go to Dashboard]
+    end
+    
+    W --> Y((End: Invite Squad))
+    X --> Z((End: Dashboard))
+
+    style A fill:#4CAF50,color:white
+    style Y fill:#2196F3,color:white
+    style Z fill:#2196F3,color:white
+    style H1 fill:#FF9800,color:white
+    style L1 fill:#f44336,color:white

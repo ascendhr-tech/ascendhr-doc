@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invite Your Squad | AscendHR</title>
+  <style>
+    /* === Design System Variables === */
+    :root {
+      --primary: #3B82F6;
+      --primary-light: #EFF6FF;
+      --primary-dark: #1E40AF;
+      --secondary: #F1F5F9;
+      --accent: #22C55E;
+      --destructive: #EF4444;
+      --warning: #FACC15;
+      --background: #F8FAFC;
+      --foreground: #334155;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --card: #FFFFFF;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-soft: 0 2px 8px -2px rgba(51,65,85,0.08);
+      --shadow-medium: 0 4px 16px -4px rgba(51,65,85,0.12);
+      --shadow-strong: 0 8px 32px -8px rgba(51,65,85,0.16);
+      --gradient-primary: linear-gradient(135deg, #3B82F6, #7C3AED);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--foreground);
+      background: var(--background);
+      min-height: 100vh;
+    }
+
+    /* === Dashboard Layout === */
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background: white;
+      border-right: 1px solid var(--border);
+      padding: 24px;
+    }
+    
+    .sidebar-logo {
+      font-size: 20px;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 32px;
+    }
+    
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.2s, color 0.2s;
+    }
+    
+    .nav-item:hover {
+      background: var(--secondary);
+      color: var(--foreground);
+    }
+    
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 32px;
+    }
+
+    /* === Page Header === */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--foreground);
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    /* === Stats Cards === */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    
+    .stat-value.primary { color: var(--primary); }
+    
+    .stat-change {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    
+    .stat-change.positive { color: var(--accent); }
+
+    /* === Empty State === */
+    .empty-state {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 64px;
+      text-align: center;
+    }
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .empty-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .empty-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* === Modal Overlay === */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: var(--shadow-strong);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* === Form Styles === */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      background: white;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* === Email Tags === */
+    .email-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      min-height: 48px;
+    }
+    
+    .email-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 4px 10px;
+      font-size: 13px;
+      border-radius: 9999px;
+    }
+    
+    .email-tag-remove {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .email-input {
+      flex: 1;
+      min-width: 200px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    /* === Role Select === */
+    .role-select {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .role-option {
+      flex: 1;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    
+    .role-option:hover {
+      border-color: var(--primary);
+    }
+    
+    .role-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .role-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .role-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .role-desc {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* === Section Divider === */
+    .section-divider {
+      background: var(--secondary);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* === Success Alert === */
+    .success-alert {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #F0FDF4;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .success-alert-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+    
+    .success-alert-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #166534;
+    }
+    
+    .success-alert-content p {
+      font-size: 13px;
+      color: #166534;
+    }
+
+    /* === Pending Invites List === */
+    .invites-list {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    
+    .invites-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .invites-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .invite-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .invite-item:last-child {
+      border-bottom: none;
+    }
+    
+    .invite-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .invite-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--secondary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .invite-email {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .invite-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .invite-status {
+      display: inline-flex;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 9999px;
+    }
+    
+    .invite-status.pending {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    
+    .invite-status.accepted {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+    
+    .resend-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* === Accept Invitation Page === */
+    .accept-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+      padding: 40px;
+    }
+    
+    .accept-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow-strong);
+    }
+    
+    .accept-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .accept-logo {
+      font-size: 24px;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+    }
+    
+    .accept-club {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--secondary);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+    }
+    
+    .accept-club-logo {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .accept-club-name {
+      font-weight: 600;
+    }
+    
+    .accept-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .accept-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .accept-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 9999px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Invite Initial Squad
+    User Story: US-0.0.4
+    Flow: Dashboard → Invite Modal → Confirmation → Accept Invitation (Invitee)
+  -->
+
+  <!-- ============================================ -->
+  <!-- SCREEN 1: Dashboard with Empty Squad         -->
+  <!-- ============================================ -->
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-logo">⚽ AscendHR</div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active">📊 Dashboard</a>
+        <a href="#" class="nav-item">👥 Squad</a>
+        <a href="#" class="nav-item">🏟️ Formation</a>
+        <a href="#" class="nav-item">📈 Gap Analysis</a>
+        <a href="#" class="nav-item">🔍 Scouting</a>
+        <a href="#" class="nav-item">⚙️ Settings</a>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <header class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <button class="btn-primary">👥 Invite Team Members</button>
+      </header>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Squad Size</div>
+          <div class="stat-value primary">1</div>
+          <div class="stat-change">Just you for now</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Invites</div>
+          <div class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Teams</div>
+          <div class="stat-value">1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. Ability</div>
+          <div class="stat-value">85</div>
+        </div>
+      </div>
+      
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h2 class="empty-title">Your Squad is Empty</h2>
+        <p class="empty-subtitle">Invite your HR team and managers to start building your championship squad.</p>
+        <button class="btn-primary">📧 Send First Invitation</button>
+      </div>
+    </main>
+  </div>
+
+  <div class="section-divider">↓ Invite Modal ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 2: Invite Modal                       -->
+  <!-- ============================================ -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">👥 Invite Team Members</h2>
+        <button class="modal-close">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Email Addresses</label>
+          <div class="email-tags">
+            <span class="email-tag">
+              hr@acmecorp.com
+              <button class="email-tag-remove">×</button>
+            </span>
+            <span class="email-tag">
+              manager@acmecorp.com
+              <button class="email-tag-remove">×</button>
+            </span>
+            <input type="email" class="email-input" placeholder="Add more emails...">
+          </div>
+          <p class="form-hint">Press Enter or comma to add multiple emails</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Select Role</label>
+          <div class="role-select">
+            <div class="role-option selected">
+              <div class="role-icon">🔍</div>
+              <div class="role-name">Scout (HR)</div>
+              <div class="role-desc">Can add players</div>
+            </div>
+            <div class="role-option">
+              <div class="role-icon">📋</div>
+              <div class="role-name">Manager</div>
+              <div class="role-desc">Manage own team</div>
+            </div>
+            <div class="role-option">
+              <div class="role-icon">👀</div>
+              <div class="role-name">Viewer</div>
+              <div class="role-desc">Read-only access</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Personal Message (Optional)</label>
+          <textarea class="form-textarea" placeholder="Add a welcome message for your invitees...">Hey team! I've set up our new HR platform with a Football Manager style. Join me and create your Player Card! 🎮⚽</textarea>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-secondary">Skip for now</button>
+        <button class="btn-primary">📧 Send Invitations</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">↓ After sending invitations ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 3: Dashboard with Pending Invites     -->
+  <!-- ============================================ -->
+  <div class="dashboard" style="position: relative; z-index: 1;">
+    <aside class="sidebar">
+      <div class="sidebar-logo">⚽ AscendHR</div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active">📊 Dashboard</a>
+        <a href="#" class="nav-item">👥 Squad</a>
+        <a href="#" class="nav-item">🏟️ Formation</a>
+        <a href="#" class="nav-item">📈 Gap Analysis</a>
+        <a href="#" class="nav-item">🔍 Scouting</a>
+        <a href="#" class="nav-item">⚙️ Settings</a>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <header class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <button class="btn-primary">👥 Invite More</button>
+      </header>
+      
+      <div class="success-alert">
+        <div class="success-alert-icon">✓</div>
+        <div class="success-alert-content">
+          <h4>Invitations Sent!</h4>
+          <p>2 invitations sent successfully. They'll receive an email to join your club.</p>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Squad Size</div>
+          <div class="stat-value primary">1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Invites</div>
+          <div class="stat-value" style="color: var(--warning);">2</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Teams</div>
+          <div class="stat-value">1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. Ability</div>
+          <div class="stat-value">85</div>
+        </div>
+      </div>
+      
+      <div class="invites-list">
+        <div class="invites-header">
+          <h3 class="invites-title">Pending Invitations</h3>
+        </div>
+        <div class="invite-item">
+          <div class="invite-info">
+            <div class="invite-avatar">📧</div>
+            <div>
+              <div class="invite-email">hr@acmecorp.com</div>
+              <div class="invite-meta">Scout (HR) • Sent 2 minutes ago</div>
+            </div>
+          </div>
+          <div>
+            <span class="invite-status pending">⏳ Pending</span>
+            <button class="resend-btn">Resend</button>
+          </div>
+        </div>
+        <div class="invite-item">
+          <div class="invite-info">
+            <div class="invite-avatar">📧</div>
+            <div>
+              <div class="invite-email">manager@acmecorp.com</div>
+              <div class="invite-meta">Manager • Sent 2 minutes ago</div>
+            </div>
+          </div>
+          <div>
+            <span class="invite-status pending">⏳ Pending</span>
+            <button class="resend-btn">Resend</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="section-divider">↓ Invitee View: Accept Invitation ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 4: Accept Invitation (Invitee View)   -->
+  <!-- ============================================ -->
+  <div class="accept-container">
+    <div class="accept-card">
+      <div class="accept-header">
+        <div class="accept-logo">⚽ AscendHR</div>
+        
+        <div class="accept-club">
+          <div class="accept-club-logo">🏢</div>
+          <div class="accept-club-name">Acme Corporation</div>
+        </div>
+        
+        <h2 class="accept-title">You've Been Invited!</h2>
+        <p class="accept-subtitle">John Smith invited you to join their squad</p>
+        <span class="accept-role-badge">🔍 Scout (HR)</span>
+      </div>
+      
+      <form>
+        <div class="form-group">
+          <label class="form-label">Your Email</label>
+          <input type="email" class="form-input" value="hr@acmecorp.com" disabled style="background: var(--secondary);">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="Enter your full name" value="Sarah Wilson">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Set Password</label>
+          <input type="password" class="form-input" placeholder="Min. 8 characters" value="••••••••">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" placeholder="Confirm your password" value="••••••••">
+        </div>
+        
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;">
+          🎮 Join the Squad
+        </button>
+      </form>
+      
+      <p style="text-align: center; margin-top: 16px; font-size: 12px; color: var(--muted);">
+        After joining, you'll create your own Player Card!
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>

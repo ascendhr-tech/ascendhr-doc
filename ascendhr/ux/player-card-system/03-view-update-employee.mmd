@@ -1,0 +1,29 @@
+graph TD
+    A((Start)) --> B[Select Employee from List]
+    B --> C[Navigate to Player Card]
+    
+    subgraph View["Player Card Detail - View Mode"]
+        C --> D[Display Photo + Info]
+        D --> E[Display Radar Chart]
+        E --> F[Display Ability Scores]
+    end
+    
+    F --> G[/Click Edit Button/]
+    
+    subgraph Edit["Player Card Detail - Edit Mode"]
+        G --> H[Switch to Edit Mode]
+        H --> I[/Update Fields or Attributes/]
+        I --> J{Valid Input?}
+        J -->|No| K[Show Field Error]
+        K --> I
+        J -->|Yes| L{Changes Made?}
+        L -->|No| M[Save Button Disabled]
+        M --> I
+    end
+    
+    L -->|Yes| N[/Click Save Changes/]
+    N --> O[Save with Audit Log]
+    O --> P[Recalculate Current Ability]
+    P --> Q[Show Success Notification]
+    Q --> R[Return to View Mode]
+    R --> S((End))

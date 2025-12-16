@@ -1,0 +1,32 @@
+graph TD
+    A((Start)) --> B[Navigate to Player Gallery]
+    B --> C[Display Cards with Checkboxes]
+    
+    subgraph Selection["Player Selection"]
+        C --> D[/Select First Player/]
+        D --> E[Add to Comparison - Show Badge]
+        E --> F[/Select More Players/]
+        F --> G{Count Check}
+        G -->|Less than 2| H[Compare Button Disabled]
+        G -->|2-4 Players| I[Compare Button Enabled]
+        G -->|Try 5th| J[Show Max 4 Warning]
+        J --> F
+    end
+    
+    I --> K[/Click Compare Selected/]
+    K --> L[[Open Comparison Modal]]
+    
+    subgraph Compare["Comparison Modal"]
+        L --> M[Display Side-by-Side Cards]
+        M --> N[Show Attribute Comparison]
+        N --> O[Highlight Differences]
+        O --> P[Green = Higher, Red = Lower]
+    end
+    
+    P --> Q{Export?}
+    Q -->|Yes| R[/Click Export/]
+    R --> S[Download as Image/PDF]
+    Q -->|No| T[/Click Close/]
+    S --> T
+    T --> U[Return to Gallery]
+    U --> V((End))

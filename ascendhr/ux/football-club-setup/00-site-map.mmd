@@ -1,0 +1,26 @@
+graph TD
+    A((Start)) --> B[Landing Page]
+    
+    subgraph Onboarding["🏟️ Football Club Setup Onboarding"]
+        B --> C[Register Account]
+        C --> D[Verify Email]
+        D --> E[Create Your Club]
+        E --> F[Setup Owner Player Card]
+        F --> G{Invite Team?}
+        G -->|Yes| H[Invite Squad]
+        G -->|Skip| I[Dashboard]
+        H --> I
+    end
+    
+    I --> J((End: Ready to Build Squad))
+    
+    subgraph Legend["Flow Legend"]
+        L1[Landing Page] ~~~ L2[Registration]
+        L2 ~~~ L3[Club Setup]
+        L3 ~~~ L4[Invite Team]
+    end
+
+    style A fill:#4CAF50,color:white
+    style J fill:#2196F3,color:white
+    style E fill:#FF9800,color:white
+    style F fill:#9C27B0,color:white

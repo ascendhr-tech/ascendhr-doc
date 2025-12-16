@@ -1,0 +1,30 @@
+graph TD
+    A((Start)) --> B[Click Change Status]
+    B --> C[[Open Status Modal]]
+    
+    subgraph Modal["Status Change Modal"]
+        C --> D[/Select New Status/]
+        D --> E{Status Type?}
+        E -->|On Leave| F[Show Date Fields]
+        E -->|Suspended| G[Show Reason Field]
+        E -->|Terminated| H[Show Termination Form]
+        
+        F --> I[/Fill Effective Date/]
+        G --> I
+        H --> J[/Fill Exit Date + Reason + Handover/]
+        J --> I
+        
+        I --> K{Valid?}
+        K -->|No| L[Show Validation Errors]
+        L --> I
+    end
+    
+    K -->|Yes| M[/Click Confirm/]
+    M --> N[Update Employee Status]
+    N --> O[Log to Status History]
+    O --> P{Terminated?}
+    P -->|Yes| Q[Deactivate User Account]
+    Q --> R[Show Confirmation]
+    P -->|No| R
+    R --> S[Close Modal]
+    S --> T((End))

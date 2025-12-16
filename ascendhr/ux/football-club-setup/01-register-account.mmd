@@ -1,0 +1,49 @@
+graph TD
+    A((Start)) --> B[Visit Landing Page]
+    
+    subgraph LandingPage["Landing Page"]
+        B --> C[View Hero + CTA]
+        C --> D[Click 'Start Your Journey']
+    end
+    
+    D --> E
+    
+    subgraph RegistrationForm["Registration Form"]
+        E[/Fill Name/] --> F[/Fill Email/]
+        F --> G{Email Valid?}
+        G -->|No| G1[Show format error]
+        G1 --> F
+        G -->|Yes| H{Email Exists?}
+        H -->|Yes| H1[Show 'Email in use, login instead?']
+        H1 --> F
+        H -->|No| I[/Fill Password/]
+        I --> J{Password Strong?}
+        J -->|No| J1[Show 'Min 8 characters']
+        J1 --> I
+        J -->|Yes| K[Click 'Create Account']
+    end
+    
+    K --> L
+    
+    subgraph EmailVerification["Email Verification"]
+        L[System sends verification email] --> M[Show 'Check your email' screen]
+        M --> N{User clicks email link}
+        N -->|Link Valid| O[Verify email address]
+        N -->|Link Expired| P[Show 'Link expired']
+        P --> Q[Click 'Resend']
+        Q --> L
+    end
+    
+    O --> R
+    
+    subgraph Success["Verified Success"]
+        R[Show success message] --> S[Redirect to Create Club]
+    end
+    
+    S --> T((End: Create Your Club))
+
+    style A fill:#4CAF50,color:white
+    style T fill:#2196F3,color:white
+    style H1 fill:#f44336,color:white
+    style J1 fill:#f44336,color:white
+    style P fill:#f44336,color:white

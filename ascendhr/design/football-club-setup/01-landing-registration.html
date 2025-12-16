@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start Your Journey | AscendHR</title>
+  <style>
+    /* === Design System Variables === */
+    :root {
+      --primary: #3B82F6;
+      --primary-light: #EFF6FF;
+      --primary-dark: #1E40AF;
+      --secondary: #F1F5F9;
+      --accent: #22C55E;
+      --destructive: #EF4444;
+      --warning: #FACC15;
+      --background: #F8FAFC;
+      --foreground: #334155;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --card: #FFFFFF;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-soft: 0 2px 8px -2px rgba(51,65,85,0.08);
+      --shadow-medium: 0 4px 16px -4px rgba(51,65,85,0.12);
+      --gradient-primary: linear-gradient(135deg, #3B82F6, #7C3AED);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--foreground);
+      background: var(--gradient-primary);
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    
+    /* === Landing Page Section === */
+    .landing-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    
+    .hero-content {
+      text-align: center;
+      max-width: 600px;
+    }
+    
+    .hero-logo {
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 24px;
+    }
+    
+    .hero-logo span { opacity: 0.8; font-weight: 400; }
+    
+    .hero-title {
+      font-size: 48px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+      font-size: 20px;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 40px;
+    }
+    
+    .hero-features {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-size: 14px;
+    }
+    
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .btn-hero {
+      background: white;
+      color: var(--primary);
+      border: none;
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 32px -8px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px -8px rgba(0,0,0,0.4);
+    }
+    
+    .login-link {
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      margin-top: 24px;
+    }
+    
+    .login-link a { color: white; text-decoration: underline; }
+
+    /* === Registration Form Section === */
+    .register-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    
+    .register-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 16px 64px -16px rgba(0,0,0,0.3);
+    }
+    
+    .register-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .register-logo {
+      font-size: 24px;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    
+    .register-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+    
+    .register-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--foreground);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    
+    .form-input.error {
+      border-color: var(--destructive);
+    }
+    
+    .form-error {
+      font-size: 12px;
+      color: var(--destructive);
+      margin-top: 4px;
+    }
+    
+    .password-strength {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+    
+    .strength-bar.active { background: var(--accent); }
+    .strength-bar.warning { background: var(--warning); }
+    
+    .btn-primary {
+      width: 100%;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    
+    .form-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .form-footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* === Email Verification Section === */
+    .verify-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    
+    .verify-card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 16px 64px -16px rgba(0,0,0,0.3);
+    }
+    
+    .verify-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 24px;
+    }
+    
+    .verify-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--foreground);
+    }
+    
+    .verify-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    
+    .verify-email {
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    
+    .resend-link {
+      font-size: 14px;
+      color: var(--primary);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* === Success Section === */
+    .success-card .verify-icon {
+      background: #F0FDF4;
+    }
+    
+    .success-card .verify-icon::after {
+      content: '✓';
+      color: var(--accent);
+    }
+
+    /* === Section Separator === */
+    .section-divider {
+      background: rgba(255,255,255,0.1);
+      padding: 24px;
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Landing Page + Registration Flow
+    User Story: US-0.0.1
+    Flow: Landing → Register → Verify Email → Success
+  -->
+
+  <!-- ============================================ -->
+  <!-- SCREEN 1: Landing Page                       -->
+  <!-- ============================================ -->
+  <section class="landing-section">
+    <div class="hero-content">
+      <div class="hero-logo">⚽ AscendHR</div>
+      <h1 class="hero-title">Build Your Championship Squad</h1>
+      <p class="hero-subtitle">
+        Manage your team like a Football Manager. 
+        Track skills, analyze gaps, and scout top talent.
+      </p>
+      
+      <div class="hero-features">
+        <div class="feature-item">
+          <div class="feature-icon">🎮</div>
+          Player Cards
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          Skill Ratings
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔍</div>
+          Gap Analysis
+        </div>
+      </div>
+      
+      <button class="btn-hero">🚀 Start Your Journey</button>
+      
+      <p class="login-link">
+        Already have a club? <a href="#">Sign in</a>
+      </p>
+    </div>
+  </section>
+
+  <div class="section-divider">↓ After clicking "Start Your Journey" ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 2: Registration Form                  -->
+  <!-- ============================================ -->
+  <section class="register-section">
+    <div class="register-card">
+      <div class="register-header">
+        <div class="register-logo">⚽ AscendHR</div>
+        <h2 class="register-title">Create Your Account</h2>
+        <p class="register-subtitle">Join the league and start building your squad</p>
+      </div>
+      
+      <form>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" placeholder="John Smith" value="John Smith">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" placeholder="john@company.com" value="john@acmecorp.com">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="Min. 8 characters" value="••••••••••">
+          <div class="password-strength">
+            <div class="strength-bar active"></div>
+            <div class="strength-bar active"></div>
+            <div class="strength-bar active"></div>
+            <div class="strength-bar"></div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
+      
+      <p class="form-footer">
+        Already have an account? <a href="#">Sign in</a>
+      </p>
+    </div>
+  </section>
+
+  <div class="section-divider">↓ Show validation error states ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 2b: Registration Form (Error State)  -->
+  <!-- ============================================ -->
+  <section class="register-section">
+    <div class="register-card">
+      <div class="register-header">
+        <div class="register-logo">⚽ AscendHR</div>
+        <h2 class="register-title">Create Your Account</h2>
+        <p class="register-subtitle">Join the league and start building your squad</p>
+      </div>
+      
+      <form>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" value="John Smith">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input error" value="john@acmecorp.com">
+          <p class="form-error">⚠️ Email already in use. <a href="#" style="color: var(--primary);">Login instead?</a></p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input error" value="••••">
+          <p class="form-error">Password must be at least 8 characters</p>
+          <div class="password-strength">
+            <div class="strength-bar warning"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-primary" disabled style="opacity: 0.6; cursor: not-allowed;">Create Account</button>
+      </form>
+      
+      <p class="form-footer">
+        Already have an account? <a href="#">Sign in</a>
+      </p>
+    </div>
+  </section>
+
+  <div class="section-divider">↓ After successful registration ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 3: Email Verification Pending         -->
+  <!-- ============================================ -->
+  <section class="verify-section">
+    <div class="verify-card">
+      <div class="verify-icon">📧</div>
+      <h2 class="verify-title">Check Your Email</h2>
+      <p class="verify-subtitle">
+        We've sent a verification link to<br>
+        <span class="verify-email">john@acmecorp.com</span>
+      </p>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 24px;">
+        Click the link in the email to verify your account and start creating your club.
+      </p>
+      <a href="#" class="resend-link">Didn't receive the email? Resend</a>
+    </div>
+  </section>
+
+  <div class="section-divider">↓ After clicking email link ↓</div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 4: Email Verified Success             -->
+  <!-- ============================================ -->
+  <section class="verify-section">
+    <div class="verify-card success-card">
+      <div class="verify-icon" style="background: #F0FDF4; color: var(--accent); font-size: 32px;">✓</div>
+      <h2 class="verify-title">Email Verified!</h2>
+      <p class="verify-subtitle">
+        Your account is now active.<br>
+        Let's create your Football Club!
+      </p>
+      <button class="btn-primary" style="max-width: 280px; margin: 0 auto;">
+        🏟️ Create Your Club
+      </button>
+    </div>
+  </section>
+
+</body>
+</html>
