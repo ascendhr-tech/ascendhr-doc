@@ -1,8 +1,8 @@
 # AscendHR - Squad Planner MVP
 
-**Document Version:** 3.0  
+**Document Version:** 3.1  
 **Created:** December 2, 2024  
-**Updated:** December 10, 2024  
+**Updated:** December 16, 2024  
 **Status:** Planning  
 **Methodology:** Lean + AI-Assisted (Vibe Coding)  
 **MVP Concept:** 🎮 The Squad Planner (Football Manager-Inspired)
@@ -13,13 +13,13 @@
 
 | Epic | Scope | AI-Assisted Man-days | With Buffer (20%) |
 |------|-------|----------------------|-------------------|
-| Epic 0.0 | Football Club Setup (Multi-tenant) | 5 | 6 |
+| Epic 0.0 | Football Club Setup (Multi-tenant) | 4 | 5 |
 | Epic 0.1-0.3 | Foundation + Auth | 10 | 12 |
-| Epic 0.4 | Player Card System | 14 | 17 |
-| Epic 0.5 | Formation View | 9 | 11 |
+| Epic 0.4 | Player Card System | 15 | 18 |
+| Epic 0.5 | Formation View + Squad Builder | 16.5 | 20 |
 | Epic 0.6 | Gap Analysis | 5 | 6 |
 | Epic 0.7 | Scouting Network | 8 | 10 |
-| **TOTAL** | | **51** | **62 man-days** |
+| **TOTAL** | | **58.5** | **71 man-days** |
 
 > **AI Productivity Boost:** ~40-50% faster than traditional development
 
@@ -68,11 +68,11 @@
 |-------|----------|--------|
 | Club Setup (0.0) | 0.5 weeks | Week 0.5 |
 | Foundation (0.1-0.3) | 2 weeks | Week 2.5 |
-| Player Cards (0.4) | 2 weeks | Week 4.5 |
-| Formation View (0.5) | 1.5 weeks | Week 6 |
-| Gap Analysis (0.6) | 1 week | Week 7 |
-| Scouting (0.7) | 1.5 weeks | Week 8.5 |
-| **Total** | **~8.5 weeks** | **~2 months** |
+| Formation View (0.5) | 2.5 weeks | Week 5 | <!-- Enhanced with Role Templates & Squad Builder -->
+| Player Cards (0.4) | 2.5 weeks | Week 7.5 | <!-- Now includes Owner's Card -->
+| Gap Analysis (0.6) | 1 week | Week 8.5 |
+| Scouting (0.7) | 1.5 weeks | Week 10 |
+| **Total** | **~10 weeks** | **~2.5 months** |
 
 ---
 
@@ -150,24 +150,56 @@ companies (
 ### 🎮 Squad Planner Schemas
 
 ```sql
--- Employee Attributes (FM-Style 1-20 ratings)
+-- Attribute Definitions (Master list of all attributes)
+attribute_definitions (
+  id: UUID PRIMARY KEY,
+  name: VARCHAR(100) NOT NULL,           -- 'Coding', 'Leadership', 'Negotiation'
+  code: VARCHAR(50) NOT NULL UNIQUE,     -- 'coding', 'leadership', 'negotiation'
+  category: VARCHAR(20) NOT NULL,        -- 'core' or 'specialist'
+  zone: VARCHAR(20),                     -- 'attack', 'midfield', 'defense', 'support' (NULL for core)
+  icon: VARCHAR(50),                     -- emoji or icon name
+  description: TEXT,
+  is_active: BOOLEAN DEFAULT true,
+  display_order: INTEGER,
+  created_at: TIMESTAMP
+)
+
+-- Role Templates (Pre-configured common roles)
+role_templates (
+  id: UUID PRIMARY KEY,
+  name: VARCHAR(100) NOT NULL,           -- 'Software Developer'
+  code: VARCHAR(50) NOT NULL UNIQUE,     -- 'software_developer'
+  zone: VARCHAR(20) NOT NULL,            -- 'midfield'
+  department_type: VARCHAR(50),          -- 'Engineering'
+  description: TEXT,
+  icon: VARCHAR(50),
+  color: VARCHAR(7),
+  attribute_config: JSONB NOT NULL,      -- Pre-configured attribute requirements
+  is_system: BOOLEAN DEFAULT false,      -- System templates can't be deleted
+  company_id: UUID,                      -- NULL for system templates
+  created_at: TIMESTAMP
+)
+
+-- Role Attribute Requirements (Which attributes matter per position)
+role_attribute_requirements (
+  id: UUID PRIMARY KEY,
+  position_id: UUID REFERENCES positions(id),
+  attribute_id: UUID REFERENCES attribute_definitions(id),
+  importance: VARCHAR(20) NOT NULL,      -- 'critical', 'important', 'nice-to-have'
+  min_value: INTEGER CHECK (min_value BETWEEN 1 AND 20),
+  ideal_value: INTEGER CHECK (ideal_value BETWEEN 1 AND 20),
+  weight: DECIMAL(3,2) DEFAULT 1.00,     -- For fit score calculation
+  UNIQUE(position_id, attribute_id)
+)
+
+-- Employee Attributes (FM-Style 1-20 ratings - Flexible JSONB)
 employee_attributes (
   id: UUID PRIMARY KEY,
   employee_id: UUID REFERENCES employees(id),
   
-  -- Technical Attributes
-  attr_coding: INTEGER CHECK (attr_coding BETWEEN 1 AND 20),
-  attr_sales_closing: INTEGER CHECK (attr_sales_closing BETWEEN 1 AND 20),
-  attr_copywriting: INTEGER CHECK (attr_copywriting BETWEEN 1 AND 20),
-  attr_design: INTEGER CHECK (attr_design BETWEEN 1 AND 20),
-  attr_data_analysis: INTEGER CHECK (attr_data_analysis BETWEEN 1 AND 20),
-  
-  -- Mental Attributes
-  attr_leadership: INTEGER CHECK (attr_leadership BETWEEN 1 AND 20),
-  attr_determination: INTEGER CHECK (attr_determination BETWEEN 1 AND 20),
-  attr_adaptability: INTEGER CHECK (attr_adaptability BETWEEN 1 AND 20),
-  attr_teamwork: INTEGER CHECK (attr_teamwork BETWEEN 1 AND 20),
-  attr_creativity: INTEGER CHECK (attr_creativity BETWEEN 1 AND 20),
+  -- Flexible attribute storage (allows any attributes)
+  core_attributes: JSONB NOT NULL,       -- {"leadership": 15, "teamwork": 12, "communication": 14, ...}
+  specialist_attributes: JSONB NOT NULL, -- {"coding": 18, "problem_solving": 16, ...}
   
   -- Calculated Ability Scores
   current_ability: INTEGER CHECK (current_ability BETWEEN 1 AND 200),
@@ -182,18 +214,19 @@ employee_attributes (
 -- Position Roles (Attack/Midfield/Defense mapping)
 position_roles (
   id: UUID PRIMARY KEY,
-  name: VARCHAR(50) NOT NULL,          -- 'Striker', 'Midfielder', 'Defender'
-  zone: VARCHAR(20) NOT NULL,           -- 'attack', 'midfield', 'defense', 'support'
-  department_type: VARCHAR(50),         -- Maps to: 'Sales', 'Product', 'Operations'
+  name: VARCHAR(50) NOT NULL,            -- 'Striker', 'Midfielder', 'Defender'
+  zone: VARCHAR(20) NOT NULL,            -- 'attack', 'midfield', 'defense', 'support'
+  department_type: VARCHAR(50),          -- Maps to: 'Sales', 'Product', 'Operations'
+  template_id: UUID REFERENCES role_templates(id), -- Link to role template
   color: VARCHAR(7),
-  pitch_position_x: INTEGER,            -- X coordinate (0-100)
-  pitch_position_y: INTEGER             -- Y coordinate (0-100)
+  pitch_position_x: INTEGER,             -- X coordinate (0-100)
+  pitch_position_y: INTEGER              -- Y coordinate (0-100)
 )
 
 -- Formation Templates
 formations (
   id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL,          -- '4-3-3', '4-4-2 Diamond'
+  name: VARCHAR(100) NOT NULL,           -- '4-3-3', '4-4-2 Diamond'
   layout_config: JSONB,
   is_default: BOOLEAN DEFAULT false,
   company_id: UUID,
@@ -206,7 +239,7 @@ position_requirements (
   position_id: UUID REFERENCES positions(id),
   min_headcount: INTEGER DEFAULT 1,
   ideal_headcount: INTEGER DEFAULT 1,
-  critical_attributes: JSONB,           -- {"coding": 15, "leadership": 12}
+  critical_attributes: JSONB,            -- {"coding": 15, "leadership": 12}
   created_at: TIMESTAMP
 )
 
@@ -233,7 +266,118 @@ scouted_players (
   scouted_by: UUID REFERENCES users(id),
   created_at: TIMESTAMP
 )
+
+-- Squad Templates (Define team structure)
+squad_templates (
+  id: UUID PRIMARY KEY,
+  name: VARCHAR(100) NOT NULL,           -- 'Scrum Team', 'Design Team'
+  description: TEXT,
+  icon: VARCHAR(50),
+  is_system: BOOLEAN DEFAULT false,      -- System templates can't be deleted
+  company_id: UUID,                      -- NULL for system templates
+  created_at: TIMESTAMP
+)
+
+-- Squad Template Slots (Positions in a squad template)
+squad_template_slots (
+  id: UUID PRIMARY KEY,
+  template_id: UUID REFERENCES squad_templates(id),
+  position_id: UUID REFERENCES positions(id),
+  min_count: INTEGER DEFAULT 1,          -- Minimum players for this position
+  max_count: INTEGER DEFAULT 1,          -- Maximum players for this position
+  is_required: BOOLEAN DEFAULT true,     -- Required or optional slot
+  display_order: INTEGER                 -- Order in formation view
+)
+
+-- Squads (Actual teams)
+squads (
+  id: UUID PRIMARY KEY,
+  name: VARCHAR(100) NOT NULL,           -- 'Alpha Team', 'Phoenix Squad'
+  template_id: UUID REFERENCES squad_templates(id),
+  company_id: UUID REFERENCES companies(id),
+  status: VARCHAR(20) DEFAULT 'active',  -- 'active', 'archived'
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Squad Members (Player assignments to squads)
+squad_members (
+  id: UUID PRIMARY KEY,
+  squad_id: UUID REFERENCES squads(id),
+  employee_id: UUID REFERENCES employees(id),
+  position_id: UUID REFERENCES positions(id),
+  assigned_at: TIMESTAMP,
+  assigned_by: UUID REFERENCES users(id),
+  UNIQUE(squad_id, employee_id)          -- Each player in one position per squad
+)
 ```
+
+### Pre-seeded Attributes (Software House Focus)
+
+> 🏢 **Target Industry:** Software House / Digital Agency
+
+**Core Attributes (5)** - Apply to ALL roles:
+| Attribute | Code | Description |
+|-----------|------|-------------|
+| Leadership | `leadership` | Leading teams and projects |
+| Teamwork | `teamwork` | Agile collaboration |
+| Communication | `communication` | With team and clients |
+| Adaptability | `adaptability` | Tech changes fast |
+| Determination | `determination` | Meeting deadlines |
+
+**Specialist Attributes (15)** - Role-specific:
+| Category | Attributes | Description |
+|----------|------------|-------------|
+| **Engineering** | `coding` | Programming and development skills |
+| | `system_design` | Architecture and scalability thinking |
+| | `problem_solving` | Debugging and finding solutions |
+| | `code_quality` | Clean, maintainable, tested code |
+| | `technical_learning` | Staying current with new tech |
+| **Design** | `visual_design` | Aesthetics and UI skills |
+| | `ux_thinking` | User-centered design approach |
+| | `prototyping` | Wireframes and mockups |
+| **Business** | `client_relations` | Managing client expectations |
+| | `negotiation` | Contract and rate negotiation |
+| | `presentation` | Pitching and demos |
+| | `upselling` | Expanding existing accounts |
+| **Operations** | `process_management` | Workflows and SOPs |
+| | `documentation` | Record keeping and specs |
+| | `talent_acquisition` | Recruiting tech talent |
+
+### Pre-seeded Role Templates (10 - Software House)
+
+| # | Role | Zone | Department | Key Attributes (min/ideal) |
+|---|------|------|------------|---------------------------|
+| 1 | **Frontend Developer** | Midfield | Engineering | Coding 14/17, Visual Design 11/14, Problem Solving 13/16 |
+| 2 | **Backend Developer** | Midfield | Engineering | Coding 15/18, System Design 13/16, Problem Solving 14/17 |
+| 3 | **Full-stack Developer** | Midfield | Engineering | Coding 14/17, System Design 12/15, Technical Learning 13/16 |
+| 4 | **UX/UI Designer** | Midfield | Design | UX Thinking 15/18, Visual Design 14/17, Prototyping 13/16 |
+| 5 | **Product Manager** | Midfield | Product | Communication 15/17, Problem Solving 13/16, Leadership 12/15 |
+| 6 | **QA Engineer** | Midfield | Engineering | Code Quality 14/17, Problem Solving 13/16, Documentation 12/15 |
+| 7 | **DevOps Engineer** | Midfield | Engineering | System Design 14/17, Technical Learning 13/16, Process Management 12/15 |
+| 8 | **Tech Lead** | Midfield | Engineering | Leadership 14/17, Coding 13/16, Communication 13/16 |
+| 9 | **Account Manager** | Attack | Sales | Client Relations 15/18, Communication 14/16, Upselling 12/15 |
+| 10 | **HR / Recruiter** | Support | HR | Talent Acquisition 14/17, Communication 14/16, Process Management 11/14 |
+
+### Pre-seeded Squad Templates (4 - Software House)
+
+> 🏈 **Squad = Cross-functional team** (like a football squad with specific positions)
+
+| # | Squad Template | Positions | Min-Max | Description |
+|---|---------------|-----------|---------|-------------|
+| 1 | **Scrum Team** | Product Manager | 1 | Classic agile team |
+| | | UX/UI Designer | 1-2 | |
+| | | Developer (any) | 2-5 | |
+| | | QA Engineer | 1 | |
+| 2 | **Full-stack Team** | Tech Lead | 1 | Small delivery team |
+| | | Full-stack Developer | 2-4 | |
+| | | QA Engineer | 0-1 | Optional |
+| 3 | **Design Team** | Product Manager | 1 | Design-focused team |
+| | | UX/UI Designer | 2-4 | |
+| | | Frontend Developer | 1-2 | For prototypes |
+| 4 | **DevOps Team** | DevOps Engineer | 2-4 | Infrastructure team |
+| | | Backend Developer | 1-2 | |
+| | | QA Engineer | 0-1 | Optional |
 
 ### Core System Schemas
 
@@ -346,9 +490,11 @@ Approved/Rejected → notify Employee
 ## Epic 0.0: 🏟️ Football Club Setup (Multi-tenant)
 
 **AI Boost:** High (forms, auth)  
-**Estimate:** 5 man-days
+**Estimate:** 4 man-days
 
-> Owner-first onboarding: Create Account → Create Club → Setup Your Player Card → Invite Squad
+> Owner-first onboarding: Create Account → Create Club → Invite Squad
+> 
+> ⚠️ **Note:** Player Card setup is handled in Epic 0.4 (Player Card System) since it requires Department/Position to be configured first.
 
 ### US-0.0.1: Register Account (Owner Sign Up)
 | ID | Task | Est. |
@@ -372,21 +518,11 @@ Approved/Rejected → notify Employee
 
 **Subtotal: 2.25 days**
 
-### US-0.0.3: Setup Owner's Player Card (Dogfooding)
+### US-0.0.3: Invite Initial Squad (Scouts/Staff)
 | ID | Task | Est. |
 |----|------|------|
-| TASK-0.0.3.1 | "Set up your Player Card" prompt | 0.25d |
-| TASK-0.0.3.2 | Owner selects their Position/Department | 0.25d |
-| TASK-0.0.3.3 | Owner rates their own 10 attributes | 0.25d |
-| TASK-0.0.3.4 | Create Employee + Player Card for Owner | 0.25d |
-
-**Subtotal: 1 day**
-
-### US-0.0.4: Invite Initial Squad (Scouts/Staff)
-| ID | Task | Est. |
-|----|------|------|
-| TASK-0.0.4.1 | Invite team member form | 0.25d |
-| TASK-0.0.4.2 | Email invitation flow | 0.25d |
+| TASK-0.0.3.1 | Invite team member form | 0.25d |
+| TASK-0.0.3.2 | Email invitation flow | 0.25d |
 
 **Subtotal: 0.5 days**
 
@@ -475,9 +611,24 @@ Approved/Rejected → notify Employee
 ## Epic 0.4: 🎮 Player Card System (was: Employee Database)
 
 **AI Boost:** High (CRUD) + Medium (custom UI)  
-**Estimate:** 14 man-days
+**Estimate:** 15 man-days
 
 > Every employee gets an FM-style Player Card with 1-20 attribute ratings
+> 
+> ⚠️ **Prerequisite:** Epic 0.5 Department/Position setup must be completed first, or basic Position seeding is needed.
+
+### US-0.4.0: Setup Owner's Player Card (First Player Card)
+
+> 🎮 **Dogfooding:** The Club Owner sets up their own Player Card as the first entry.
+
+| ID | Task | Est. |
+|----|------|------|
+| TASK-0.4.0.1 | "Set up your Player Card" prompt/wizard | 0.25d |
+| TASK-0.4.0.2 | Owner selects their Position/Department | 0.25d |
+| TASK-0.4.0.3 | Owner rates their own 10 attributes (1-20) | 0.25d |
+| TASK-0.4.0.4 | Create Employee + Player Card for Owner | 0.25d |
+
+**Subtotal: 1 day**
 
 ### US-0.4.1: Create Employee + Player Card
 | ID | Task | Est. |
@@ -562,12 +713,12 @@ Approved/Rejected → notify Employee
 
 ---
 
-## Epic 0.5: ⚽ Formation View (was: Org Structure)
+## Epic 0.5: ⚽ Formation View + Squad Builder
 
-**AI Boost:** Medium (custom visualization)  
-**Estimate:** 9 man-days
+**AI Boost:** Medium (custom visualization + role configuration)  
+**Estimate:** 16.5 man-days
 
-> Visual "Pitch" view instead of boring org chart tree
+> Visual "Pitch" view with deep role/attribute configuration - the organizational backbone
 
 ### US-0.5.1: Department Management
 | ID | Task | Est. |
@@ -575,34 +726,75 @@ Approved/Rejected → notify Employee
 | TASK-0.5.1.1 | Department list page | 0.25d |
 | TASK-0.5.1.2 | Create/edit department modal | 0.5d |
 | TASK-0.5.1.3 | Zone assignment (Attack/Midfield/Defense/Support) | 0.5d |
-| TASK-0.5.1.4 | Department CRUD APIs | 0.5d |
+| TASK-0.5.1.4 | Zone visual preview | 0.25d |
+| TASK-0.5.1.5 | Department CRUD APIs | 0.25d |
 
 **Subtotal: 1.75 days**
 
-### US-0.5.2: Position Management
+### US-0.5.2: Position/Role Management (Enhanced)
 | ID | Task | Est. |
 |----|------|------|
 | TASK-0.5.2.1 | Position list (grouped by zone) | 0.25d |
-| TASK-0.5.2.2 | Create/edit position modal | 0.25d |
+| TASK-0.5.2.2 | Create/edit position modal | 0.5d |
 | TASK-0.5.2.3 | Pitch position (x,y coordinates) | 0.5d |
-| TASK-0.5.2.4 | Position CRUD APIs | 0.5d |
+| TASK-0.5.2.4 | Attribute requirements configuration | 0.75d |
+| TASK-0.5.2.5 | Apply role template to position | 0.25d |
+| TASK-0.5.2.6 | Position CRUD APIs | 0.25d |
+
+**Subtotal: 2.5 days**
+
+### US-0.5.3: 🎯 Attribute Configuration System (NEW)
+| ID | Task | Est. |
+|----|------|------|
+| TASK-0.5.3.1 | Attribute definitions management UI | 0.5d |
+| TASK-0.5.3.2 | Core vs Specialist attribute categorization | 0.25d |
+| TASK-0.5.3.3 | Zone-based attribute filtering | 0.25d |
+| TASK-0.5.3.4 | Importance levels (Critical/Important/Nice-to-have) | 0.25d |
+| TASK-0.5.3.5 | Role card preview with configured attributes | 0.5d |
+| TASK-0.5.3.6 | Attribute definitions API | 0.25d |
+
+**Subtotal: 2 days**
+
+### US-0.5.4: 📋 Role Templates Library (NEW)
+| ID | Task | Est. |
+|----|------|------|
+| TASK-0.5.4.1 | Role templates gallery view | 0.5d |
+| TASK-0.5.4.2 | Template preview card | 0.25d |
+| TASK-0.5.4.3 | Apply template to position | 0.25d |
+| TASK-0.5.4.4 | Create custom template from position | 0.25d |
+| TASK-0.5.4.5 | Role templates CRUD API | 0.25d |
 
 **Subtotal: 1.5 days**
 
-### US-0.5.3: 🏔️ Formation / Pitch View (NEW)
+### US-0.5.5: 🏟️ Formation / Pitch View
 | ID | Task | Est. |
 |----|------|------|
-| TASK-0.5.3.1 | Pitch canvas component (SVG/Canvas) | 1.5d |
-| TASK-0.5.3.2 | Drag-and-drop player positioning | 1d |
-| TASK-0.5.3.3 | Department zone overlays | 0.5d |
-| TASK-0.5.3.4 | Player card tooltips on hover | 0.5d |
-| TASK-0.5.3.5 | Zoom/Pan controls | 0.5d |
-| TASK-0.5.3.6 | Formation template system | 0.5d |
-| TASK-0.5.3.7 | Export formation as image | 0.25d |
-| TASK-0.5.3.8 | Mobile-responsive pitch view | 0.5d |
-| TASK-0.5.3.9 | Formation data API | 0.5d |
+| TASK-0.5.5.1 | Pitch canvas component (SVG/Canvas) | 1.5d |
+| TASK-0.5.5.2 | Drag-and-drop player positioning | 1d |
+| TASK-0.5.5.3 | Department zone overlays | 0.5d |
+| TASK-0.5.5.4 | Player card tooltips with fit score | 0.5d |
+| TASK-0.5.5.5 | Zoom/Pan controls | 0.5d |
+| TASK-0.5.5.6 | Formation template system | 0.5d |
+| TASK-0.5.5.7 | Export formation as image | 0.25d |
+| TASK-0.5.5.8 | Mobile-responsive pitch view | 0.5d |
+| TASK-0.5.5.9 | Formation data API | 0.5d |
 
 **Subtotal: 5.75 days**
+
+### US-0.5.6: 🎮 Squad Builder (Enhanced)
+| ID | Task | Est. |
+|----|------|------|
+| TASK-0.5.6.1 | Squad template selection/creation | 0.5d |
+| TASK-0.5.6.2 | Squad template slots configuration | 0.25d |
+| TASK-0.5.6.3 | Squad builder canvas (formation view) | 0.5d |
+| TASK-0.5.6.4 | Player selection panel | 0.25d |
+| TASK-0.5.6.5 | Drag player to position slot | 0.25d |
+| TASK-0.5.6.6 | Real-time fit score calculation | 0.5d |
+| TASK-0.5.6.7 | Best-fit player suggestions | 0.25d |
+| TASK-0.5.6.8 | Squad health overview (filled vs empty slots) | 0.25d |
+| TASK-0.5.6.9 | Squad CRUD APIs | 0.25d |
+
+**Subtotal: 3 days**
 
 ---
 
@@ -698,13 +890,15 @@ Approved/Rejected → notify Employee
 | Week | Focus | Dev 1-2 | Dev 3-4 |
 |------|-------|---------|---------|
 | **1** | Club Setup + Foundation | Club Registration (0.0) + Infrastructure (0.1) | Database + Auth (0.2, 0.3) |
-| **2** | Auth + Player Cards | Auth complete (0.3) | Player Card DB + UI (0.4) |
-| **3** | Player Cards | Player Card features (0.4) | Attributes + Ability (0.4) |
-| **4** | Player Cards + Hierarchy | Player comparison (0.4) | Hierarchy APIs (0.4) |
-| **5** | Formation View | Pitch component (0.5) | Drag-drop positioning (0.5) |
-| **6** | Formation + Gap Analysis | Formation features (0.5) | Gap algorithm (0.6) |
-| **7** | Scouting Network | Scouted players (0.7) | Kanban board (0.7) |
-| **8** | Scouting + Polish | Scouting features (0.7) | Bug fixes, testing, deployment |
+| **2** | Auth Complete | Auth complete (0.3) | Auth testing + Security review |
+| **3** | Formation View | Department/Position setup (0.5) | Attribute Config (0.5) |
+| **4** | Formation View | Role Templates (0.5.4) | Pitch View (0.5.5) |
+| **5** | Formation + Player Cards | Squad Builder (0.5.6) | Owner Player Card (0.4) |
+| **6** | Player Cards | Player Card DB + UI (0.4) | Attributes + Ability (0.4) |
+| **7** | Player Cards | Player comparison + Hierarchy (0.4) | Bulk import (0.4) |
+| **8** | Gap Analysis | Gap algorithm (0.6) | Gap Dashboard (0.6) |
+| **9** | Scouting Network | Scouted players (0.7) | Kanban board (0.7) |
+| **10** | Scouting + Polish | Scouting features (0.7) | Bug fixes, testing, deployment |
 
 ---
 
@@ -761,12 +955,13 @@ Evening: Queue AI tasks for overnight generation
 | Metric | Value |
 |--------|-------|
 | Total Epics | 8 |
-| Total User Stories | ~24 |
-| Total Man-days | 51 (62 with buffer) |
+| Total User Stories | ~30 |
+| Total Man-days | 58.5 (71 with buffer) |
 | Team Size | 4 part-time (2 FTE) |
-| Timeline | **~8.5 weeks (~2 months)** |
+| Timeline | **~10 weeks (~2.5 months)** |
+| Target Industry | **Software House / Digital Agency** |
 | AI Productivity Gain | ~40-50% |
-| Key Innovation | **FM-Style Squad Planning** |
+| Key Innovation | **FM-Style Squad Planning + Squad Templates** |
 
 ---
 

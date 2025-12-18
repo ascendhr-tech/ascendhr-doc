@@ -1,0 +1,39 @@
+flowchart TD
+    Start((Start)) --> ListScreen
+    
+    subgraph ListScreen ["Position List Screen"]
+        ViewList[View Positions Grouped by Zone]
+        ClickAdd[Click 'Add Position']
+    end
+
+    subgraph Modal ["Position Config Modal"]
+        TabDetails[Tab: Details]
+        TabAttrs[Tab: Attributes]
+        TabLoc[Tab: Location]
+        
+        InputTitle[/Input Title/]
+        SelectDept[/Select Department/]
+        SelectTempl[/Select Role Template/]
+        
+        AutoFill[Auto-fill Attributes]
+        ConfigAttrs[Adjust Importance/Values]
+        SetLoc[Drag on Mini-Map]
+        
+        Save[Click Save]
+    end
+
+    ClickAdd --> TabDetails
+    TabDetails --> InputTitle
+    InputTitle --> SelectDept
+    SelectDept --> SelectTempl
+    
+    SelectTempl -->|Template Chosen| AutoFill
+    AutoFill --> TabAttrs
+    SelectTempl -->|None| TabAttrs
+    
+    TabAttrs --> ConfigAttrs
+    ConfigAttrs --> TabLoc
+    TabLoc --> SetLoc
+    SetLoc --> Save
+    
+    Save -->|Success| ListScreen

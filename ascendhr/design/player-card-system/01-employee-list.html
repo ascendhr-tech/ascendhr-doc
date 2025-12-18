@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee List | AscendHR</title>
+
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* Feature-specific styles */
+    .search-bar {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .search-input {
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .employee-row {
+      display: grid;
+      grid-template-columns: 50px 1fr 150px 120px 100px 80px 100px;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .employee-row:hover {
+      background: var(--background);
+    }
+
+    .employee-row.header {
+      background: var(--muted);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+      cursor: default;
+    }
+
+    .employee-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+
+    .employee-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .employee-name {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .employee-email {
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+    }
+
+    .ability-score {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .ability-current {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-lg);
+      color: var(--accent);
+    }
+
+    .ability-potential {
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+    }
+
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .status-active {
+      background: var(--accent-light);
+      color: #166534;
+    }
+
+    .status-pending {
+      background: var(--warning-light);
+      color: #713F12;
+    }
+
+    .status-inactive {
+      background: var(--muted);
+      color: var(--muted-foreground);
+    }
+
+    .actions-menu {
+      position: relative;
+    }
+
+    .actions-btn {
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--muted-foreground);
+      border-radius: var(--radius-md);
+    }
+
+    .actions-btn:hover {
+      background: var(--muted);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-top: 1px solid var(--border);
+    }
+
+    .pagination-info {
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+    }
+
+    .page-btn:hover {
+      background: var(--muted);
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12);
+      color: var(--muted-foreground);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-4);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    MOCKUP: Employee List
+    User Story: US-0.4.2
+    
+    INTERACTIVE: Search, filter, click rows to navigate
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">AscendHR</div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="../formation-view/06-squad-builder.html" class="sidebar-item"><span class="icon">👥</span> Squads</a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item"><span class="icon">🏟️</span>
+            Formation</a>
+          <a href="04-player-gallery.html" class="sidebar-item"><span class="icon">🃏</span> Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="#" class="sidebar-item active"><span class="icon">📋</span> Employee List</a>
+          <a href="../formation-view/01-department-management.html" class="sidebar-item"><span class="icon">🏢</span>
+            Departments</a>
+          <a href="../formation-view/02-position-management.html" class="sidebar-item"><span class="icon">📍</span>
+            Positions</a>
+          <a href="../formation-view/03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span>
+            Attributes</a>
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Employee List</h1>
+          <p style="color: var(--muted-foreground); margin-top: 4px;">Manage your squad roster</p>
+        </div>
+        <div style="display: flex; gap: var(--space-3);">
+          <a href="05-bulk-import.html" class="btn btn-secondary">📥 Import</a>
+          <a href="02-create-employee.html" class="btn btn-primary">+ Add Employee</a>
+        </div>
+      </header>
+
+      <!-- Search & Filters -->
+      <div class="search-bar">
+        <input type="text" class="form-input search-input" placeholder="🔍 Search by name, email, or employee ID..."
+          id="searchInput" oninput="filterEmployees()">
+        <div class="filter-group">
+          <select class="form-select" id="deptFilter" onchange="filterEmployees()">
+            <option value="">All Departments</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Design">Design</option>
+            <option value="Sales">Sales</option>
+            <option value="HR">HR</option>
+          </select>
+          <select class="form-select" id="statusFilter" onchange="filterEmployees()">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Employee Table -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="employee-row header">
+          <div></div>
+          <div>Employee</div>
+          <div>Department</div>
+          <div>Position</div>
+          <div>Ability</div>
+          <div>Status</div>
+          <div></div>
+        </div>
+
+        <div id="employeeList">
+          <!-- Employee rows will be rendered here -->
+        </div>
+
+        <div class="pagination">
+          <div class="pagination-info">
+            Showing <strong>1-10</strong> of <strong id="totalCount">25</strong> employees
+          </div>
+          <div class="pagination-controls">
+            <button class="page-btn" disabled>← Prev</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Sample employee data
+    const employees = [
+      { id: 'EMP001', initials: 'JS', name: 'John Smith', email: 'john.smith@company.com', dept: 'Engineering', position: 'Tech Lead', current: 156, potential: 175, status: 'active' },
+      { id: 'EMP002', initials: 'SJ', name: 'Sarah Johnson', email: 'sarah.j@company.com', dept: 'Design', position: 'UX Designer', current: 142, potential: 168, status: 'active' },
+      { id: 'EMP003', initials: 'MW', name: 'Mike Wilson', email: 'mike.w@company.com', dept: 'Engineering', position: 'Backend Dev', current: 138, potential: 160, status: 'active' },
+      { id: 'EMP004', initials: 'EC', name: 'Emily Chen', email: 'emily.c@company.com', dept: 'Sales', position: 'Account Mgr', current: 145, potential: 165, status: 'active' },
+      { id: 'EMP005', initials: 'DK', name: 'David Kim', email: 'david.k@company.com', dept: 'Engineering', position: 'Frontend Dev', current: 128, potential: 155, status: 'pending' },
+      { id: 'EMP006', initials: 'LT', name: 'Lisa Taylor', email: 'lisa.t@company.com', dept: 'HR', position: 'HR Manager', current: 140, potential: 158, status: 'active' },
+      { id: 'EMP007', initials: 'RB', name: 'Robert Brown', email: 'robert.b@company.com', dept: 'Engineering', position: 'DevOps Eng', current: 135, potential: 162, status: 'active' },
+      { id: 'EMP008', initials: 'AP', name: 'Anna Patel', email: 'anna.p@company.com', dept: 'Design', position: 'UI Designer', current: 132, potential: 155, status: 'active' },
+      { id: 'EMP009', initials: 'JL', name: 'James Lee', email: 'james.l@company.com', dept: 'Sales', position: 'Sales Rep', current: 125, potential: 150, status: 'inactive' },
+      { id: 'EMP010', initials: 'MG', name: 'Maria Garcia', email: 'maria.g@company.com', dept: 'Engineering', position: 'QA Engineer', current: 130, potential: 155, status: 'active' }
+    ];
+
+    function renderEmployees(data) {
+      const container = document.getElementById('employeeList');
+
+      if (data.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3>No employees found</h3>
+            <p>Try adjusting your search or filters</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = data.map(emp => `
+        <div class="employee-row" onclick="window.location.href='03-employee-detail.html?id=${emp.id}'">
+          <div class="employee-avatar">${emp.initials}</div>
+          <div class="employee-info">
+            <span class="employee-name">${emp.name}</span>
+            <span class="employee-email">${emp.email}</span>
+          </div>
+          <div>${emp.dept}</div>
+          <div>${emp.position}</div>
+          <div class="ability-score">
+            <span class="ability-current">${emp.current}</span>
+            <span class="ability-potential">/ ${emp.potential}</span>
+          </div>
+          <div>
+            <span class="status-badge status-${emp.status}">${emp.status.charAt(0).toUpperCase() + emp.status.slice(1)}</span>
+          </div>
+          <div class="actions-menu">
+            <button class="actions-btn" onclick="event.stopPropagation();">⋮</button>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('totalCount').textContent = data.length;
+    }
+
+    function filterEmployees() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const dept = document.getElementById('deptFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      let filtered = employees.filter(emp => {
+        const matchesSearch = emp.name.toLowerCase().includes(search) ||
+          emp.email.toLowerCase().includes(search) ||
+          emp.id.toLowerCase().includes(search);
+        const matchesDept = !dept || emp.dept === dept;
+        const matchesStatus = !status || emp.status === status;
+        return matchesSearch && matchesDept && matchesStatus;
+      });
+
+      renderEmployees(filtered);
+    }
+
+    // Initial render
+    renderEmployees(employees);
+  </script>
+</body>
+
+</html>

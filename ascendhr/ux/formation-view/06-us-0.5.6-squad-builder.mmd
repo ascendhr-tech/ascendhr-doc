@@ -1,0 +1,41 @@
+flowchart TD
+    Start((Start)) --> SquadDash
+    
+    subgraph SquadDash ["Squad Dashboard"]
+        ViewSquads[View Active Squads]
+        ClickNew[Click 'New Squad']
+    end
+
+    subgraph TemplateModal ["Select Template Modal"]
+        ListTemplates[List Squad Templates]
+        SelectScrum[Select 'Scrum Team']
+        InputName[/Input Squad Name/]
+        Create[Click Create]
+    end
+
+    subgraph Builder ["Squad Builder Canvas"]
+        RenderSlots[Render Empty Slots]
+        ClickSlot[Click Empty Slot]
+        DragPlayer[Drag Player to Slot]
+    end
+
+    subgraph Drawer ["Player Selection Drawer"]
+        ShowRecs[Show Recommended Players]
+        CalcFit[Calculate Fit Scores]
+        Search[Search Manually]
+        SelectPlayer[Select Player]
+    end
+
+    ClickNew --> ListTemplates
+    ListTemplates --> SelectScrum
+    SelectScrum --> InputName
+    InputName --> Create
+    Create --> RenderSlots
+    
+    RenderSlots --> ClickSlot
+    ClickSlot --> ShowRecs
+    ShowRecs --> CalcFit
+    CalcFit --> SelectPlayer
+    SelectPlayer --> Assign[Assign to Slot]
+    Assign --> UpdateStats[Update Squad Stats]
+    UpdateStats --> RenderSlots

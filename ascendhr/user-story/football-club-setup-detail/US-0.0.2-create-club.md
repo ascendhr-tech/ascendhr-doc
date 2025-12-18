@@ -2,7 +2,9 @@
 
 **Story ID:** US-0.0.2  
 **Epic:** 0.0 - Football Club Setup  
-**Persona:** Club Owner
+**Persona:** Club Owner  
+**Version:** 2.0  
+**Updated:** December 16, 2024
 
 ---
 
@@ -26,7 +28,9 @@
 - Logo ต้องมีขนาดไม่เกิน 2MB (รองรับ PNG, JPG, SVG)
 - ระบบจะสร้าง slug จากชื่อ club อัตโนมัติ
 - User ที่สร้าง club จะกลายเป็น Super Admin โดยอัตโนมัติ
-- หลังสร้าง club สำเร็จ จะ redirect ไปหน้า Setup Player Card
+- หลังสร้าง club สำเร็จ จะ redirect ไป Invite Team หรือ Dashboard
+
+> ⚠️ **Note:** Player Card setup ย้ายไป **Epic 0.4 (Player Card System)** เนื่องจากต้อง Setup Department/Position ก่อน
 
 ---
 
@@ -53,7 +57,7 @@
 - System creates company record in database
 - System assigns user as Club Owner (Super Admin role)
 - System creates default departments (Leadership, Operations, etc.)
-- System redirects to "Setup Your Player Card"
+- System redirects to Invite Team Modal or Dashboard
 - System shows success message
 
 ---

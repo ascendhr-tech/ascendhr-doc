@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attribute Library | AscendHR</title>
+
+  <!-- SHARED COMPONENT SYSTEM -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* === PAGE-SPECIFIC STYLES === */
+    .attr-section {
+      margin-bottom: 40px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .attr-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .attr-card:hover {
+      box-shadow: var(--shadow-soft);
+      border-color: var(--primary);
+    }
+
+    .attr-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--muted);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .attr-info {
+      flex: 1;
+    }
+
+    .attr-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .attr-desc {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    .zone-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .zone-tab {
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--muted);
+      color: var(--muted-foreground);
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .zone-tab:hover {
+      background: var(--border);
+    }
+
+    .zone-tab.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .zone-tab.attack.active {
+      background: var(--zone-attack);
+    }
+
+    .zone-tab.midfield.active {
+      background: var(--zone-midfield);
+    }
+
+    .zone-tab.defense.active {
+      background: var(--zone-defense);
+    }
+
+    .zone-tab.support.active {
+      background: var(--zone-support);
+    }
+
+    .category-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .category-badge.core {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .category-badge.specialist {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    /* Preview Card */
+    .preview-card {
+      background: linear-gradient(145deg, var(--card) 0%, var(--muted) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      max-width: 200px;
+      margin-top: 16px;
+    }
+
+    .preview-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .preview-name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .preview-type {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    MOCKUP: Attribute Library
+    User Story: US-0.5.3
+    Flow: View/manage Core and Specialist attributes
+  -->
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <span class="brand-name">Ascend FC</span>
+            <span class="brand-subtitle">Club Manager</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="06-squad-builder.html" class="sidebar-item"><span class="icon">👥</span> Squads</a>
+          <a href="05-formation-pitch.html" class="sidebar-item"><span class="icon">🏟️</span> Formation</a>
+          <a href="../player-card-system/04-player-gallery.html" class="sidebar-item"><span class="icon">🃏</span>
+            Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="01-department-management.html" class="sidebar-item"><span class="icon">🏢</span> Departments</a>
+          <a href="02-position-management.html" class="sidebar-item"><span class="icon">📍</span> Positions</a>
+          <a href="03-attribute-library.html" class="sidebar-item active"><span class="icon">🎯</span> Attributes</a>
+          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Attribute Library</h1>
+          <p class="text-muted">Define skills that make your players valuable</p>
+        </div>
+        <button class="btn btn-primary" onclick="showModal()">
+          + New Attribute
+        </button>
+      </header>
+
+      <!-- Core Attributes -->
+      <div class="attr-section">
+        <div class="section-header">
+          <div>
+            <span class="section-title">Core Attributes</span>
+            <span class="category-badge core">UNIVERSAL</span>
+            <p class="section-subtitle">Apply to all players regardless of position</p>
+          </div>
+        </div>
+        <div class="attr-grid">
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">👑</div>
+            <div class="attr-info">
+              <div class="attr-name">Leadership</div>
+              <div class="attr-desc">Ability to guide and inspire teams</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🤝</div>
+            <div class="attr-info">
+              <div class="attr-name">Teamwork</div>
+              <div class="attr-desc">Collaborative work effectiveness</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">💬</div>
+            <div class="attr-info">
+              <div class="attr-name">Communication</div>
+              <div class="attr-desc">Clear and effective expression</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🔄</div>
+            <div class="attr-info">
+              <div class="attr-name">Adaptability</div>
+              <div class="attr-desc">Flexibility in changing situations</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">💪</div>
+            <div class="attr-info">
+              <div class="attr-name">Determination</div>
+              <div class="attr-desc">Persistence and drive</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specialist Attributes -->
+      <div class="attr-section">
+        <div class="section-header">
+          <div>
+            <span class="section-title">Specialist Attributes</span>
+            <span class="category-badge specialist">BY ZONE</span>
+            <p class="section-subtitle">Specific skills for particular positions</p>
+          </div>
+        </div>
+
+        <!-- Zone Filter Tabs -->
+        <div class="zone-tabs">
+          <button class="zone-tab active">All</button>
+          <button class="zone-tab attack">⚔️ Attack</button>
+          <button class="zone-tab midfield">⚙️ Midfield</button>
+          <button class="zone-tab defense">🛡️ Defense</button>
+          <button class="zone-tab support">🏥 Support</button>
+        </div>
+
+        <div class="attr-grid">
+          <!-- Engineering (Midfield) -->
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">💻</div>
+            <div class="attr-info">
+              <div class="attr-name">Coding <span class="badge badge-midfield"
+                  style="font-size: 9px; padding: 1px 6px;">Midfield</span></div>
+              <div class="attr-desc">Programming proficiency</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🏗️</div>
+            <div class="attr-info">
+              <div class="attr-name">System Design <span class="badge badge-midfield"
+                  style="font-size: 9px; padding: 1px 6px;">Midfield</span></div>
+              <div class="attr-desc">Architecture and scalability</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🧩</div>
+            <div class="attr-info">
+              <div class="attr-name">Problem Solving <span class="badge badge-midfield"
+                  style="font-size: 9px; padding: 1px 6px;">Midfield</span></div>
+              <div class="attr-desc">Analytical thinking</div>
+            </div>
+          </div>
+
+          <!-- Design (Midfield) -->
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🎨</div>
+            <div class="attr-info">
+              <div class="attr-name">Visual Design <span class="badge badge-midfield"
+                  style="font-size: 9px; padding: 1px 6px;">Midfield</span></div>
+              <div class="attr-desc">Aesthetic sense and UI skills</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🧠</div>
+            <div class="attr-info">
+              <div class="attr-name">UX Thinking <span class="badge badge-midfield"
+                  style="font-size: 9px; padding: 1px 6px;">Midfield</span></div>
+              <div class="attr-desc">User-centered design approach</div>
+            </div>
+          </div>
+
+          <!-- Sales (Attack) -->
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🎯</div>
+            <div class="attr-info">
+              <div class="attr-name">Closing <span class="badge badge-attack"
+                  style="font-size: 9px; padding: 1px 6px;">Attack</span></div>
+              <div class="attr-desc">Deal closing ability</div>
+            </div>
+          </div>
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🤝</div>
+            <div class="attr-info">
+              <div class="attr-name">Client Relations <span class="badge badge-attack"
+                  style="font-size: 9px; padding: 1px 6px;">Attack</span></div>
+              <div class="attr-desc">Customer relationship management</div>
+            </div>
+          </div>
+
+          <!-- HR (Support) -->
+          <div class="attr-card" onclick="showModal()">
+            <div class="attr-icon">🔍</div>
+            <div class="attr-info">
+              <div class="attr-name">Talent Acquisition <span class="badge badge-support"
+                  style="font-size: 9px; padding: 1px 6px;">Support</span></div>
+              <div class="attr-desc">Recruiting and hiring skills</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Attribute Modal -->
+  <div class="modal-overlay" id="modal" style="display: none;">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2 class="modal-title">New Attribute</h2>
+        <button class="modal-close" onclick="hideModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Attribute Name</label>
+          <input type="text" class="form-input" placeholder="e.g., Rust Programming" value="Rust">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Code (auto-generated)</label>
+          <input type="text" class="form-input" value="rust_lang" disabled style="background: var(--muted);">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="category" value="core">
+              <span>Core (Universal)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="category" value="specialist" checked>
+              <span>Specialist (Zone-specific)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Zone</label>
+          <select class="form-input">
+            <option value="midfield" selected>⚙️ Midfield (Engineering/Design)</option>
+            <option value="attack">⚔️ Attack (Sales/Marketing)</option>
+            <option value="defense">🛡️ Defense (Finance/Legal)</option>
+            <option value="support">🏥 Support (HR/Admin)</option>
+          </select>
+          <p class="form-hint">Only visible for Specialist attributes</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input" rows="2"
+            placeholder="What does this attribute measure?">Systems programming in Rust language</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Icon</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+            <button class="btn btn-outline" style="font-size: 20px; padding: 8px 12px;" title="Selected">🦀</button>
+            <button class="btn btn-outline" style="font-size: 20px; padding: 8px 12px;">💻</button>
+            <button class="btn btn-outline" style="font-size: 20px; padding: 8px 12px;">🔧</button>
+            <button class="btn btn-outline" style="font-size: 20px; padding: 8px 12px;">⚡</button>
+            <button class="btn btn-outline" style="font-size: 20px; padding: 8px 12px;">🎯</button>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="form-group">
+          <label class="form-label">Preview</label>
+          <div class="preview-card">
+            <div class="preview-icon">🦀</div>
+            <div class="preview-name">Rust</div>
+            <div class="preview-type">Specialist • Midfield</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+        <button class="btn btn-primary">Save Attribute</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function hideModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+  </script>
+</body>
+
+</html>

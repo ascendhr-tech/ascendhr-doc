@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formation Editor | AscendHR</title>
+
+  <!-- SHARED COMPONENT SYSTEM -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* === FC26 STYLE FORMATION EDITOR - LIGHT THEME === */
+
+    /* Fix main content to take full width */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* === EDITOR HEADER (Full Width) === */
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .editor-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .editor-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin: 0;
+    }
+
+    .editor-title .badge {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .editor-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .header-btn.secondary {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .header-btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .header-btn.primary {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      border: none;
+      color: white;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+
+    .header-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+    }
+
+    /* === ANALYTICS BAR (Full Width) === */
+    .analytics-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding: 20px 24px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .analytics-card {
+      background: var(--muted);
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+
+    .analytics-card .analytics-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--foreground);
+      line-height: 1;
+    }
+
+    .analytics-card .analytics-value.success {
+      color: #22c55e;
+    }
+
+    .analytics-card .analytics-value.warning {
+      color: #f59e0b;
+    }
+
+    .analytics-card .analytics-value.danger {
+      color: #ef4444;
+    }
+
+    .analytics-card .analytics-value.primary {
+      color: #3b82f6;
+    }
+
+    .analytics-card .analytics-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .analytics-card .analytics-trend {
+      font-size: 10px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .analytics-card .analytics-trend.up {
+      color: #22c55e;
+    }
+
+    .analytics-card .analytics-trend.down {
+      color: #ef4444;
+    }
+
+    /* === MAIN PITCH AREA === */
+    .pitch-section {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .pitch-canvas {
+      background: linear-gradient(180deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+      border-radius: 16px;
+      position: relative;
+      padding: 28px 40px;
+      min-height: 380px;
+      box-shadow:
+        inset 0 0 80px rgba(0, 0, 0, 0.2),
+        0 8px 32px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Pitch Markings */
+    .pitch-canvas::before {
+      content: '';
+      position: absolute;
+      inset: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .pitch-center-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      top: 50%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .pitch-center-circle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 80px;
+      height: 80px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* === ZONE ROWS === */
+    .zone-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px 0;
+      position: relative;
+      flex-wrap: wrap;
+      z-index: 1;
+    }
+
+    .zone-label-side {
+      position: absolute;
+      left: 4px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* === POSITION CARDS === */
+    .position-card {
+      width: 88px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .position-card:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .position-card.attack {
+      border-color: #ef4444;
+    }
+
+    .position-card.attack:hover {
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+    }
+
+    .position-card.midfield {
+      border-color: #3b82f6;
+    }
+
+    .position-card.midfield:hover {
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .position-card.defense {
+      border-color: #22c55e;
+    }
+
+    .position-card.defense:hover {
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Average Score Badge */
+    .avg-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #1a1a1a;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    .avg-badge.gold {
+      background: linear-gradient(145deg, #fcd34d 0%, #f59e0b 100%);
+    }
+
+    .avg-badge.silver {
+      background: linear-gradient(145deg, #e2e8f0 0%, #94a3b8 100%);
+    }
+
+    .avg-badge.bronze {
+      background: linear-gradient(145deg, #fdba74 0%, #ea580c 100%);
+    }
+
+    /* Position Icon */
+    .position-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .position-icon.attack {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .position-icon.midfield {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .position-icon.defense {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    }
+
+    .position-icon.support {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    }
+
+    .position-name {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 2px;
+    }
+
+    .position-count {
+      font-size: 9px;
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    /* Add Button for each zone */
+    .add-zone-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      border: 2px dashed rgba(255, 255, 255, 0.6);
+      color: white;
+      font-size: 24px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-zone-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: white;
+      transform: scale(1.1);
+    }
+
+    /* === BENCH BAR === */
+    .bench-section {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .bench-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 80px;
+    }
+
+    .bench-cards {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+
+    .bench-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+      border: 1px solid #c4b5fd;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 140px;
+    }
+
+    .bench-card:hover {
+      background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+      border-color: #a855f7;
+      transform: translateY(-2px);
+    }
+
+    .bench-card .bench-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .bench-card .bench-info {
+      flex: 1;
+    }
+
+    .bench-card .bench-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+
+    .bench-card .bench-count {
+      font-size: 9px;
+      color: var(--muted-foreground);
+    }
+
+    .bench-card.add-btn {
+      border-style: dashed;
+      border-color: #c4b5fd;
+      background: #faf5ff;
+      justify-content: center;
+      min-width: 80px;
+      color: #a855f7;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .bench-card.add-btn:hover {
+      background: #f3e8ff;
+      color: #7c3aed;
+    }
+
+    /* === STATS BAR === */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 14px 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      box-sizing: border-box;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .stat-item .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .stat-item .stat-dot.attack {
+      background: #ef4444;
+    }
+
+    .stat-item .stat-dot.midfield {
+      background: #3b82f6;
+    }
+
+    .stat-item .stat-dot.defense {
+      background: #22c55e;
+    }
+
+    .stat-item .stat-dot.bench {
+      background: #a855f7;
+    }
+
+    .stat-item .stat-count {
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+    }
+
+    .stat-total {
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    /* === MODALS === */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 480px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      color: var(--foreground);
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted-foreground);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: var(--foreground);
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+    }
+
+    .modal-body .form-label {
+      color: var(--muted-foreground);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      display: block;
+      font-weight: 600;
+    }
+
+    .zone-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .zone-btn {
+      padding: 10px 6px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      border: 2px solid var(--border);
+      background: white;
+      color: var(--foreground);
+    }
+
+    .zone-btn:hover {
+      background: var(--muted);
+    }
+
+    .zone-btn.active.attack {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .zone-btn.active.midfield {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .zone-btn.active.defense {
+      background: #f0fdf4;
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+
+    .zone-btn.active.support {
+      background: #faf5ff;
+      border-color: #a855f7;
+      color: #a855f7;
+    }
+
+    .position-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .position-option {
+      background: var(--muted);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .position-option:hover {
+      background: white;
+      border-color: var(--primary);
+    }
+
+    .position-option.selected {
+      background: #eff6ff;
+      border-color: #3b82f6;
+    }
+
+    .position-option .pos-abbr {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 2px;
+    }
+
+    .position-option .pos-name {
+      font-size: 9px;
+      color: var(--muted-foreground);
+    }
+
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-btn.secondary {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .modal-btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .modal-btn.primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      border: none;
+      color: white;
+    }
+
+    .modal-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Position Details Modal */
+    .details-header {
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .details-icon-large {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .details-info h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      margin: 0 0 4px;
+    }
+
+    .details-info .zone-tag {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 3px 10px;
+      border-radius: 10px;
+      color: white;
+    }
+
+    .details-section {
+      margin-bottom: 18px;
+    }
+
+    .details-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .details-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .position-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-stat {
+      background: var(--muted);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .summary-stat .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .summary-stat .stat-label {
+      font-size: 9px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+    }
+
+    .player-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .player-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: var(--muted);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .player-list-item:hover {
+      background: var(--border);
+    }
+
+    .player-list-item .player-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .player-list-item .player-info {
+      flex: 1;
+    }
+
+    .player-list-item .player-name {
+      font-weight: 600;
+      color: var(--foreground);
+      font-size: 13px;
+    }
+
+    .player-list-item .player-dept {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    .player-list-item .player-fit {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .player-list-item .player-fit.high {
+      color: #22c55e;
+    }
+
+    .player-list-item .player-fit.medium {
+      color: #f59e0b;
+    }
+
+    .player-list-item .player-fit.low {
+      color: #ef4444;
+    }
+
+    .modal-btn.danger {
+      background: #ef4444;
+      border: none;
+      color: white;
+    }
+
+    .modal-btn.danger:hover {
+      background: #dc2626;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <span class="brand-name">Ascend FC</span>
+            <span class="brand-subtitle">Club Manager</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="06-squad-builder.html" class="sidebar-item"><span class="icon">👥</span> Squads</a>
+          <a href="05-formation-pitch.html" class="sidebar-item active"><span class="icon">🏟️</span>
+            Formation</a>
+          <a href="../player-card-system/04-player-gallery.html" class="sidebar-item"><span class="icon">🃏</span>
+            Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="01-department-management.html" class="sidebar-item"><span class="icon">🏢</span> Departments</a>
+          <a href="02-position-management.html" class="sidebar-item"><span class="icon">📍</span> Positions</a>
+          <a href="03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span> Attributes</a>
+          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Editor Header -->
+      <header class="editor-header">
+        <div class="editor-title">
+          <h1>Formation View</h1>
+        </div>
+      </header>
+
+      <!-- Analytics Bar -->
+      <div class="analytics-bar">
+        <div class="analytics-card">
+          <div class="analytics-value success">85</div>
+          <div class="analytics-label">Team Score</div>
+          <div class="analytics-trend up">↑ +3 this month</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-value primary">87%</div>
+          <div class="analytics-label">Coverage</div>
+          <div class="analytics-trend up">↑ 2 filled</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-value">82%</div>
+          <div class="analytics-label">Avg Fit</div>
+          <div class="analytics-trend up">↑ +5%</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-value primary">Mid</div>
+          <div class="analytics-label">Strongest</div>
+          <div class="analytics-trend">5 pos • 89%</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-value warning">2</div>
+          <div class="analytics-label">Gaps</div>
+          <div class="analytics-trend down">⚠️ Attention</div>
+        </div>
+      </div>
+
+      <!-- Pitch Section -->
+      <section class="pitch-section">
+        <div class="pitch-canvas">
+          <div class="pitch-center-line"></div>
+          <div class="pitch-center-circle"></div>
+
+          <!-- Attack Zone -->
+          <div class="zone-row">
+            <span class="zone-label-side">⚔️ ATK</span>
+            <div class="position-card attack" onclick="showPositionDetails('Product Manager', 'PM', 'attack', 3, 88)">
+              <span class="avg-badge gold">88</span>
+              <div class="position-icon attack">PM</div>
+              <div class="position-name">Product Mgr</div>
+              <div class="position-count">👥 3</div>
+            </div>
+            <div class="position-card attack" onclick="showPositionDetails('Sales Lead', 'SL', 'attack', 4, 82)">
+              <span class="avg-badge gold">82</span>
+              <div class="position-icon attack">SL</div>
+              <div class="position-name">Sales Lead</div>
+              <div class="position-count">👥 4</div>
+            </div>
+            <button class="add-zone-btn" onclick="showAddModal('attack')">+</button>
+          </div>
+
+          <!-- Midfield Zone -->
+          <div class="zone-row">
+            <span class="zone-label-side">⚙️ MID</span>
+            <div class="position-card midfield" onclick="showPositionDetails('Tech Lead', 'TL', 'midfield', 2, 94)">
+              <span class="avg-badge gold">94</span>
+              <div class="position-icon midfield">TL</div>
+              <div class="position-name">Tech Lead</div>
+              <div class="position-count">👥 2</div>
+            </div>
+            <div class="position-card midfield" onclick="showPositionDetails('Backend Dev', 'BE', 'midfield', 5, 87)">
+              <span class="avg-badge gold">87</span>
+              <div class="position-icon midfield">BE</div>
+              <div class="position-name">Backend</div>
+              <div class="position-count">👥 5</div>
+            </div>
+            <div class="position-card midfield" onclick="showPositionDetails('Frontend Dev', 'FE', 'midfield', 4, 85)">
+              <span class="avg-badge gold">85</span>
+              <div class="position-icon midfield">FE</div>
+              <div class="position-name">Frontend</div>
+              <div class="position-count">👥 4</div>
+            </div>
+            <div class="position-card midfield" onclick="showPositionDetails('UX Designer', 'UX', 'midfield', 2, 91)">
+              <span class="avg-badge gold">91</span>
+              <div class="position-icon midfield">UX</div>
+              <div class="position-name">UX Design</div>
+              <div class="position-count">👥 2</div>
+            </div>
+            <div class="position-card midfield" onclick="showPositionDetails('QA Engineer', 'QA', 'midfield', 3, 76)">
+              <span class="avg-badge silver">76</span>
+              <div class="position-icon midfield">QA</div>
+              <div class="position-name">QA</div>
+              <div class="position-count">👥 3</div>
+            </div>
+            <button class="add-zone-btn" onclick="showAddModal('midfield')">+</button>
+          </div>
+
+          <!-- Defense Zone -->
+          <div class="zone-row">
+            <span class="zone-label-side">🛡️ DEF</span>
+            <div class="position-card defense"
+              onclick="showPositionDetails('Finance Director', 'FD', 'defense', 1, 92)">
+              <span class="avg-badge gold">92</span>
+              <div class="position-icon defense">FD</div>
+              <div class="position-name">Finance</div>
+              <div class="position-count">👥 1</div>
+            </div>
+            <div class="position-card defense" onclick="showPositionDetails('Legal Counsel', 'LC', 'defense', 2, 84)">
+              <span class="avg-badge gold">84</span>
+              <div class="position-icon defense">LC</div>
+              <div class="position-name">Legal</div>
+              <div class="position-count">👥 2</div>
+            </div>
+            <div class="position-card defense" onclick="showPositionDetails('Ops Manager', 'OM', 'defense', 2, 78)">
+              <span class="avg-badge silver">78</span>
+              <div class="position-icon defense">OM</div>
+              <div class="position-name">Ops</div>
+              <div class="position-count">👥 2</div>
+            </div>
+            <button class="add-zone-btn" onclick="showAddModal('defense')">+</button>
+          </div>
+        </div>
+
+        <!-- Bench Bar -->
+        <div class="bench-section">
+          <div class="bench-label">🏠 Bench</div>
+          <div class="bench-cards">
+            <div class="bench-card" onclick="showPositionDetails('CEO', 'CEO', 'support', 1, 95)">
+              <div class="bench-icon">CEO</div>
+              <div class="bench-info">
+                <div class="bench-title">CEO</div>
+                <div class="bench-count">👥 1 • 95 avg</div>
+              </div>
+            </div>
+            <div class="bench-card" onclick="showPositionDetails('HR Director', 'HR', 'support', 2, 88)">
+              <div class="bench-icon">HR</div>
+              <div class="bench-info">
+                <div class="bench-title">HR Director</div>
+                <div class="bench-count">👥 2 • 88 avg</div>
+              </div>
+            </div>
+            <div class="bench-card" onclick="showPositionDetails('Office Manager', 'OM', 'support', 1, 82)">
+              <div class="bench-icon">OM</div>
+              <div class="bench-info">
+                <div class="bench-title">Office Mgr</div>
+                <div class="bench-count">👥 1 • 82 avg</div>
+              </div>
+            </div>
+            <div class="bench-card add-btn" onclick="showAddModal('support')">+ Add</div>
+          </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <span class="stat-dot attack"></span>
+            <span>Attack:</span>
+            <span class="stat-count">2 pos • 7 ppl</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-dot midfield"></span>
+            <span>Midfield:</span>
+            <span class="stat-count">5 pos • 16 ppl</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-dot defense"></span>
+            <span>Defense:</span>
+            <span class="stat-count">3 pos • 5 ppl</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-dot bench"></span>
+            <span>Bench:</span>
+            <span class="stat-count">3 pos • 4 ppl</span>
+          </div>
+          <div class="stat-divider"></div>
+          <span class="stat-total">Total: 13 positions • 32 employees</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add Position Modal -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>➕ Add Position</h3>
+        <button class="modal-close" onclick="hideAddModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Select Zone</label>
+        <div class="zone-buttons">
+          <button class="zone-btn attack" onclick="selectZone('attack')">⚔️ Atk</button>
+          <button class="zone-btn midfield active" onclick="selectZone('midfield')">⚙️ Mid</button>
+          <button class="zone-btn defense" onclick="selectZone('defense')">🛡️ Def</button>
+          <button class="zone-btn support" onclick="selectZone('support')">🏠 Bench</button>
+        </div>
+
+        <label class="form-label">Select Position Type</label>
+        <div class="position-grid">
+          <div class="position-option selected" onclick="selectPosition(this, 'PM')">
+            <div class="pos-abbr">PM</div>
+            <div class="pos-name">Product Mgr</div>
+          </div>
+          <div class="position-option" onclick="selectPosition(this, 'BE')">
+            <div class="pos-abbr">BE</div>
+            <div class="pos-name">Backend</div>
+          </div>
+          <div class="position-option" onclick="selectPosition(this, 'FE')">
+            <div class="pos-abbr">FE</div>
+            <div class="pos-name">Frontend</div>
+          </div>
+          <div class="position-option" onclick="selectPosition(this, 'UX')">
+            <div class="pos-abbr">UX</div>
+            <div class="pos-name">UX Design</div>
+          </div>
+          <div class="position-option" onclick="selectPosition(this, 'QA')">
+            <div class="pos-abbr">QA</div>
+            <div class="pos-name">QA Engr</div>
+          </div>
+          <div class="position-option" onclick="selectPosition(this, 'DO')">
+            <div class="pos-abbr">DO</div>
+            <div class="pos-name">DevOps</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="hideAddModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="addPosition()">➕ Add Position</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Position Details Modal -->
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal-content">
+      <div class="details-header">
+        <div class="details-icon-large" id="detailIcon">PM</div>
+        <div class="details-info">
+          <h3 id="detailTitle">Product Manager</h3>
+          <span class="zone-tag" id="detailZone">⚔️ Attack</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="details-section">
+          <div class="details-section-title">Position Overview</div>
+          <div class="position-summary">
+            <div class="summary-stat">
+              <div class="stat-value" id="playerCount">3</div>
+              <div class="stat-label">Players</div>
+            </div>
+            <div class="summary-stat">
+              <div class="stat-value" style="color: #22c55e;" id="avgFit">88%</div>
+              <div class="stat-label">Avg Fit</div>
+            </div>
+            <div class="summary-stat">
+              <div class="stat-value" id="highestFit">95%</div>
+              <div class="stat-label">Highest</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="details-section-title">Players in Position</div>
+          <div class="player-list">
+            <div class="player-list-item">
+              <div class="player-avatar">SK</div>
+              <div class="player-info">
+                <div class="player-name">Sarah Kim</div>
+                <div class="player-dept">Product</div>
+              </div>
+              <div class="player-fit high">95%</div>
+            </div>
+            <div class="player-list-item">
+              <div class="player-avatar">JP</div>
+              <div class="player-info">
+                <div class="player-name">John Park</div>
+                <div class="player-dept">Product</div>
+              </div>
+              <div class="player-fit high">88%</div>
+            </div>
+            <div class="player-list-item">
+              <div class="player-avatar">LT</div>
+              <div class="player-info">
+                <div class="player-name">Lisa Tran</div>
+                <div class="player-dept">Product</div>
+              </div>
+              <div class="player-fit medium">81%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="hideDetails()">Close</button>
+        <button class="modal-btn primary" onclick="addPlayerToPosition()">➕ Add Player</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedZone = 'midfield';
+    let selectedPosition = 'PM';
+    let currentPosition = null;
+
+    const zoneBadges = {
+      attack: '⚔️ Attack',
+      midfield: '⚙️ Midfield',
+      defense: '🛡️ Defense',
+      support: '🏠 Bench'
+    };
+
+    function showAddModal(zone = 'midfield') {
+      selectZone(zone);
+      document.getElementById('addModal').classList.add('active');
+    }
+
+    function hideAddModal() {
+      document.getElementById('addModal').classList.remove('active');
+    }
+
+    function selectZone(zone) {
+      selectedZone = zone;
+      document.querySelectorAll('.zone-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.classList.contains(zone)) btn.classList.add('active');
+      });
+    }
+
+    function selectPosition(el, pos) {
+      selectedPosition = pos;
+      document.querySelectorAll('.position-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function addPosition() {
+      alert(`Added ${selectedPosition} position to ${zoneBadges[selectedZone]}!`);
+      hideAddModal();
+    }
+
+    function showPositionDetails(title, abbr, zone, count, avgFit) {
+      currentPosition = { title, abbr, zone, count, avgFit };
+      document.getElementById('detailIcon').textContent = abbr;
+      document.getElementById('detailTitle').textContent = title;
+      document.getElementById('detailZone').textContent = zoneBadges[zone];
+      document.getElementById('playerCount').textContent = count;
+      document.getElementById('avgFit').textContent = avgFit + '%';
+      document.getElementById('highestFit').textContent = (avgFit + 7) + '%';
+      document.getElementById('detailsModal').classList.add('active');
+    }
+
+    function hideDetails() {
+      document.getElementById('detailsModal').classList.remove('active');
+    }
+
+    function addPlayerToPosition() {
+      alert('Opening player selection to add to ' + currentPosition.title + '...');
+      hideDetails();
+    }
+
+    function resetFormation() {
+      if (confirm('Reset all positions?')) alert('Formation reset.');
+    }
+
+    function saveFormation() {
+      alert('Formation Saved!\n\n• 13 positions\n• 32 employees\n• 85 team score');
+    }
+  </script>
+</body>
+
+</html>

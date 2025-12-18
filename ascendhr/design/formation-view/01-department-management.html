@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Management | AscendHR</title>
+
+  <!-- SHARED COMPONENT SYSTEM -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* === PAGE-SPECIFIC STYLES === */
+    .zone-selector {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .zone-option {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      background: var(--white);
+    }
+
+    .zone-option:hover {
+      border-color: var(--muted-foreground);
+    }
+
+    .zone-option.selected {
+      border-width: 3px;
+    }
+
+    .zone-option.attack.selected {
+      border-color: var(--zone-attack);
+      background: var(--zone-attack-light);
+    }
+
+    .zone-option.midfield.selected {
+      border-color: var(--zone-midfield);
+      background: var(--zone-midfield-light);
+    }
+
+    .zone-option.defense.selected {
+      border-color: var(--zone-defense);
+      background: var(--zone-defense-light);
+    }
+
+    .zone-option.support.selected {
+      border-color: var(--zone-support);
+      background: var(--zone-support-light);
+    }
+
+    .zone-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .zone-label {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .mini-pitch {
+      width: 200px;
+      height: 280px;
+      background: linear-gradient(180deg, #15803d 0%, #166534 100%);
+      border-radius: var(--radius-md);
+      position: relative;
+      margin: 16px auto 0;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .pitch-zone {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      border-radius: 4px;
+      opacity: 0.3;
+      transition: opacity 0.3s;
+    }
+
+    .pitch-zone.attack {
+      top: 5%;
+      height: 22%;
+      background: var(--zone-attack);
+    }
+
+    .pitch-zone.midfield {
+      top: 30%;
+      height: 35%;
+      background: var(--zone-midfield);
+    }
+
+    .pitch-zone.defense {
+      top: 68%;
+      height: 22%;
+      background: var(--zone-defense);
+    }
+
+    .pitch-zone.support {
+      bottom: 2%;
+      left: 35%;
+      right: 35%;
+      height: 8%;
+      background: var(--zone-support);
+      border-radius: 50%;
+    }
+
+    .pitch-zone.highlighted {
+      opacity: 0.8;
+    }
+
+    .dept-count {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    MOCKUP: Department Management
+    User Story: US-0.5.1
+    Flow: List departments, create/edit with zone assignment
+  -->
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <span class="brand-name">Ascend FC</span>
+            <span class="brand-subtitle">Club Manager</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="06-squad-builder.html" class="sidebar-item"><span class="icon">👥</span> Squads</a>
+          <a href="05-formation-pitch.html" class="sidebar-item"><span class="icon">🏟️</span> Formation</a>
+          <a href="../player-card-system/04-player-gallery.html" class="sidebar-item"><span class="icon">🃏</span>
+            Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="01-department-management.html" class="sidebar-item active"><span class="icon">🏢</span>
+            Departments</a>
+          <a href="02-position-management.html" class="sidebar-item"><span class="icon">📍</span> Positions</a>
+          <a href="03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span> Attributes</a>
+          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
+        </div>
+      </nav>
+
+      <!-- User Profile -->
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Departments</h1>
+          <p class="text-muted">Organize your company into zones on the pitch</p>
+        </div>
+        <button class="btn btn-primary" onclick="showModal()">
+          + Add Department
+        </button>
+      </header>
+
+      <!-- Department Table -->
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Zone</th>
+              <th>Positions</th>
+              <th>Employees</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="font-medium">Engineering</div>
+                <div class="text-muted" style="font-size: 12px;">Core product development</div>
+              </td>
+              <td><span class="badge badge-midfield">⚙️ Midfield</span></td>
+              <td>8 positions</td>
+              <td>24 players</td>
+              <td>
+                <button class="btn btn-sm btn-outline">Edit</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="font-medium">Sales</div>
+                <div class="text-muted" style="font-size: 12px;">Revenue generation</div>
+              </td>
+              <td><span class="badge badge-attack">⚔️ Attack</span></td>
+              <td>5 positions</td>
+              <td>12 players</td>
+              <td>
+                <button class="btn btn-sm btn-outline">Edit</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="font-medium">Design</div>
+                <div class="text-muted" style="font-size: 12px;">UX/UI and brand</div>
+              </td>
+              <td><span class="badge badge-midfield">⚙️ Midfield</span></td>
+              <td>3 positions</td>
+              <td>6 players</td>
+              <td>
+                <button class="btn btn-sm btn-outline">Edit</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="font-medium">Finance</div>
+                <div class="text-muted" style="font-size: 12px;">Financial operations</div>
+              </td>
+              <td><span class="badge badge-defense">🛡️ Defense</span></td>
+              <td>4 positions</td>
+              <td>5 players</td>
+              <td>
+                <button class="btn btn-sm btn-outline">Edit</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="font-medium">Human Resources</div>
+                <div class="text-muted" style="font-size: 12px;">People operations</div>
+              </td>
+              <td><span class="badge badge-support">🏥 Support</span></td>
+              <td>2 positions</td>
+              <td>3 players</td>
+              <td>
+                <button class="btn btn-sm btn-outline">Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Department Modal -->
+  <div class="modal-overlay" id="modal" style="display: none;">
+    <div class="modal" style="max-width: 520px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Department</h2>
+        <button class="modal-close" onclick="hideModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Department Name</label>
+          <input type="text" class="form-input" placeholder="e.g., Engineering" value="Marketing">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input" rows="2"
+            placeholder="Brief description...">Drive brand awareness and customer acquisition</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Zone</label>
+          <p class="form-hint">Where does this department sit on the pitch?</p>
+
+          <div class="zone-selector">
+            <div class="zone-option attack selected" onclick="selectZone(this, 'attack')">
+              <div class="zone-icon">⚔️</div>
+              <div class="zone-label">Attack</div>
+            </div>
+            <div class="zone-option midfield" onclick="selectZone(this, 'midfield')">
+              <div class="zone-icon">⚙️</div>
+              <div class="zone-label">Midfield</div>
+            </div>
+            <div class="zone-option defense" onclick="selectZone(this, 'defense')">
+              <div class="zone-icon">🛡️</div>
+              <div class="zone-label">Defense</div>
+            </div>
+            <div class="zone-option support" onclick="selectZone(this, 'support')">
+              <div class="zone-icon">🏥</div>
+              <div class="zone-label">Support</div>
+            </div>
+          </div>
+
+          <!-- Mini Pitch Preview -->
+          <div class="mini-pitch">
+            <div class="pitch-zone attack highlighted"></div>
+            <div class="pitch-zone midfield"></div>
+            <div class="pitch-zone defense"></div>
+            <div class="pitch-zone support"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+        <button class="btn btn-primary">Save Department</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function hideModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+    function selectZone(el, zone) {
+      // Remove selected from all
+      document.querySelectorAll('.zone-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      // Highlight zone on pitch
+      document.querySelectorAll('.pitch-zone').forEach(z => z.classList.remove('highlighted'));
+      document.querySelector('.pitch-zone.' + zone).classList.add('highlighted');
+    }
+  </script>
+</body>
+
+</html>

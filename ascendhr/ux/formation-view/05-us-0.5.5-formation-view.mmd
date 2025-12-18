@@ -1,0 +1,31 @@
+flowchart TD
+    Start((Start)) --> MainView
+    
+    subgraph MainView ["Formation Pitch View"]
+        Render[Render Pitch Canvas]
+        Controls[Zoom/Pan Controls]
+        Filter[Toggle View Options]
+        
+        HoverNode[Hover over Position Node]
+        DragNode[Drag Position Node (Admin)]
+    end
+
+    subgraph Tooltip ["Position Tooltip"]
+        ShowInfo[Display Title, Dept, Assignee]
+        ShowFit[Display Fit Score]
+    end
+
+    subgraph UpdateLoc ["Update Logic"]
+        CalcXY[Calculate New X,Y]
+        SaveXY[Save Coordinates]
+    end
+
+    Start --> Render
+    Render --> HoverNode
+    HoverNode --> ShowInfo
+    ShowInfo --> ShowFit
+    
+    Render --> DragNode
+    DragNode --> CalcXY
+    CalcXY --> SaveXY
+    SaveXY --> Render

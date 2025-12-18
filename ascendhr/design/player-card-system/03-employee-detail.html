@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Card | AscendHR</title>
+
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* Feature-specific styles */
+    .detail-container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: var(--space-8);
+    }
+
+    /* Player Card (Left) */
+    .player-card {
+      background: var(--gradient-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      color: white;
+      text-align: center;
+      position: sticky;
+      top: var(--space-8);
+    }
+
+    .player-photo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 0 auto var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .player-name {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-1);
+    }
+
+    .player-position {
+      opacity: 0.85;
+      margin-bottom: var(--space-2);
+    }
+
+    .player-dept {
+      font-size: var(--font-size-sm);
+      opacity: 0.7;
+      margin-bottom: var(--space-6);
+    }
+
+    .ability-row {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-8);
+      margin-bottom: var(--space-6);
+    }
+
+    .ability-box {
+      text-align: center;
+    }
+
+    .ability-number {
+      font-size: 42px;
+      font-weight: var(--font-weight-bold);
+      line-height: 1;
+    }
+
+    .ability-label {
+      font-size: var(--font-size-xs);
+      opacity: 0.8;
+    }
+
+    /* Radar Chart */
+    .radar-container {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto var(--space-4);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .player-meta {
+      display: flex;
+      justify-content: space-around;
+      padding-top: var(--space-4);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: var(--font-size-sm);
+    }
+
+    .meta-item {
+      text-align: center;
+    }
+
+    .meta-value {
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .meta-label {
+      opacity: 0.7;
+      font-size: var(--font-size-xs);
+    }
+
+    /* Detail Panel (Right) */
+    .detail-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-6);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-weight: var(--font-weight-semibold);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .section-body {
+      padding: var(--space-6);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+
+    .info-item {
+      margin-bottom: var(--space-4);
+    }
+
+    .info-label {
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+      margin-bottom: var(--space-1);
+    }
+
+    .info-value {
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* Attribute Grid */
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+    }
+
+    .attr-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3);
+      background: var(--background);
+      border-radius: var(--radius-md);
+    }
+
+    .attr-name {
+      font-size: var(--font-size-sm);
+    }
+
+    .attr-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--primary);
+    }
+
+    .attr-bar {
+      width: 60px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin-left: var(--space-2);
+      overflow: hidden;
+    }
+
+    .attr-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: var(--space-1);
+      padding: 0 var(--space-6);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* Status Badge Large */
+    .status-large {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .status-active {
+      background: var(--accent-light);
+      color: #166534;
+    }
+
+    /* History Timeline */
+    .history-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-date {
+      width: 100px;
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+    }
+
+    .history-content {
+      flex: 1;
+    }
+
+    .history-title {
+      font-weight: var(--font-weight-medium);
+      margin-bottom: 2px;
+    }
+
+    .history-desc {
+      font-size: var(--font-size-sm);
+      color: var(--muted-foreground);
+    }
+
+    /* Action Buttons */
+    .action-bar {
+      position: sticky;
+      top: 0;
+      background: var(--background);
+      z-index: 10;
+      padding: var(--space-4) 0;
+      margin-bottom: var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Modal visible state */
+    .modal-overlay {
+      display: none;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    MOCKUP: Employee Detail / Player Card
+    User Story: US-0.4.3, US-0.4.4, US-0.4.5, US-0.4.7
+    
+    INTERACTIVE: View profile, change status, edit info
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <span class="brand-name">Ascend FC</span>
+            <span class="brand-subtitle">Club Manager</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="../formation-view/06-squad-builder.html" class="sidebar-item"><span class="icon">👥</span> Squads</a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item"><span class="icon">🏟️</span>
+            Formation</a>
+          <a href="04-player-gallery.html" class="sidebar-item active"><span class="icon">🃏</span> Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="../formation-view/01-department-management.html" class="sidebar-item"><span class="icon">🏢</span>
+            Departments</a>
+          <a href="../formation-view/02-position-management.html" class="sidebar-item"><span class="icon">📍</span>
+            Positions</a>
+          <a href="../formation-view/03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span>
+            Attributes</a>
+          <a href="../formation-view/04-role-templates.html" class="sidebar-item"><span class="icon">📋</span>
+            Templates</a>
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <a href="01-employee-list.html" style="color: var(--muted-foreground); text-decoration: none;">← Back to
+          List</a>
+        <div style="display: flex; gap: var(--space-3);">
+          <button class="btn btn-secondary" onclick="showModal('statusModal')">🔄 Change Status</button>
+          <button class="btn btn-primary">✏️ Edit Profile</button>
+        </div>
+      </div>
+
+      <div class="detail-container">
+        <!-- Player Card (Left) -->
+        <div class="player-card">
+          <div class="player-photo">JS</div>
+          <h1 class="player-name">John Smith</h1>
+          <p class="player-position">Tech Lead</p>
+          <p class="player-dept">Engineering</p>
+
+          <div class="ability-row">
+            <div class="ability-box">
+              <div class="ability-number">156</div>
+              <div class="ability-label">Current</div>
+            </div>
+            <div class="ability-box">
+              <div class="ability-number">175</div>
+              <div class="ability-label">Potential</div>
+            </div>
+          </div>
+
+          <div class="radar-container">📊 Radar Chart</div>
+
+          <div class="player-meta">
+            <div class="meta-item">
+              <div class="meta-value">2 years</div>
+              <div class="meta-label">Tenure</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-value">EMP001</div>
+              <div class="meta-label">ID</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-value">4</div>
+              <div class="meta-label">Reports</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Panel (Right) -->
+        <div class="detail-area">
+          <!-- Basic Info -->
+          <div class="detail-section">
+            <div class="section-header">
+              <span class="section-title">👤 Basic Information</span>
+              <span class="status-large status-active">● Active</span>
+            </div>
+            <div class="section-body">
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Email</div>
+                  <div class="info-value">john.smith@company.com</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Phone</div>
+                  <div class="info-value">+66 89 123 4567</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Department</div>
+                  <div class="info-value">Engineering</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Position</div>
+                  <div class="info-value">Tech Lead</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Reports To</div>
+                  <div class="info-value">Sarah Johnson (VP Engineering)</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Start Date</div>
+                  <div class="info-value">January 15, 2022</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attributes -->
+          <div class="detail-section">
+            <div class="tabs">
+              <div class="tab active">Core Attributes</div>
+              <div class="tab">Specialist</div>
+              <div class="tab">History</div>
+            </div>
+            <div class="section-body">
+              <div class="attr-grid">
+                <div class="attr-item">
+                  <span class="attr-name">🎯 Leadership</span>
+                  <span class="attr-value">17</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 85%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">🤝 Teamwork</span>
+                  <span class="attr-value">15</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 75%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">💬 Communication</span>
+                  <span class="attr-value">16</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 80%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">🔄 Adaptability</span>
+                  <span class="attr-value">14</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 70%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">💪 Determination</span>
+                  <span class="attr-value">18</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 90%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">💻 Coding</span>
+                  <span class="attr-value">18</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 90%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">🏗️ System Design</span>
+                  <span class="attr-value">17</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 85%;"></div>
+                  </div>
+                </div>
+                <div class="attr-item">
+                  <span class="attr-name">🧩 Problem Solving</span>
+                  <span class="attr-value">16</span>
+                  <div class="attr-bar">
+                    <div class="attr-fill" style="width: 80%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direct Reports -->
+          <div class="detail-section">
+            <div class="section-header">
+              <span class="section-title">👥 Direct Reports (4)</span>
+              <button class="btn btn-sm btn-secondary">View All</button>
+            </div>
+            <div class="section-body" style="padding: var(--space-4);">
+              <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+                <div
+                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
+                  <div
+                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                    MW</div>
+                  <div>
+                    <div style="font-weight: 500; font-size: 14px;">Mike Wilson</div>
+                    <div style="font-size: 12px; color: var(--muted-foreground);">Backend Dev</div>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
+                  <div
+                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                    DK</div>
+                  <div>
+                    <div style="font-weight: 500; font-size: 14px;">David Kim</div>
+                    <div style="font-size: 12px; color: var(--muted-foreground);">Frontend Dev</div>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
+                  <div
+                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--zone-midfield); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                    MG</div>
+                  <div>
+                    <div style="font-weight: 500; font-size: 14px;">Maria Garcia</div>
+                    <div style="font-size: 12px; color: var(--muted-foreground);">QA Engineer</div>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
+                  <div
+                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--zone-support); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                    RB</div>
+                  <div>
+                    <div style="font-weight: 500; font-size: 14px;">Robert Brown</div>
+                    <div style="font-size: 12px; color: var(--muted-foreground);">DevOps Eng</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Roles -->
+          <div class="detail-section">
+            <div class="section-header">
+              <span class="section-title">🔐 Assigned Roles</span>
+              <button class="btn btn-sm btn-secondary">Manage</button>
+            </div>
+            <div class="section-body" style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+              <span class="badge badge-primary">Team Lead</span>
+              <span class="badge badge-muted">Employee</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Status Change Modal -->
+  <div class="modal-overlay" id="statusModal" onclick="hideModal('statusModal')">
+    <div class="modal" style="max-width: 480px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Change Employment Status</h2>
+        <button class="modal-close" onclick="hideModal('statusModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Current Status</label>
+          <span class="status-large status-active">● Active</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Status *</label>
+          <select class="form-select" id="newStatus">
+            <option value="">Select new status</option>
+            <option value="leave">On Leave</option>
+            <option value="suspended">Suspended</option>
+            <option value="terminated">Terminated</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Effective Date *</label>
+          <input type="date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reason</label>
+          <textarea class="form-input" rows="3" placeholder="Enter reason for status change..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('statusModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="hideModal('statusModal')">Confirm Change</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showModal(id) {
+      document.getElementById(id).classList.add('visible');
+    }
+
+    function hideModal(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    // Click overlay to close - handle on the overlay element
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', function (e) {
+        // Only close if clicking directly on the overlay (not the modal content)
+        if (e.target === overlay) {
+          overlay.classList.remove('visible');
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

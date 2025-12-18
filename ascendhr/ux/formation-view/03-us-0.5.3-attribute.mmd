@@ -1,0 +1,38 @@
+flowchart TD
+    Start((Start)) --> LibScreen
+    
+    subgraph LibScreen ["Attribute Library Screen"]
+        ViewCore[View Core Attributes]
+        ViewSpec[View Specialist Attributes]
+        ClickAdd[Click 'Add Attribute']
+    end
+
+    subgraph Editor ["Attribute Editor Screen"]
+        InputName[/Input Name/]
+        GenCode[Auto-generate Code slug]
+        SelectCat{Select Category}
+        
+        CatCore[Category: Core]
+        CatSpec[Category: Specialist]
+        
+        SelectZone[/Select Zone (Specialist Only)/]
+        InputDesc[/Input Description/]
+        PreviewCard[Update Card Preview]
+        
+        Save[Click Save]
+    end
+
+    ClickAdd --> InputName
+    InputName --> GenCode
+    GenCode --> SelectCat
+    
+    SelectCat -->|Core| CatCore
+    SelectCat -->|Specialist| CatSpec
+    
+    CatCore --> InputDesc
+    CatSpec --> SelectZone
+    SelectZone --> InputDesc
+    
+    InputDesc --> PreviewCard
+    PreviewCard --> Save
+    Save -->|Success| LibScreen

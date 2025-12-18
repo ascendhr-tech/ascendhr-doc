@@ -5,22 +5,24 @@ graph TD
         B --> C[Register Account]
         C --> D[Verify Email]
         D --> E[Create Your Club]
-        E --> F[Setup Owner Player Card]
-        F --> G{Invite Team?}
-        G -->|Yes| H[Invite Squad]
-        G -->|Skip| I[Dashboard]
-        H --> I
+        E --> F{Invite Team?}
+        F -->|Yes| G[Invite Squad]
+        F -->|Skip| H[Dashboard]
+        G --> H
     end
     
-    I --> J((End: Ready to Build Squad))
+    H --> I((Next: Epic 0.4 Player Card Setup))
     
     subgraph Legend["Flow Legend"]
         L1[Landing Page] ~~~ L2[Registration]
         L2 ~~~ L3[Club Setup]
-        L3 ~~~ L4[Invite Team]
+        L3 ~~~ L4[Dashboard]
     end
 
     style A fill:#4CAF50,color:white
-    style J fill:#2196F3,color:white
+    style I fill:#2196F3,color:white
     style E fill:#FF9800,color:white
-    style F fill:#9C27B0,color:white
+    style H fill:#9C27B0,color:white
+
+    %% Note: Player Card setup moved to Epic 0.4
+    %% This flow ends at Dashboard, where user can then create Player Card

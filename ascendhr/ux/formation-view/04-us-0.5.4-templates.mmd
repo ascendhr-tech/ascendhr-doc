@@ -1,0 +1,28 @@
+flowchart TD
+    Start((Start)) --> GalleryScreen
+    
+    subgraph GalleryScreen ["Role Template Gallery"]
+        ViewGrid[View Template Cards]
+        FilterZone[Filter by Zone]
+        ClickCard[Click Template Card]
+    end
+
+    subgraph DetailModal ["Template Detail Modal"]
+        ViewStats[View Attributes & Stats]
+        ActionUse[Click 'Create Position from Template']
+    end
+
+    subgraph PosModal ["Position Create Modal"]
+        PreFill[Pre-fill Position Form]
+        EditDetails[Customize Title/Dept]
+        Save[Click Save]
+    end
+
+    Start --> GalleryScreen
+    ViewGrid --> ClickCard
+    ClickCard --> ViewStats
+    ViewStats --> ActionUse
+    ActionUse --> PreFill
+    PreFill --> EditDetails
+    EditDetails --> Save
+    Save -->|Success| RedirectPosList[Redirect to Position List]

@@ -1,8 +1,11 @@
 # Invite Initial Squad (Scouts/Staff)
 
-**Story ID:** US-0.0.4  
+**Story ID:** US-0.0.3  
 **Epic:** 0.0 - Football Club Setup  
-**Persona:** Club Owner
+**Persona:** Club Owner  
+**Version:** 3.0  
+**Updated:** December 18, 2024  
+**Design Reference:** [`03-invite-team.html`](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/football-club-setup/03-invite-team.html) (Invite Modal)
 
 ---
 
@@ -16,14 +19,16 @@
 
 ## Business Requirement/Logic
 
-หลังจาก Owner สร้าง Player Card ของตัวเองเสร็จแล้ว จะสามารถเชิญทีมงานคนอื่น (เช่น HR, Managers) เข้ามาร่วมใช้งานระบบได้ คนที่ถูกเชิญจะได้รับ email invitation และต้องสร้าง Player Card ของตัวเองเช่นกัน
+หลังจาก Owner สร้าง Club เสร็จแล้ว จะสามารถเชิญทีมงานคนอื่น (เช่น HR, Managers) เข้ามาร่วมใช้งานระบบได้ คนที่ถูกเชิญจะได้รับ email invitation
+
+> ⚠️ **Note:** Player Card setup สำหรับทั้ง Owner และ Invitee จะทำใน **Epic 0.4 (Player Card System)** เนื่องจากต้อง Setup Department/Position ก่อน
 
 **Key Business Rules:**
 - Invitation email มีอายุ 7 วัน
 - สามารถเชิญหลายคนพร้อมกันได้ (comma-separated emails)
 - ต้องกำหนด Role ให้ผู้ถูกเชิญ (Scout/HR, Manager, Employee)
-- ผู้ถูกเชิญจะต้องสร้าง Player Card ของตัวเองหลังยอมรับ invitation
 - สามารถข้าม (Skip) ขั้นตอนนี้ได้ และกลับมาเชิญทีหลัง
+- ผู้ถูกเชิญหลังยอมรับ invitation จะเข้า Dashboard และสร้าง Player Card ใน Epic 0.4
 
 ---
 
@@ -33,7 +38,7 @@
 
 **Given**
 - Club Owner has created their club
-- Club Owner has completed their player card
+- Club Owner is logged in
 
 **When**
 - Owner clicks "Invite Team Members"
@@ -65,8 +70,8 @@
 **Then**
 - System creates user account for invitee
 - System assigns the role specified in invitation
-- System redirects invitee to "Setup Your Player Card" flow
-- Invitee must create their own Player Card (same as US-0.0.3)
+- System redirects invitee to Dashboard
+- Invitee can create their Player Card later (Epic 0.4: US-0.4.0)
 
 ---
 
@@ -135,3 +140,12 @@
 - **Accept Page**: Welcome message, password creation form
 - **Password Form**: Password + confirm password with strength indicator
 - **Skip Link**: "Skip for now" option in modal footer
+
+---
+
+## Related Stories
+
+| Story | Description | Epic |
+|-------|-------------|------|
+| **US-0.4.0** | Setup Owner's Player Card (First Player Card) | Epic 0.4 |
+| **US-0.4.1** | Create Employee + Player Card | Epic 0.4 |

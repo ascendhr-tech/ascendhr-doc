@@ -1,5 +1,5 @@
 graph TD
-    A((Start: After Player Card)) --> B[Click 'Invite Team Members']
+    A((Start: After Club Created)) --> B[Click 'Invite Team Members']
     
     subgraph InviteModal["Invite Team Modal"]
         B --> C[[Open Invite Modal]]
@@ -24,7 +24,8 @@ graph TD
         L --> M[Show 'Invitations sent' summary]
     end
     
-    M --> N((Owner Flow End))
+    M --> N[Continue to Dashboard]
+    N --> I2((Owner: Go to Dashboard))
     
     subgraph InviteeFlow["Invitee Accept Flow"]
         O((Invitee Receives Email)) --> P[Click invitation link]
@@ -37,16 +38,20 @@ graph TD
         T --> U[Click 'Join the Club']
         U --> V[Create user account]
         V --> W[Assign role from invitation]
-        W --> X[Redirect to Setup Player Card]
+        W --> X[Redirect to Dashboard]
     end
     
-    X --> Y((Invitee: Setup Their Player Card))
+    X --> Y((Invitee: Dashboard))
     I --> Z((End: Dashboard))
 
     style A fill:#4CAF50,color:white
-    style N fill:#2196F3,color:white
-    style Y fill:#9C27B0,color:white
+    style I2 fill:#2196F3,color:white
+    style Y fill:#2196F3,color:white
     style Z fill:#2196F3,color:white
     style E1 fill:#f44336,color:white
     style E2 fill:#f44336,color:white
     style Q1 fill:#f44336,color:white
+
+    %% Note: Player Card setup for both Owner and Invitee
+    %% is handled in Epic 0.4 (Player Card System)
+    %% After login/invite, users go to Dashboard first

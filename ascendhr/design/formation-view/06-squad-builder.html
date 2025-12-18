@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Squad Builder | AscendHR</title>
+
+  <!-- SHARED COMPONENT SYSTEM -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* === PAGE-SPECIFIC STYLES === */
+    .builder-container {
+      display: flex;
+      gap: 24px;
+      height: calc(100vh - 140px);
+    }
+
+    /* Squad Canvas */
+    .squad-canvas {
+      flex: 1;
+      background: linear-gradient(180deg, #15803d 0%, #166534 100%);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2);
+    }
+
+    .squad-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      color: white;
+    }
+
+    .squad-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .squad-meta {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .squad-avg-score {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avg-score-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .avg-score-label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    /* Slot Grid */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .slot-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: 3px solid transparent;
+    }
+
+    .slot-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .slot-card.filled {
+      border-color: var(--accent);
+    }
+
+    .slot-card.empty {
+      background: rgba(255, 255, 255, 0.3);
+      border: 3px dashed rgba(255, 255, 255, 0.5);
+    }
+
+    .slot-card.empty:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .slot-role {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .slot-card.empty .slot-role {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .slot-avatar {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slot-avatar.filled {
+      background: var(--primary);
+      color: white;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .slot-avatar.empty {
+      background: rgba(255, 255, 255, 0.3);
+      border: 2px dashed rgba(255, 255, 255, 0.6);
+      font-size: 28px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .slot-card.filled .slot-avatar.empty {
+      display: none;
+    }
+
+    .slot-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+
+    .slot-card.empty .slot-name {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .slot-dept {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+
+    .slot-fit {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .slot-fit.high {
+      background: var(--accent-light);
+      color: #166534;
+    }
+
+    .slot-fit.medium {
+      background: var(--warning-light);
+      color: #713F12;
+    }
+
+    .slot-fit.low {
+      background: var(--destructive-light);
+      color: #991B1B;
+    }
+
+    /* Player Drawer */
+    .player-drawer {
+      width: 360px;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .player-drawer.open {
+      display: flex;
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .drawer-subtitle {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .drawer-search {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .player-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+      background: var(--background);
+      border: 1px solid var(--border);
+    }
+
+    .player-option:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .player-option.recommended {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+
+    .player-option .avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .player-option .info {
+      flex: 1;
+    }
+
+    .player-option .name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .player-option .role {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .player-option .fit {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .player-option .fit.high {
+      color: var(--accent);
+    }
+
+    .player-option .fit.medium {
+      color: var(--warning);
+    }
+
+    .player-option .fit.low {
+      color: var(--destructive);
+    }
+
+    .rec-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    /* Ability Scores */
+    .ability-scores {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .ability-current {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .ability-sep {
+      color: var(--muted-foreground);
+      margin: 0 2px;
+    }
+
+    .ability-potential {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Fit Score Container */
+    .fit-score {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .view-card {
+      font-size: 11px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .view-card:hover {
+      text-decoration: underline;
+    }
+
+    /* Template Selection Modal */
+    .template-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+
+    .template-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .template-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .template-option .icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .template-option .details {
+      flex: 1;
+    }
+
+    .template-option .name {
+      font-weight: 600;
+    }
+
+    .template-option .desc {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .template-option .slots {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    /* === FC26 / FOOTBALL MANAGER STYLE === */
+
+    /* Light Dashboard Background */
+    .squad-dashboard {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100%;
+    }
+
+    /* Light Stats Cards */
+    .stat-card-dark {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-card-dark .value {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-card-dark .label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Light Squad Cards */
+    .squad-card-dark {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .squad-card-dark::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(124, 58, 237, 0.5) 100%);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      -webkit-mask-composite: xor;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .squad-card-dark:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+    }
+
+    .squad-card-dark:hover::before {
+      opacity: 1;
+    }
+
+    .squad-card-dark .squad-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+
+    .squad-card-dark .squad-template {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    /* FIFA-style Rating Badge */
+    .fit-rating-badge {
+      width: 56px;
+      height: 70px;
+      background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px 4px 0 0;
+      clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+    }
+
+    .fit-rating-badge .rating-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1;
+    }
+
+    .fit-rating-badge .rating-label {
+      font-size: 8px;
+      font-weight: 600;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Progress Bar Light */
+    .progress-bar-dark {
+      height: 6px;
+      background: var(--muted);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-dark .fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-bar-dark .fill.green {
+      background: linear-gradient(90deg, #22c55e 0%, #10b981 100%);
+    }
+
+    /* Team Avatars Stack */
+    .avatar-stack {
+      display: flex;
+    }
+
+    .avatar-stack .avatar-item {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid white;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: -8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-stack .avatar-item:first-child {
+      margin-left: 0;
+    }
+
+    .avatar-stack .avatar-more {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    /* Open Slots Badge */
+    .open-slots-badge {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Create New Squad Card (Light) */
+    .create-squad-card-dark {
+      background: white;
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .create-squad-card-dark:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .create-squad-card-dark .plus-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+
+    .create-squad-card-dark .text {
+      color: var(--foreground);
+      font-weight: 600;
+    }
+
+    .create-squad-card-dark .subtext {
+      color: var(--muted-foreground);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    /* Light Modal */
+    .modal-dark {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .modal-dark .modal-header {
+      border-bottom-color: var(--border);
+    }
+
+    .modal-dark .modal-title {
+      color: var(--foreground);
+    }
+
+    .modal-dark .modal-close {
+      color: var(--muted-foreground);
+    }
+
+    .modal-dark .modal-close:hover {
+      color: var(--foreground);
+    }
+
+    .modal-dark .form-label {
+      color: var(--foreground);
+    }
+
+    .modal-dark .form-input {
+      background: white;
+      border-color: var(--border);
+      color: var(--foreground);
+    }
+
+    .modal-dark .form-hint {
+      color: var(--muted-foreground);
+    }
+
+    /* Template Cards (Light) */
+    .template-card-dark {
+      background: var(--background);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .template-card-dark:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .template-card-dark.selected {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .template-card-dark .template-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .template-card-dark .template-details {
+      flex: 1;
+    }
+
+    .template-card-dark .template-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+
+    .template-card-dark .template-desc {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-top: 2px;
+    }
+
+    .template-card-dark .template-slots {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Role Badges Preview (replaces mini pitch) */
+    .roles-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .role-badge-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 56px;
+      text-align: center;
+    }
+
+    .role-badge-preview.filled {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .role-badge-preview.empty {
+      border-style: dashed;
+      opacity: 0.6;
+    }
+
+    .role-badge-preview .role-abbr {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .role-badge-preview.filled .role-abbr {
+      color: var(--primary);
+    }
+
+    .role-badge-preview .role-member {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-top: 2px;
+    }
+
+    .role-badge-preview.empty .role-member {
+      color: var(--muted-foreground);
+      font-size: 16px;
+    }
+
+    /* Toggle Button Group */
+    .toggle-group {
+      display: flex;
+      background: var(--muted);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background: white;
+      color: var(--foreground);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Position Picker */
+    .position-picker {
+      display: none;
+    }
+
+    .position-picker.active {
+      display: block;
+    }
+
+    /* Total Slots Header */
+    .total-slots-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .total-slots-header .label {
+      font-size: 14px;
+      color: var(--foreground);
+      font-weight: 500;
+    }
+
+    .total-slots-header .total {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Position Cards Grid */
+    .position-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .position-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .position-card.has-count {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .position-card .position-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .position-card .position-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--foreground);
+      text-align: center;
+      margin-bottom: 12px;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Stepper Controls */
+    .position-stepper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--background);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .stepper-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: var(--muted);
+      color: var(--foreground);
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .stepper-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .stepper-btn:active {
+      transform: scale(0.95);
+    }
+
+    .position-count {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--foreground);
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .position-count.zero {
+      color: var(--muted-foreground);
+    }
+
+    /* Summary Bar */
+    .position-summary {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .position-summary .summary-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .position-summary .summary-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .position-summary .summary-tag {
+      background: var(--primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .position-summary .no-positions {
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    MOCKUP: Squad Builder
+    User Story: US-0.5.6
+    Flow: Create squads from templates, assign players, view fit scores
+  -->
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <span class="brand-name">Ascend FC</span>
+            <span class="brand-subtitle">Club Manager</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="06-squad-builder.html" class="sidebar-item active"><span class="icon">👥</span> Squads</a>
+          <a href="05-formation-pitch.html" class="sidebar-item"><span class="icon">🏟️</span>
+            Formation</a>
+          <a href="../player-card-system/04-player-gallery.html" class="sidebar-item"><span class="icon">🃏</span>
+            Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="01-department-management.html" class="sidebar-item"><span class="icon">🏢</span> Departments</a>
+          <a href="02-position-management.html" class="sidebar-item"><span class="icon">📍</span> Positions</a>
+          <a href="03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span> Attributes</a>
+          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Squad Builder</h1>
+          <p class="text-muted">Build cross-functional teams with optimal fit</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-secondary" onclick="showDashboard()">
+            ← Back to Squads
+          </button>
+          <button class="btn btn-primary">
+            Save Squad
+          </button>
+        </div>
+      </header>
+
+      <div class="builder-container">
+        <!-- Squad Canvas -->
+        <div class="squad-canvas">
+          <div class="squad-header">
+            <div>
+              <div class="squad-title">🛡️ Project Phoenix Team</div>
+              <div class="squad-meta">Scrum Team Template • 4/6 slots filled</div>
+            </div>
+            <div class="squad-avg-score">
+              <div>
+                <div class="avg-score-value">87%</div>
+                <div class="avg-score-label">Avg Fit</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slots-grid">
+            <!-- Filled Slots -->
+            <div class="slot-card filled" onclick="openDrawer('pm')">
+              <div class="slot-role">Product Manager</div>
+              <div class="slot-avatar filled">DT</div>
+              <div class="slot-name">David Thompson</div>
+              <div class="slot-dept">Product</div>
+              <span class="slot-fit high">✓ 92% fit</span>
+            </div>
+
+            <div class="slot-card filled" onclick="openDrawer('be')">
+              <div class="slot-role">Backend Developer</div>
+              <div class="slot-avatar filled">MK</div>
+              <div class="slot-name">Michael Kim</div>
+              <div class="slot-dept">Engineering</div>
+              <span class="slot-fit high">✓ 91% fit</span>
+            </div>
+
+            <div class="slot-card filled" onclick="openDrawer('fe')">
+              <div class="slot-role">Frontend Developer</div>
+              <div class="slot-avatar filled">LW</div>
+              <div class="slot-name">Lisa Wang</div>
+              <div class="slot-dept">Engineering</div>
+              <span class="slot-fit medium">⚠ 78% fit</span>
+            </div>
+
+            <div class="slot-card filled" onclick="openDrawer('ux')">
+              <div class="slot-role">UX/UI Designer</div>
+              <div class="slot-avatar filled">ER</div>
+              <div class="slot-name">Emma Roberts</div>
+              <div class="slot-dept">Design</div>
+              <span class="slot-fit high">✓ 89% fit</span>
+            </div>
+
+            <!-- Empty Slots -->
+            <div class="slot-card empty" onclick="openDrawer('qa')">
+              <div class="slot-role">QA Engineer</div>
+              <div class="slot-avatar empty">+</div>
+              <div class="slot-name">Click to assign</div>
+            </div>
+
+            <div class="slot-card empty" onclick="openDrawer('devops')">
+              <div class="slot-role">DevOps Engineer</div>
+              <div class="slot-avatar empty">+</div>
+              <div class="slot-name">Click to assign</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player Selection Drawer -->
+        <div class="player-drawer" id="drawer">
+          <div class="drawer-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="drawer-title" id="drawerTitle">Assign: QA Engineer</div>
+              <div class="drawer-subtitle">Select a player for this slot</div>
+            </div>
+            <button onclick="closeDrawer()"
+              style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted-foreground); padding: 4px;">×</button>
+          </div>
+          <div class="drawer-search">
+            <input type="text" class="form-input" placeholder="Search players...">
+          </div>
+          <div class="drawer-body">
+            <div
+              style="font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; padding: 0 4px;">
+              ⭐ Recommended
+            </div>
+
+            <div class="player-option recommended" onclick="selectPlayer(this)">
+              <div class="avatar" style="background: #4ade80;">JL</div>
+              <div class="info">
+                <div class="name">James Lee <span class="rec-badge">Best Fit</span></div>
+                <div class="role">QA Engineer • Engineering</div>
+                <div class="ability-scores">
+                  <span class="ability-current">148</span>
+                  <span class="ability-sep">/</span>
+                  <span class="ability-potential">165</span>
+                </div>
+              </div>
+              <div class="fit-score">
+                <div class="fit high">94%</div>
+                <a href="../player-card-system/03-employee-detail.html" class="view-card"
+                  onclick="event.stopPropagation()">View →</a>
+              </div>
+            </div>
+
+            <div class="player-option recommended" onclick="selectPlayer(this)">
+              <div class="avatar" style="background: #60a5fa;">SK</div>
+              <div class="info">
+                <div class="name">Sophie Kim</div>
+                <div class="role">Senior QA • Engineering</div>
+                <div class="ability-scores">
+                  <span class="ability-current">155</span>
+                  <span class="ability-sep">/</span>
+                  <span class="ability-potential">168</span>
+                </div>
+              </div>
+              <div class="fit-score">
+                <div class="fit high">88%</div>
+                <a href="../player-card-system/03-employee-detail.html" class="view-card"
+                  onclick="event.stopPropagation()">View →</a>
+              </div>
+            </div>
+
+            <div
+              style="font-size: 11px; font-weight: 600; color: var(--muted-foreground); text-transform: uppercase; margin: 16px 0 12px; padding: 0 4px;">
+              All Available
+            </div>
+
+            <div class="player-option" onclick="selectPlayer(this)">
+              <div class="avatar" style="background: #a78bfa;">RT</div>
+              <div class="info">
+                <div class="name">Robert Taylor</div>
+                <div class="role">QA Lead • Engineering</div>
+                <div class="ability-scores">
+                  <span class="ability-current">142</span>
+                  <span class="ability-sep">/</span>
+                  <span class="ability-potential">155</span>
+                </div>
+              </div>
+              <div class="fit-score">
+                <div class="fit medium">76%</div>
+                <a href="../player-card-system/03-employee-detail.html" class="view-card"
+                  onclick="event.stopPropagation()">View →</a>
+              </div>
+            </div>
+
+            <div class="player-option" onclick="selectPlayer(this)">
+              <div class="avatar" style="background: #f87171;">AN</div>
+              <div class="info">
+                <div class="name">Amy Nguyen</div>
+                <div class="role">Manual Tester • Engineering</div>
+                <div class="ability-scores">
+                  <span class="ability-current">128</span>
+                  <span class="ability-sep">/</span>
+                  <span class="ability-potential">150</span>
+                </div>
+              </div>
+              <div class="fit-score">
+                <div class="fit medium">72%</div>
+                <a href="../player-card-system/03-employee-detail.html" class="view-card"
+                  onclick="event.stopPropagation()">View →</a>
+              </div>
+            </div>
+
+            <div class="player-option" onclick="selectPlayer(this)">
+              <div class="avatar" style="background: #fbbf24;">MC</div>
+              <div class="info">
+                <div class="name">Marcus Chen</div>
+                <div class="role">Junior QA • Engineering</div>
+                <div class="ability-scores">
+                  <span class="ability-current">105</span>
+                  <span class="ability-sep">/</span>
+                  <span class="ability-potential">145</span>
+                </div>
+              </div>
+              <div class="fit-score">
+                <div class="fit low">58%</div>
+                <a href="../player-card-system/03-employee-detail.html" class="view-card"
+                  onclick="event.stopPropagation()">View →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Dashboard State (SHOWN by default - positioned after sidebar) -->
+  <div id="dashboard-overlay" class="squad-dashboard"
+    style="position: fixed; top: 0; right: 0; bottom: 0; left: 260px; z-index: 100; padding: 32px; overflow-y: auto;">
+    <div style="max-width: 1100px; margin: 0 auto;">
+      <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+          <h1 style="font-size: 28px; font-weight: 700;">👥 My Squads</h1>
+          <p style="color: var(--muted-foreground);">Manage and compare your cross-functional teams</p>
+        </div>
+        <button class="btn btn-primary" onclick="showTemplateModal()"
+          style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); border: none;">
+          + New Squad
+        </button>
+      </header>
+
+      <!-- Summary Stats Bar (Dark Glassmorphism) -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+        <div class="stat-card-dark">
+          <div class="value">3</div>
+          <div class="label">Total Squads</div>
+        </div>
+        <div class="stat-card-dark">
+          <div class="value">86%</div>
+          <div class="label">Avg Team Fit</div>
+        </div>
+        <div class="stat-card-dark">
+          <div class="value">11</div>
+          <div class="label">Active Members</div>
+        </div>
+        <div class="stat-card-dark">
+          <div class="value">3</div>
+          <div class="label">Open Positions</div>
+        </div>
+      </div>
+
+      <!-- Squad Cards Grid -->
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+
+        <!-- Squad Card 1: Project Phoenix (Dark Theme) -->
+        <div class="squad-card-dark" onclick="hideDashboard()">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+            <div>
+              <div class="squad-name">🛡️ Project Phoenix</div>
+              <div class="squad-template">Scrum Team Template</div>
+            </div>
+            <div class="fit-rating-badge">
+              <div class="rating-value">87</div>
+              <div class="rating-label">FIT</div>
+            </div>
+          </div>
+
+          <!-- Role Badges Preview -->
+          <div class="roles-preview">
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">PM</span>
+              <span class="role-member">DT</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">BE</span>
+              <span class="role-member">MK</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">FE</span>
+              <span class="role-member">LW</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">UX</span>
+              <span class="role-member">ER</span>
+            </div>
+            <div class="role-badge-preview empty">
+              <span class="role-abbr">QA</span>
+              <span class="role-member">+</span>
+            </div>
+            <div class="role-badge-preview empty">
+              <span class="role-abbr">DevOps</span>
+              <span class="role-member">+</span>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 11px; color: var(--muted-foreground); text-transform: uppercase;">Slots
+                Filled</span>
+              <span style="font-size: 13px; font-weight: 600; color: var(--foreground);">4/6</span>
+            </div>
+            <div class="progress-bar-dark">
+              <div class="fill green" style="width: 66%;"></div>
+            </div>
+          </div>
+
+          <!-- Team Avatars & Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="avatar-stack">
+              <div class="avatar-item">DT</div>
+              <div class="avatar-item">MK</div>
+              <div class="avatar-item">LW</div>
+              <div class="avatar-item">ER</div>
+              <div class="avatar-item avatar-more">+2</div>
+            </div>
+            <span class="open-slots-badge">2 open</span>
+          </div>
+        </div>
+
+        <!-- Squad Card 2: Growth Squad (Dark Theme) -->
+        <div class="squad-card-dark">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+            <div>
+              <div class="squad-name">⚔️ Growth Squad</div>
+              <div class="squad-template">Marketing Team</div>
+            </div>
+            <div class="fit-rating-badge">
+              <div class="rating-value">82</div>
+              <div class="rating-label">FIT</div>
+            </div>
+          </div>
+
+          <!-- Role Badges Preview -->
+          <div class="roles-preview">
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">Mkt Lead</span>
+              <span class="role-member">JC</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">Content</span>
+              <span class="role-member">SR</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">SEO</span>
+              <span class="role-member">AP</span>
+            </div>
+            <div class="role-badge-preview empty">
+              <span class="role-abbr">Social</span>
+              <span class="role-member">+</span>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 11px; color: var(--muted-foreground); text-transform: uppercase;">Slots
+                Filled</span>
+              <span style="font-size: 13px; font-weight: 600; color: var(--foreground);">3/4</span>
+            </div>
+            <div class="progress-bar-dark">
+              <div class="fill green" style="width: 75%;"></div>
+            </div>
+          </div>
+
+          <!-- Team Avatars & Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="avatar-stack">
+              <div class="avatar-item" style="background: #f59e0b;">JC</div>
+              <div class="avatar-item" style="background: #8b5cf6;">SR</div>
+              <div class="avatar-item" style="background: #ec4899;">AP</div>
+            </div>
+            <span class="open-slots-badge">1 open</span>
+          </div>
+        </div>
+
+        <!-- Squad Card 3: Infrastructure (Dark Theme) -->
+        <div class="squad-card-dark">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+            <div>
+              <div class="squad-name">🏗️ Infrastructure</div>
+              <div class="squad-template">DevOps Team</div>
+            </div>
+            <div class="fit-rating-badge"
+              style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 50%, #15803d 100%);">
+              <div class="rating-value">99</div>
+              <div class="rating-label">FIT</div>
+            </div>
+          </div>
+
+          <!-- Role Badges Preview -->
+          <div class="roles-preview">
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">DevOps Lead</span>
+              <span class="role-member">RB</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">SRE</span>
+              <span class="role-member">TC</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">SRE</span>
+              <span class="role-member">KL</span>
+            </div>
+            <div class="role-badge-preview filled">
+              <span class="role-abbr">Security</span>
+              <span class="role-member">JN</span>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 11px; color: var(--muted-foreground); text-transform: uppercase;">Slots
+                Filled</span>
+              <span style="font-size: 13px; font-weight: 600; color: #22c55e;">4/4 ✓</span>
+            </div>
+            <div class="progress-bar-dark">
+              <div class="fill green" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Team Avatars & Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="avatar-stack">
+              <div class="avatar-item" style="background: #0ea5e9;">RB</div>
+              <div class="avatar-item" style="background: #06b6d4;">TC</div>
+              <div class="avatar-item" style="background: #14b8a6;">KL</div>
+              <div class="avatar-item" style="background: #10b981;">JN</div>
+            </div>
+            <span
+              style="background: rgba(34,197,94,0.2); color: #4ade80; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Complete</span>
+          </div>
+        </div>
+
+        <!-- Create New Squad Card (Dark Theme) -->
+        <div class="create-squad-card-dark" onclick="showTemplateModal()">
+          <div class="plus-icon">+</div>
+          <div class="text">Create New Squad</div>
+          <div class="subtext">Choose from templates</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Squad Modal with Template/Custom Toggle -->
+  <div class="modal-overlay" id="templateModal" style="display: none;">
+    <div class="modal modal-dark" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🏆 Create New Squad</h2>
+        <button class="modal-close" onclick="hideTemplateModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Squad Name</label>
+          <input type="text" class="form-input" placeholder="e.g., Project Alpha Team">
+        </div>
+
+        <!-- Custom Position Picker Section (only option now) -->
+        <div id="customSection" class="position-picker active">
+          <label class="form-label">Configure Positions</label>
+          <p class="form-hint" style="margin-bottom: 16px;">Use +/- to set how many of each position you need</p>
+
+          <!-- Total Slots Header -->
+          <div class="total-slots-header">
+            <span class="label">📊 Total Positions Configured</span>
+            <span class="total" id="totalSlots">0 slots</span>
+          </div>
+
+          <!-- Position Cards Grid -->
+          <div class="position-cards-grid">
+            <div class="position-card" id="card-pm">
+              <div class="position-name">Product Manager</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('pm', -1)">−</button>
+                <span class="position-count zero" id="count-pm">0</span>
+                <button class="stepper-btn" onclick="changeCount('pm', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-be">
+              <div class="position-name">Backend Developer</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('be', -1)">−</button>
+                <span class="position-count zero" id="count-be">0</span>
+                <button class="stepper-btn" onclick="changeCount('be', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-fe">
+              <div class="position-name">Frontend Developer</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('fe', -1)">−</button>
+                <span class="position-count zero" id="count-fe">0</span>
+                <button class="stepper-btn" onclick="changeCount('fe', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-ux">
+              <div class="position-name">UX Designer</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('ux', -1)">−</button>
+                <span class="position-count zero" id="count-ux">0</span>
+                <button class="stepper-btn" onclick="changeCount('ux', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-qa">
+              <div class="position-name">QA Engineer</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('qa', -1)">−</button>
+                <span class="position-count zero" id="count-qa">0</span>
+                <button class="stepper-btn" onclick="changeCount('qa', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-devops">
+              <div class="position-name">DevOps Engineer</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('devops', -1)">−</button>
+                <span class="position-count zero" id="count-devops">0</span>
+                <button class="stepper-btn" onclick="changeCount('devops', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-lead">
+              <div class="position-name">Tech Lead</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('lead', -1)">−</button>
+                <span class="position-count zero" id="count-lead">0</span>
+                <button class="stepper-btn" onclick="changeCount('lead', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="position-card" id="card-data">
+              <div class="position-name">Data Analyst</div>
+              <div class="position-stepper">
+                <button class="stepper-btn" onclick="changeCount('data', -1)">−</button>
+                <span class="position-count zero" id="count-data">0</span>
+                <button class="stepper-btn" onclick="changeCount('data', 1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Position Summary -->
+          <div class="position-summary" id="positionSummary">
+            <div class="summary-label">Your Squad Composition</div>
+            <div class="summary-tags" id="summaryTags">
+              <span class="no-positions">Add positions using the + buttons above</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideTemplateModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="hideTemplateModal(); hideDashboard();"
+          style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); border: none;">🚀 Start
+          Building</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openDrawer(role) {
+      const drawer = document.getElementById('drawer');
+      const title = document.getElementById('drawerTitle');
+
+      // Map role codes to display names
+      const roleNames = {
+        'pm': 'Product Manager',
+        'be': 'Backend Developer',
+        'fe': 'Frontend Developer',
+        'ux': 'UX/UI Designer',
+        'qa': 'QA Engineer',
+        'devops': 'DevOps Engineer'
+      };
+
+      title.textContent = 'Assign: ' + (roleNames[role] || role);
+      drawer.classList.add('open');
+    }
+    function closeDrawer() {
+      document.getElementById('drawer').classList.remove('open');
+    }
+    function selectPlayer(el) {
+      alert('Player assigned! (Demo)');
+      closeDrawer();
+    }
+    function showDashboard() {
+      document.getElementById('dashboard-overlay').style.display = 'block';
+    }
+    function hideDashboard() {
+      document.getElementById('dashboard-overlay').style.display = 'none';
+    }
+    function showTemplateModal() {
+      document.getElementById('templateModal').style.display = 'flex';
+    }
+    function hideTemplateModal() {
+      document.getElementById('templateModal').style.display = 'none';
+    }
+
+    // Toggle between Template and Custom sections
+    function showTemplateSection() {
+      document.getElementById('templateSection').style.display = 'block';
+      document.getElementById('customSection').classList.remove('active');
+      document.querySelectorAll('.toggle-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === 0);
+      });
+    }
+
+    function showCustomSection() {
+      document.getElementById('templateSection').style.display = 'none';
+      document.getElementById('customSection').classList.add('active');
+      document.querySelectorAll('.toggle-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === 1);
+      });
+    }
+
+    // Position counter for custom squads
+    const positionCounts = {
+      pm: 0, be: 0, fe: 0, ux: 0, qa: 0, devops: 0, lead: 0, data: 0
+    };
+
+    const positionNames = {
+      pm: 'Product Manager',
+      be: 'Backend Developer',
+      fe: 'Frontend Developer',
+      ux: 'UX Designer',
+      qa: 'QA Engineer',
+      devops: 'DevOps Engineer',
+      lead: 'Tech Lead',
+      data: 'Data Analyst'
+    };
+
+    function changeCount(id, delta) {
+      const newCount = Math.max(0, Math.min(5, positionCounts[id] + delta));
+      positionCounts[id] = newCount;
+
+      // Update count display
+      const countEl = document.getElementById(`count-${id}`);
+      countEl.textContent = newCount;
+      countEl.classList.toggle('zero', newCount === 0);
+
+      // Update card highlight
+      const cardEl = document.getElementById(`card-${id}`);
+      cardEl.classList.toggle('has-count', newCount > 0);
+
+      // Update total and summary
+      updateTotalSlots();
+      updateSummary();
+    }
+
+    function updateTotalSlots() {
+      const total = Object.values(positionCounts).reduce((a, b) => a + b, 0);
+      document.getElementById('totalSlots').textContent = `${total} slot${total !== 1 ? 's' : ''}`;
+    }
+
+    function updateSummary() {
+      const container = document.getElementById('summaryTags');
+      const positions = Object.entries(positionCounts)
+        .filter(([_, count]) => count > 0)
+        .map(([id, count]) => ({ name: positionNames[id], count }));
+
+      if (positions.length === 0) {
+        container.innerHTML = '<span class="no-positions">Add positions using the + buttons above</span>';
+        return;
+      }
+
+      container.innerHTML = positions.map(p =>
+        `<span class="summary-tag">${p.count}× ${p.name}</span>`
+      ).join('');
+    }
+  </script>
+</body>
+
+</html>

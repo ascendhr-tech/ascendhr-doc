@@ -1,0 +1,36 @@
+flowchart TD
+    Start((Start)) --> ListScreen
+    
+    subgraph ListScreen ["Department List Screen"]
+        ViewList[View Departments]
+        ClickAdd[Click 'Add Department']
+        ClickEdit[Click 'Edit' on Row]
+    end
+
+    subgraph Modal ["Add/Edit Department Modal"]
+        FormOpen{Form Opens}
+        InputName[/Input Name e.g., 'Engineering'/]
+        SelectZone{Select Zone}
+        Preview[Update Mini-Pitch Preview]
+        SaveAction[Click Save]
+        
+        SelectZone -->|Attack| ZoneAttack[Set Zone: Attack]
+        SelectZone -->|Midfield| ZoneMid[Set Zone: Midfield]
+        SelectZone -->|Defense| ZoneDef[Set Zone: Defense]
+        SelectZone -->|Support| ZoneSupp[Set Zone: Support]
+    end
+
+    ClickAdd --> FormOpen
+    ClickEdit --> FormOpen
+    FormOpen --> InputName
+    InputName --> SelectZone
+    
+    ZoneAttack --> Preview
+    ZoneMid --> Preview
+    ZoneDef --> Preview
+    ZoneSupp --> Preview
+    
+    Preview --> SaveAction
+    SaveAction -->|Success| ListScreen
+    SaveAction -->|Error| ShowError[[Show Error Toast]]
+    ShowError --> Modal

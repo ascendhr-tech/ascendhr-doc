@@ -1,5 +1,5 @@
 graph TD
-    A((Start: After Email Verified)) --> B[Land on Create Club Wizard]
+    A((Start: After Email Verified)) -->|Auto Redirect| B[Land on Create Club Wizard]
     
     subgraph Step1["Step 1: Basic Info"]
         B --> C[/Enter Club Name/]
@@ -7,10 +7,10 @@ graph TD
         D -->|No| D1[Show 'Name already in use']
         D1 --> D2[Suggest alternatives]
         D2 --> C
-        D -->|Yes| E[Generate slug automatically]
+        D -->|Yes| E[Auto: Generate slug]
         E --> F[/Select Industry/]
         F --> G[/Select Company Size/]
-        G --> H[Click Next]
+        G --> H["Click 'Next →' button"]
     end
     
     H --> I
@@ -25,28 +25,37 @@ graph TD
         K -->|Valid or Skip| L[/Choose Primary Color/]
         L --> M[/Choose Secondary Color/]
         M --> N[Preview Sample Card]
-        N --> O[Click 'Create Club']
+        N --> O["Click 'Create Club 🎉' button"]
     end
     
-    O --> P
+    O -->|System Processing| P
     
-    subgraph CreateClub["System Processing"]
+    subgraph CreateClub["System Processing (Auto)"]
         P[Create company record] --> Q[Assign user as Club Owner]
         Q --> R[Create default departments]
         R --> S[Create default positions]
     end
     
-    S --> T
+    S -->|Auto Redirect| T
     
-    subgraph Success["Club Created"]
+    subgraph Success["Club Created - Success Screen"]
         T[Show success screen] --> U[Display club info summary]
-        U --> V[Show next step CTA]
+        U --> V[Show next step buttons]
     end
     
-    V --> W((End: Setup Player Card))
+    V --> W{User Clicks?}
+    W -->|"Click 'Invite Team'"| X((End: Invite Squad - US-0.0.3))
+    W -->|"Click 'Skip → Dashboard'"| Y((End: Formation View))
 
     style A fill:#4CAF50,color:white
-    style W fill:#2196F3,color:white
+    style X fill:#2196F3,color:white
+    style Y fill:#2196F3,color:white
     style D1 fill:#f44336,color:white
     style K1 fill:#f44336,color:white
     style K2 fill:#f44336,color:white
+    style H fill:#22C55E,color:white
+    style O fill:#22C55E,color:white
+
+    %% Note: Player Card setup moved to Epic 0.4
+    %% After Club creation, user goes to Invite Squad or Formation View
+

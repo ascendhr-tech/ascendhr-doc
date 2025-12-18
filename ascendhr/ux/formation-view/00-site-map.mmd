@@ -1,0 +1,38 @@
+flowchart TD
+    Start((Start)) --> Dashboard[Main Dashboard]
+    
+    subgraph CoreNav [Formation System]
+        Dashboard --> FormationView[Formation Pitch View]
+        Dashboard --> SquadDashboard[Squad Dashboard]
+        Dashboard --> SetupMenu[Formation Setup]
+    end
+
+    subgraph SetupModule [Configuration]
+        SetupMenu --> DeptList[Department List]
+        SetupMenu --> PosList[Position List]
+        SetupMenu --> AttrLib[Attribute Library]
+        SetupMenu --> RoleTempl[Role Templates]
+        
+        DeptList --> DeptModal[[Add/Edit Department]]
+        PosList --> PosModal[[Add/Edit Position]]
+        AttrLib --> AttrForm[[Add/Edit Attribute]]
+        RoleTempl --> TemplDetail[[Template Detail]]
+    end
+
+    subgraph Visualization [Interactive Views]
+        FormationView --> ViewControls{View Controls}
+        ViewControls -->|Zoom/Pan| PitchDisplay[Pitch Canvas]
+        ViewControls -->|Filter| ZoneOverlay[Zone Overlays]
+        PitchDisplay --> NodeTooltip[[Position Tooltip]]
+        NodeTooltip -->|Edit| PosModal
+    end
+
+    subgraph SquadModule [Squad Building]
+        SquadDashboard --> SquadList[Squad List]
+        SquadDashboard --> CreateSquad[[Create Squad Modal]]
+        CreateSquad -->|Select Template| SquadBuilder[Squad Builder Canvas]
+        SquadList -->|Edit| SquadBuilder
+        
+        SquadBuilder --> PlayerDrawer[Player Selection Drawer]
+        PlayerDrawer -->|Drag| SlotAssignment[Assign Player to Slot]
+    end

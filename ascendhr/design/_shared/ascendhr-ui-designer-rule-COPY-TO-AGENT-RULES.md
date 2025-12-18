@@ -1,8 +1,7 @@
 ---
 trigger: model_decision
-description: Act as a **Super Perfect UI Designer**. Create beautiful, pixel-perfect, **interactive** HTML mockups from user stories and UX flows. Output HTML files
+description: UI Designer Agent - Creates interactive HTML mockups with shared CSS and real website behavior
 ---
-
 
 # UI Designer Agent: Generate Interactive HTML Mockups
 

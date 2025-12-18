@@ -61,14 +61,14 @@ HR creates a new employee profile with FM-style attributes during onboarding.
 
 ---
 
-## US-0.4.2: Employee List & Search
+## US-0.4.2: Player Gallery & Search
 
 > **As a** Scout (HR),  
-> **I want to** search and filter employees,  
-> **So that** I can quickly find specific players in the squad.
+> **I want to** search and filter the player gallery,  
+> **So that** I can visually browse the squad and find specific players.
 
 ### Scenario
-HR needs to find an employee to update their profile.
+HR needs to find an employee to update their profile or compare attributes.
 
 ### Preconditions
 - User is logged in with `employee:read` permission
@@ -78,24 +78,22 @@ HR needs to find an employee to update their profile.
 
 | Step | User Action | System Response |
 |------|-------------|-----------------|
-| 1 | Navigate to "Squad" page | Display employee list (DataGrid) |
-| 2 | Type in search box | Filter by name/email/ID in real-time |
-| 3 | Apply filters (department, status, role) | Update list with filtered results |
-| 4 | Sort by column header | Reorder list by selected column |
-| 5 | Change page size (20/50/100) | Update pagination |
-| 6 | Click on employee row | Navigate to Player Card detail |
+| 1 | Navigate to "Players" page | Display player gallery (FC-style Card Grid) |
+| 2 | Type in search box | Filter cards by name/position in real-time |
+| 3 | Apply filters (department, status) | Update grid with filtered results |
+| 4 | Click "Sort by Rating" | Reorder cards by Current Ability |
+| 5 | Click on player card | Navigate to Player Card detail |
 
 ### Alternative Flows
 
 | Alt | Condition | Flow |
 |-----|-----------|------|
 | 2a | No results found | Show "No players match your search" |
-| 6a | Click quick action menu | Show: View, Edit, Change Status options |
+| 5a | Click "Import" or "Add Player" | Navigate to respective pages |
 
 ### Screens
-1. Employee List (DataGrid with search, filters, pagination)
-2. Filter Panel (department, status, role, ability range)
-3. Quick Actions Menu (dropdown)
+1. Player Gallery (Card Grid with search, filters)
+2. Filter Bar (Department, Status, Sort)
 
 ---
 

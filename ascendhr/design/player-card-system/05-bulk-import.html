@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Import | AscendHR</title>
+
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+
+  <style>
+    /* Feature-specific styles */
+    .import-wizard {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Steps indicator */
+    .steps-indicator {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-8);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+
+    .step-item.completed .step-num {
+      background: var(--accent);
+      color: white;
+    }
+
+    .step-item.active .step-num {
+      background: var(--primary);
+      color: white;
+    }
+
+    .step-item.pending .step-num {
+      background: var(--muted);
+      color: var(--muted-foreground);
+    }
+
+    .step-text {
+      font-size: var(--font-size-sm);
+    }
+
+    .step-item.pending .step-text {
+      color: var(--muted-foreground);
+    }
+
+    .step-divider {
+      width: 60px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 var(--space-4);
+    }
+
+    .step-item.completed+.step-divider {
+      background: var(--accent);
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-12);
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-4);
+    }
+
+    .upload-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-2);
+    }
+
+    .upload-subtitle {
+      color: var(--muted-foreground);
+      margin-bottom: var(--space-4);
+    }
+
+    /* Preview table */
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+
+    .preview-table th {
+      background: var(--muted);
+      padding: var(--space-3);
+      text-align: left;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .preview-table td {
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-table tr.valid {
+      background: var(--accent-light);
+    }
+
+    .preview-table tr.invalid {
+      background: var(--destructive-light);
+    }
+
+    .row-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      text-align: center;
+    }
+
+    .summary-number {
+      font-size: 36px;
+      font-weight: var(--font-weight-bold);
+    }
+
+    .summary-number.success {
+      color: var(--accent);
+    }
+
+    .summary-number.warning {
+      color: var(--warning);
+    }
+
+    .summary-number.error {
+      color: var(--destructive);
+    }
+
+    .summary-label {
+      color: var(--muted-foreground);
+      font-size: var(--font-size-sm);
+    }
+
+    /* States */
+    .wizard-step {
+      display: none;
+    }
+
+    .wizard-step.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    MOCKUP: Bulk Import
+    User Story: US-0.4.6
+    
+    INTERACTIVE: Upload CSV, review validation, import
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <span class="brand-name">Ascend FC</span>
+            <span class="brand-subtitle">Club Manager</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Main</div>
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item"><span class="icon">📊</span>
+            Dashboard</a>
+          <a href="../formation-view/06-squad-builder.html" class="sidebar-item"><span class="icon">👥</span> Squads</a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item"><span class="icon">🏟️</span>
+            Formation</a>
+          <a href="04-player-gallery.html" class="sidebar-item active"><span class="icon">🃏</span> Players</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Management</div>
+          <a href="../formation-view/01-department-management.html" class="sidebar-item"><span class="icon">🏢</span>
+            Departments</a>
+          <a href="../formation-view/02-position-management.html" class="sidebar-item"><span class="icon">📍</span>
+            Positions</a>
+          <a href="../formation-view/03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span>
+            Attributes</a>
+          <a href="../formation-view/04-role-templates.html" class="sidebar-item"><span class="icon">📋</span>
+            Templates</a>
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">JS</div>
+        <div class="user-info">
+          <div class="user-name">John Smith</div>
+          <div class="user-role">Club Owner</div>
+        </div>
+        <button class="user-menu">⋮</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Bulk Import Employees</h1>
+          <p style="color: var(--muted-foreground); margin-top: 4px;">Upload a CSV file to add multiple employees</p>
+        </div>
+      </header>
+
+      <div class="import-wizard">
+        <!-- Steps Indicator -->
+        <div class="steps-indicator" id="stepsIndicator">
+          <div class="step-item active" id="step1-indicator">
+            <div class="step-num">1</div>
+            <span class="step-text">Upload</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item pending" id="step2-indicator">
+            <div class="step-num">2</div>
+            <span class="step-text">Review</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item pending" id="step3-indicator">
+            <div class="step-num">3</div>
+            <span class="step-text">Import</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Upload -->
+        <div class="wizard-step active" id="step1">
+          <div class="card" style="margin-bottom: var(--space-6);">
+            <h3 style="margin-bottom: var(--space-4);">📥 Download Template</h3>
+            <p style="color: var(--muted-foreground); margin-bottom: var(--space-4);">
+              Use our CSV template to ensure your data is formatted correctly.
+            </p>
+            <button class="btn btn-secondary">⬇️ Download CSV Template</button>
+          </div>
+
+          <div class="upload-zone" onclick="simulateUpload()">
+            <div class="upload-icon">📁</div>
+            <div class="upload-title">Drag & drop your CSV file here</div>
+            <div class="upload-subtitle">or click to browse files</div>
+            <button class="btn btn-primary">Choose File</button>
+          </div>
+
+          <div style="margin-top: var(--space-6); text-align: center;">
+            <a href="01-employee-list.html" class="btn btn-secondary">← Cancel</a>
+          </div>
+        </div>
+
+        <!-- Step 2: Review -->
+        <div class="wizard-step" id="step2">
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-number success">8</div>
+              <div class="summary-label">Valid Rows</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-number error">2</div>
+              <div class="summary-label">Invalid Rows</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-number">10</div>
+              <div class="summary-label">Total Rows</div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;"></th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Position</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="valid">
+                  <td>1</td>
+                  <td>Alice Wang</td>
+                  <td>alice.w@company.com</td>
+                  <td>Engineering</td>
+                  <td>Frontend Dev</td>
+                  <td><span class="row-status">✅ Valid</span></td>
+                </tr>
+                <tr class="valid">
+                  <td>2</td>
+                  <td>Bob Lee</td>
+                  <td>bob.lee@company.com</td>
+                  <td>Design</td>
+                  <td>UX Designer</td>
+                  <td><span class="row-status">✅ Valid</span></td>
+                </tr>
+                <tr class="invalid">
+                  <td>3</td>
+                  <td>Chris</td>
+                  <td>chris@invalid</td>
+                  <td>Engineering</td>
+                  <td>Backend Dev</td>
+                  <td><span class="row-status" style="color: var(--destructive);">❌ Invalid email format</span></td>
+                </tr>
+                <tr class="valid">
+                  <td>4</td>
+                  <td>Diana Park</td>
+                  <td>diana.p@company.com</td>
+                  <td>Sales</td>
+                  <td>Account Mgr</td>
+                  <td><span class="row-status">✅ Valid</span></td>
+                </tr>
+                <tr class="invalid">
+                  <td>5</td>
+                  <td>Eve Martinez</td>
+                  <td>john.smith@company.com</td>
+                  <td>HR</td>
+                  <td>HR Specialist</td>
+                  <td><span class="row-status" style="color: var(--destructive);">❌ Email already exists</span></td>
+                </tr>
+                <tr class="valid">
+                  <td>6</td>
+                  <td>Frank Chen</td>
+                  <td>frank.c@company.com</td>
+                  <td>Engineering</td>
+                  <td>DevOps Eng</td>
+                  <td><span class="row-status">✅ Valid</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="alert alert-warning" style="margin-top: var(--space-6);">
+            ⚠️ 2 rows have errors and will be skipped. Only valid rows will be imported.
+          </div>
+
+          <div style="display: flex; justify-content: space-between; margin-top: var(--space-6);">
+            <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">Import 8 Valid Rows →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Complete -->
+        <div class="wizard-step" id="step3">
+          <div style="text-align: center; padding: var(--space-12);">
+            <div style="font-size: 64px; margin-bottom: var(--space-4);">🎉</div>
+            <h2 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-2);">Import Complete!</h2>
+            <p style="color: var(--muted-foreground); margin-bottom: var(--space-8);">
+              8 employees have been added to your squad. Invitation emails have been sent.
+            </p>
+
+            <div class="summary-grid" style="max-width: 500px; margin: 0 auto var(--space-8);">
+              <div class="summary-card">
+                <div class="summary-number success">8</div>
+                <div class="summary-label">Created</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-number warning">2</div>
+                <div class="summary-label">Skipped</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-number error">0</div>
+                <div class="summary-label">Failed</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: var(--space-4);">
+              <a href="01-employee-list.html" class="btn btn-primary">View Employee List →</a>
+              <a href="04-player-gallery.html" class="btn btn-secondary">View Player Gallery</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function goToStep(step) {
+      // Hide all steps
+      document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + step).classList.add('active');
+
+      // Update indicators
+      for (let i = 1; i <= 3; i++) {
+        const indicator = document.getElementById('step' + i + '-indicator');
+        indicator.classList.remove('active', 'completed', 'pending');
+        if (i < step) {
+          indicator.classList.add('completed');
+        } else if (i === step) {
+          indicator.classList.add('active');
+        } else {
+          indicator.classList.add('pending');
+        }
+      }
+    }
+
+    function simulateUpload() {
+      // Simulate file upload - go to step 2
+      setTimeout(() => goToStep(2), 500);
+    }
+  </script>
+</body>
+
+</html>
