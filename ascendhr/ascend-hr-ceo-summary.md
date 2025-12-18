@@ -2,7 +2,7 @@
 ## CEO Executive Summary
 
 **Document Type:** Budget & Timeline Overview  
-**Date:** December 16, 2024  
+**Date:** December 16, 2025  
 **Project Duration:** 10 Weeks (~2.5 Months)  
 **Total Investment:** 71 Man-days (with 20% buffer)
 
