@@ -925,7 +925,6 @@
           <a href="01-department-management.html" class="sidebar-item"><span class="icon">🏢</span> Departments</a>
           <a href="02-position-management.html" class="sidebar-item"><span class="icon">📍</span> Positions</a>
           <a href="03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span> Attributes</a>
-          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
         </div>
       </nav>
       <div class="sidebar-user">
@@ -934,7 +933,18 @@
           <div class="user-name">John Smith</div>
           <div class="user-role">Club Owner</div>
         </div>
-        <button class="user-menu">⋮</button>
+        <button class="user-menu" onclick="toggleUserMenu(event)">⋮</button>
+        <div class="user-dropdown" id="userDropdown"
+          style="display:none; position:absolute; bottom:60px; left:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-medium); z-index:100;">
+          <a href="#"
+            style="display:block; padding:12px 16px; color:var(--foreground); text-decoration:none; font-size:14px;"
+            onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">⚙️
+            Settings</a>
+          <a href="../football-club-setup/01-landing-registration.html"
+            style="display:block; padding:12px 16px; color:var(--destructive); text-decoration:none; font-size:14px; border-top:1px solid var(--border);"
+            onmouseover="this.style.background='var(--destructive-light)'"
+            onmouseout="this.style.background='transparent'">🚪 Logout</a>
+        </div>
       </div>
     </aside>
 
@@ -1306,6 +1316,15 @@
     function saveFormation() {
       alert('Formation Saved!\n\n• 13 positions\n• 32 employees\n• 85 team score');
     }
+
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('userDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    document.addEventListener('click', function () {
+      document.getElementById('userDropdown').style.display = 'none';
+    });
   </script>
 </body>
 

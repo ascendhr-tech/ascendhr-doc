@@ -5,54 +5,104 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Position Management | AscendHR</title>
-
-  <!-- SHARED COMPONENT SYSTEM -->
   <link rel="stylesheet" href="../_shared/base.css">
-
   <style>
-    /* === PAGE-SPECIFIC STYLES === */
-    .zone-section {
-      margin-bottom: 32px;
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
-    .zone-header {
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+    }
+
+    .dept-accordion {
+      margin-bottom: 16px;
+    }
+
+    .dept-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .zone-header.attack {
-      border-color: var(--zone-attack);
+    .dept-header:hover {
+      box-shadow: var(--shadow-soft);
     }
 
-    .zone-header.midfield {
-      border-color: var(--zone-midfield);
+    .dept-header.expanded {
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
 
-    .zone-header.defense {
-      border-color: var(--zone-defense);
+    .dept-name {
+      font-weight: 600;
+      font-size: 16px;
+      flex: 1;
     }
 
-    .zone-header.support {
-      border-color: var(--zone-support);
+    .dept-count {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    .chevron {
+      transition: transform 0.2s;
+    }
+
+    .dept-header.expanded .chevron {
+      transform: rotate(180deg);
+    }
+
+    .dept-content {
+      display: none;
+      padding: 16px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .dept-content.show {
+      display: block;
     }
 
     .position-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 16px;
     }
 
     .position-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      transition: all 0.2s;
+      border-radius: var(--radius-md);
+      padding: 16px;
       cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
     }
 
     .position-card:hover {
@@ -60,31 +110,44 @@
       transform: translateY(-2px);
     }
 
-    .position-card .title {
-      font-size: 16px;
+    .pos-title {
       font-weight: 600;
+      font-size: 15px;
       margin-bottom: 4px;
     }
 
-    .position-card .dept {
+    .pos-dept {
       font-size: 12px;
       color: var(--muted-foreground);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .position-card .attrs {
+    .pos-desc {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pos-attrs {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      margin-bottom: 12px;
     }
 
     .attr-tag {
-      background: var(--muted);
-      color: var(--foreground);
       padding: 2px 8px;
       border-radius: var(--radius-full);
       font-size: 11px;
       font-weight: 500;
+      background: var(--muted);
     }
 
     .attr-tag.critical {
@@ -92,7 +155,116 @@
       color: var(--destructive);
     }
 
-    /* Modal Tabs */
+    .attr-tag.important {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .pos-stats {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .pos-actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .position-card:hover .pos-actions {
+      opacity: 1;
+    }
+
+    .icon-btn {
+      padding: 6px;
+      border: none;
+      background: var(--white);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .icon-btn:hover {
+      background: var(--muted);
+    }
+
+    .icon-btn.delete:hover {
+      background: var(--destructive-light);
+    }
+
+    .detail-section {
+      background: var(--background);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .detail-section-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .attr-table {
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .attr-table th {
+      text-align: left;
+      padding: 8px;
+      background: var(--muted);
+      font-weight: 500;
+    }
+
+    .attr-table td {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .priority-stars {
+      color: #f59e0b;
+    }
+
+    .delete-warning {
+      background: var(--destructive-light);
+      border: 1px solid var(--destructive);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+      color: #991B1B;
+    }
+
     .modal-tabs {
       display: flex;
       border-bottom: 1px solid var(--border);
@@ -107,11 +279,6 @@
       color: var(--muted-foreground);
       border-bottom: 2px solid transparent;
       cursor: pointer;
-      margin-bottom: -1px;
-    }
-
-    .modal-tab:hover {
-      color: var(--foreground);
     }
 
     .modal-tab.active {
@@ -119,80 +286,241 @@
       border-color: var(--primary);
     }
 
-    .attr-row {
-      display: flex;
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .zone-indicator {
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--muted);
+      margin-left: 8px;
     }
 
-    .attr-row:last-child {
-      border-bottom: none;
+    .zone-indicator.attack {
+      background: var(--zone-attack-light);
+      color: var(--zone-attack);
     }
 
-    .attr-name {
-      flex: 1;
+    .zone-indicator.midfield {
+      background: var(--zone-midfield-light);
+      color: var(--zone-midfield);
+    }
+
+    .zone-indicator.defense {
+      background: var(--zone-defense-light);
+      color: var(--zone-defense);
+    }
+
+    .zone-indicator.support {
+      background: var(--zone-support-light);
+      color: var(--zone-support);
+    }
+
+    /* Improved Attributes UX */
+    .selected-attrs {
+      background: var(--accent-light);
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 16px;
+      min-height: 48px;
+    }
+
+    .selected-attrs-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .selected-attrs-empty {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      font-style: italic;
+    }
+
+    .attr-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 4px 8px 4px 12px;
+      font-size: 12px;
+      margin: 4px;
+    }
+
+    .attr-chip .chip-name {
       font-weight: 500;
     }
 
-    .attr-importance {
-      width: 120px;
+    .attr-chip .chip-priority {
+      color: #f59e0b;
+      font-size: 10px;
     }
 
-    .attr-value {
-      width: 80px;
+    .attr-chip .chip-value {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .attr-chip .chip-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      padding: 2px;
+      border-radius: 50%;
+    }
+
+    .attr-chip .chip-remove:hover {
+      background: var(--destructive-light);
+      color: var(--destructive);
+    }
+
+    .attr-search {
+      width: 100%;
+      padding: 10px 12px 10px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      margin-bottom: 16px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") no-repeat 10px center;
+      background-size: 18px;
+    }
+
+    .attr-search:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .attr-category {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .attr-category-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--muted);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .attr-category-header:hover {
+      background: var(--border);
+    }
+
+    .attr-category-header .cat-chevron {
+      margin-left: auto;
+      transition: transform 0.2s;
+    }
+
+    .attr-category-header.collapsed .cat-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .attr-category-content {
+      display: block;
+    }
+
+    .attr-category-header.collapsed+.attr-category-content {
+      display: none;
+    }
+
+    .attr-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .attr-item:last-child {
+      border-bottom: none;
+    }
+
+    .attr-item:hover {
+      background: var(--background);
+    }
+
+    .attr-item.selected {
+      background: var(--accent-light);
+    }
+
+    .attr-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .attr-item-name {
+      flex: 1;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .attr-item-icon {
+      font-size: 16px;
+    }
+
+    .priority-select {
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      background: var(--white);
+    }
+
+    .min-value-input {
+      width: 50px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
       text-align: center;
     }
 
-    .mini-map {
-      width: 100%;
-      height: 200px;
-      background: linear-gradient(180deg, #15803d 0%, #166534 100%);
+    .attr-legend {
+      margin-top: 12px;
+      padding: 10px;
+      background: var(--muted);
       border-radius: var(--radius-md);
-      position: relative;
-      margin-top: 8px;
-    }
-
-    .position-marker {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background: var(--white);
-      border: 3px solid var(--primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 12px;
-      font-weight: 700;
-      color: var(--primary);
-      cursor: move;
-      box-shadow: var(--shadow-medium);
-      /* Default position - center */
-      left: calc(50% - 20px);
-      top: calc(50% - 20px);
+      color: var(--muted-foreground);
     }
   </style>
 </head>
 
 <body>
-  <!-- 
-    MOCKUP: Position Management
-    User Story: US-0.5.2
-    Flow: List positions by zone, create/edit with attributes
-  -->
-
   <div class="app-container">
-    <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand">
           <div class="brand-icon">⚽</div>
-          <div class="brand-text">
-            <span class="brand-name">Ascend FC</span>
-            <span class="brand-subtitle">Club Manager</span>
-          </div>
+          <div class="brand-text"><span class="brand-name">Ascend FC</span><span class="brand-subtitle">Club
+              Manager</span></div>
         </div>
       </div>
       <nav class="sidebar-nav">
@@ -211,7 +539,6 @@
           <a href="01-department-management.html" class="sidebar-item"><span class="icon">🏢</span> Departments</a>
           <a href="02-position-management.html" class="sidebar-item active"><span class="icon">📍</span> Positions</a>
           <a href="03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span> Attributes</a>
-          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
         </div>
       </nav>
       <div class="sidebar-user">
@@ -220,107 +547,243 @@
           <div class="user-name">John Smith</div>
           <div class="user-role">Club Owner</div>
         </div>
-        <button class="user-menu">⋮</button>
+        <button class="user-menu" onclick="toggleUserMenu(event)">⋮</button>
+        <div class="user-dropdown" id="userDropdown"
+          style="display:none; position:absolute; bottom:60px; left:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-medium); z-index:100;">
+          <a href="#"
+            style="display:block; padding:12px 16px; color:var(--foreground); text-decoration:none; font-size:14px;"
+            onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">⚙️
+            Settings</a>
+          <a href="../football-club-setup/01-landing-registration.html"
+            style="display:block; padding:12px 16px; color:var(--destructive); text-decoration:none; font-size:14px; border-top:1px solid var(--border);"
+            onmouseover="this.style.background='var(--destructive-light)'"
+            onmouseout="this.style.background='transparent'">🚪 Logout</a>
+        </div>
       </div>
     </aside>
-
-    <!-- Main Content -->
     <main class="main-content">
       <header class="page-header">
         <div>
           <h1 class="page-title">Positions</h1>
           <p class="text-muted">Define roles and their attribute requirements</p>
         </div>
-        <button class="btn btn-primary" onclick="showModal()">
-          + Add Position
-        </button>
+        <button class="btn btn-primary" onclick="showAddModal()">+ Add Position</button>
       </header>
-
-      <!-- Attack Zone -->
-      <div class="zone-section">
-        <div class="zone-header attack">
-          <span class="badge badge-attack">⚔️ Attack</span>
-          <span class="text-muted">Revenue generators</span>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Total Positions</div>
         </div>
-        <div class="position-grid">
-          <div class="position-card" onclick="showModal()">
-            <div class="title">Account Executive</div>
-            <div class="dept">Sales • 4 players</div>
-            <div class="attrs">
-              <span class="attr-tag critical">Closing</span>
-              <span class="attr-tag">Communication</span>
-              <span class="attr-tag">Negotiation</span>
-            </div>
-          </div>
-          <div class="position-card" onclick="showModal()">
-            <div class="title">Account Manager</div>
-            <div class="dept">Sales • 3 players</div>
-            <div class="attrs">
-              <span class="attr-tag critical">Client Relations</span>
-              <span class="attr-tag">Upselling</span>
-            </div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-value">47</div>
+          <div class="stat-label">Total Employees</div>
+        </div>
+        <div class="stat-card">
+          <div style="display: flex; gap: 8px;"><span class="badge badge-attack">5</span><span
+              class="badge badge-midfield">6</span><span class="badge badge-defense">3</span><span
+              class="badge badge-support">1</span></div>
+          <div class="stat-label">By Zone</div>
         </div>
       </div>
-
-      <!-- Midfield Zone -->
-      <div class="zone-section">
-        <div class="zone-header midfield">
-          <span class="badge badge-midfield">⚙️ Midfield</span>
-          <span class="text-muted">Value creators</span>
+      <!-- Department Accordions -->
+      <div id="cardView">
+        <!-- Sales Department -->
+        <div class="dept-accordion">
+          <div class="dept-header expanded" onclick="toggleDept('sales')">
+            <span class="dept-name">Sales</span>
+            <span class="badge badge-attack">⚔️ Attack</span>
+            <span class="dept-count">3 positions • 12 employees</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="dept-content show" id="dept-sales">
+            <div class="position-grid">
+              <div class="position-card" onclick="showDetailModal(1)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(1)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(1)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(1, 'Account Executive')">🗑️</button></div>
+                <div class="pos-title">Account Executive</div>
+                <div class="pos-dept">Sales <span class="badge badge-attack"
+                    style="font-size:10px; padding:1px 6px;">Attack</span></div>
+                <div class="pos-desc">Responsible for closing deals and generating revenue through direct sales efforts.
+                </div>
+                <div class="pos-attrs"><span class="attr-tag critical">Closing</span><span
+                    class="attr-tag critical">Negotiation</span><span class="attr-tag important">Communication</span>
+                </div>
+                <div class="pos-stats">👥 4 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(2)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(2)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(2)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(2, 'Account Manager')">🗑️</button></div>
+                <div class="pos-title">Account Manager</div>
+                <div class="pos-dept">Sales <span class="badge badge-attack"
+                    style="font-size:10px; padding:1px 6px;">Attack</span></div>
+                <div class="pos-desc">Nurtures existing client relationships and identifies upselling opportunities.
+                </div>
+                <div class="pos-attrs"><span class="attr-tag critical">Client Relations</span><span
+                    class="attr-tag important">Upselling</span></div>
+                <div class="pos-stats">👥 5 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(3)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(3)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(3)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(3, 'Sales Development Rep')">🗑️</button></div>
+                <div class="pos-title">Sales Development Rep</div>
+                <div class="pos-dept">Sales <span class="badge badge-attack"
+                    style="font-size:10px; padding:1px 6px;">Attack</span></div>
+                <div class="pos-desc">Qualifies leads and sets appointments for Account Executives.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Prospecting</span><span
+                    class="attr-tag important">Communication</span></div>
+                <div class="pos-stats">👥 3 employees</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="position-grid">
-          <div class="position-card" onclick="showModal()">
-            <div class="title">Senior Backend Developer</div>
-            <div class="dept">Engineering • 5 players</div>
-            <div class="attrs">
-              <span class="attr-tag critical">Coding</span>
-              <span class="attr-tag critical">System Design</span>
-              <span class="attr-tag">Problem Solving</span>
-            </div>
+        <!-- Engineering Department -->
+        <div class="dept-accordion">
+          <div class="dept-header" onclick="toggleDept('engineering')">
+            <span class="dept-name">Engineering</span>
+            <span class="badge badge-midfield">⚙️ Midfield</span>
+            <span class="dept-count">4 positions • 13 employees</span>
+            <span class="chevron">▼</span>
           </div>
-          <div class="position-card" onclick="showModal()">
-            <div class="title">Frontend Developer</div>
-            <div class="dept">Engineering • 4 players</div>
-            <div class="attrs">
-              <span class="attr-tag critical">Coding</span>
-              <span class="attr-tag">Visual Design</span>
-            </div>
-          </div>
-          <div class="position-card" onclick="showModal()">
-            <div class="title">UX/UI Designer</div>
-            <div class="dept">Design • 3 players</div>
-            <div class="attrs">
-              <span class="attr-tag critical">UX Thinking</span>
-              <span class="attr-tag critical">Visual Design</span>
-              <span class="attr-tag">Prototyping</span>
-            </div>
-          </div>
-          <div class="position-card" onclick="showModal()">
-            <div class="title">Product Manager</div>
-            <div class="dept">Product • 2 players</div>
-            <div class="attrs">
-              <span class="attr-tag critical">Communication</span>
-              <span class="attr-tag">Leadership</span>
-              <span class="attr-tag">Problem Solving</span>
+          <div class="dept-content" id="dept-engineering">
+            <div class="position-grid">
+              <div class="position-card" onclick="showDetailModal(4)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(4)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(4)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(4, 'Senior Backend Developer')">🗑️</button></div>
+                <div class="pos-title">Senior Backend Developer</div>
+                <div class="pos-dept">Engineering <span class="badge badge-midfield"
+                    style="font-size:10px; padding:1px 6px;">Midfield</span></div>
+                <div class="pos-desc">Designs and maintains server-side applications and APIs.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Coding</span><span
+                    class="attr-tag critical">System Design</span><span class="attr-tag important">Problem
+                    Solving</span></div>
+                <div class="pos-stats">👥 5 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(5)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(5)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(5)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(5, 'Frontend Developer')">🗑️</button></div>
+                <div class="pos-title">Frontend Developer</div>
+                <div class="pos-dept">Engineering <span class="badge badge-midfield"
+                    style="font-size:10px; padding:1px 6px;">Midfield</span></div>
+                <div class="pos-desc">Builds responsive web interfaces and user experiences.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Coding</span><span
+                    class="attr-tag important">Visual Design</span><span class="attr-tag">UX Thinking</span></div>
+                <div class="pos-stats">👥 4 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(6)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(6)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(6)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(6, 'Tech Lead')">🗑️</button></div>
+                <div class="pos-title">Tech Lead</div>
+                <div class="pos-dept">Engineering <span class="badge badge-midfield"
+                    style="font-size:10px; padding:1px 6px;">Midfield</span></div>
+                <div class="pos-desc">Leads technical direction and mentors the development team.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Leadership</span><span
+                    class="attr-tag critical">Coding</span><span class="attr-tag important">Communication</span></div>
+                <div class="pos-stats">👥 2 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(7)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(7)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(7)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(7, 'DevOps Engineer')">🗑️</button></div>
+                <div class="pos-title">DevOps Engineer</div>
+                <div class="pos-dept">Engineering <span class="badge badge-midfield"
+                    style="font-size:10px; padding:1px 6px;">Midfield</span></div>
+                <div class="pos-desc">Manages CI/CD pipelines and cloud infrastructure.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Infrastructure</span><span
+                    class="attr-tag critical">Automation</span></div>
+                <div class="pos-stats">👥 2 employees</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Defense Zone -->
-      <div class="zone-section">
-        <div class="zone-header defense">
-          <span class="badge badge-defense">🛡️ Defense</span>
-          <span class="text-muted">Risk managers & enablers</span>
+        <!-- Design Department -->
+        <div class="dept-accordion">
+          <div class="dept-header" onclick="toggleDept('design')">
+            <span class="dept-name">Design</span>
+            <span class="badge badge-midfield">⚙️ Midfield</span>
+            <span class="dept-count">2 positions • 6 employees</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="dept-content" id="dept-design">
+            <div class="position-grid">
+              <div class="position-card" onclick="showDetailModal(8)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(8)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(8)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(8, 'UX/UI Designer')">��️</button></div>
+                <div class="pos-title">UX/UI Designer</div>
+                <div class="pos-dept">Design <span class="badge badge-midfield"
+                    style="font-size:10px; padding:1px 6px;">Midfield</span></div>
+                <div class="pos-desc">Creates user-centered designs and interactive prototypes.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">UX Thinking</span><span
+                    class="attr-tag critical">Visual Design</span><span class="attr-tag important">Prototyping</span>
+                </div>
+                <div class="pos-stats">👥 4 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(9)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(9)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(9)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(9, 'Product Designer')">🗑️</button></div>
+                <div class="pos-title">Product Designer</div>
+                <div class="pos-dept">Design <span class="badge badge-midfield"
+                    style="font-size:10px; padding:1px 6px;">Midfield</span></div>
+                <div class="pos-desc">Shapes product strategy through design thinking.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Design Thinking</span><span
+                    class="attr-tag important">Research</span></div>
+                <div class="pos-stats">👥 2 employees</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="position-grid">
-          <div class="position-card" onclick="showModal()">
-            <div class="title">Financial Controller</div>
-            <div class="dept">Finance • 1 player</div>
-            <div class="attrs">
-              <span class="attr-tag critical">Process Management</span>
-              <span class="attr-tag">Documentation</span>
+        <!-- Finance Department -->
+        <div class="dept-accordion">
+          <div class="dept-header" onclick="toggleDept('finance')">
+            <span class="dept-name">Finance</span>
+            <span class="badge badge-defense">🛡️ Defense</span>
+            <span class="dept-count">2 positions • 5 employees</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="dept-content" id="dept-finance">
+            <div class="position-grid">
+              <div class="position-card" onclick="showDetailModal(10)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(10)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(10)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(10, 'Financial Controller')">🗑️</button></div>
+                <div class="pos-title">Financial Controller</div>
+                <div class="pos-dept">Finance <span class="badge badge-defense"
+                    style="font-size:10px; padding:1px 6px;">Defense</span></div>
+                <div class="pos-desc">Oversees financial operations and reporting.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Process Management</span><span
+                    class="attr-tag important">Documentation</span></div>
+                <div class="pos-stats">👥 3 employees</div>
+              </div>
+              <div class="position-card" onclick="showDetailModal(11)">
+                <div class="pos-actions"><button class="icon-btn"
+                    onclick="event.stopPropagation(); showDetailModal(11)">👁️</button><button class="icon-btn"
+                    onclick="event.stopPropagation(); showEditModal(11)">✏️</button><button class="icon-btn delete"
+                    onclick="event.stopPropagation(); showDeleteModal(11, 'Accountant')">🗑️</button></div>
+                <div class="pos-title">Accountant</div>
+                <div class="pos-dept">Finance <span class="badge badge-defense"
+                    style="font-size:10px; padding:1px 6px;">Defense</span></div>
+                <div class="pos-desc">Manages day-to-day financial transactions.</div>
+                <div class="pos-attrs"><span class="attr-tag critical">Attention to Detail</span><span
+                    class="attr-tag important">Analysis</span></div>
+                <div class="pos-stats">👥 2 employees</div>
+              </div>
             </div>
           </div>
         </div>
@@ -329,540 +792,411 @@
   </div>
 
   <!-- Add/Edit Position Modal -->
-  <div class="modal-overlay" id="modal" onclick="hideModal()">
-    <div class="modal" style="max-width: 720px;" onclick="event.stopPropagation()">
+  <div class="modal-overlay" id="addEditModal" style="display: none;">
+    <div class="modal" style="max-width: 700px;">
       <div class="modal-header">
-        <h2 class="modal-title">Edit Position</h2>
-        <button class="modal-close" onclick="hideModal()">×</button>
+        <h2 class="modal-title" id="modalTitle">Add Position</h2>
+        <button class="modal-close" onclick="hideModal('addEditModal')">×</button>
       </div>
       <div class="modal-body">
-        <!-- Tabs -->
         <div class="modal-tabs">
           <div class="modal-tab active" onclick="switchTab(0)">📋 Details</div>
           <div class="modal-tab" onclick="switchTab(1)">🎯 Attributes</div>
-          <div class="modal-tab" onclick="switchTab(2)">📍 Location</div>
         </div>
-
         <!-- Tab 1: Details -->
         <div class="tab-content active" id="tab-0">
           <div class="form-group">
             <label class="form-label">Position Title *</label>
-            <input type="text" class="form-input" value="Senior Backend Developer"
-              placeholder="e.g. Tech Lead, UX Designer">
+            <input type="text" class="form-input" id="posTitle" placeholder="e.g., Senior Backend Developer">
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Department *</label>
-              <select class="form-input">
-                <option>Engineering</option>
-                <option>Sales</option>
-                <option>Design</option>
-                <option>Finance</option>
-                <option>HR</option>
+          <div class="form-group">
+            <label class="form-label">Department *</label>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <select class="form-input" id="posDept" onchange="onDeptChange()" style="flex:1;">
+                <option value="">Select department...</option>
+                <option value="sales" data-zone="attack">Sales</option>
+                <option value="marketing" data-zone="attack">Marketing</option>
+                <option value="engineering" data-zone="midfield">Engineering</option>
+                <option value="design" data-zone="midfield">Design</option>
+                <option value="finance" data-zone="defense">Finance</option>
+                <option value="legal" data-zone="defense">Legal</option>
+                <option value="hr" data-zone="support">Human Resources</option>
               </select>
+              <span class="zone-indicator" id="zoneIndicator" style="display:none;"></span>
             </div>
-            <div class="form-group">
-              <label class="form-label">Zone *</label>
-              <select class="form-input">
-                <option>⚔️ Attack (Revenue)</option>
-                <option selected>⚙️ Midfield (Value Creators)</option>
-                <option>🛡️ Defense (Risk/Enablers)</option>
-                <option>🏥 Support (Internal)</option>
-              </select>
-            </div>
+            <p class="form-hint">Zone is inherited from department</p>
           </div>
-
           <div class="form-group">
             <label class="form-label">Description</label>
-            <textarea class="form-input" rows="3"
-              placeholder="Brief description of this role...">Designs, develops, and maintains server-side applications and APIs.</textarea>
-          </div>
-
-          <div class="form-group"
-            style="background: var(--accent-light); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--accent);">
-            <label class="form-label" style="color: var(--accent); margin-bottom: 8px;">💡 Quick Setup with
-              Template</label>
-            <select class="form-input" onchange="applyTemplate(this.value)">
-              <option value="">-- Select Template to Auto-fill --</option>
-              <option value="backend">Backend Developer</option>
-              <option value="frontend">Frontend Developer</option>
-              <option value="fullstack">Full-stack Developer</option>
-              <option value="designer">UX/UI Designer</option>
-              <option value="pm">Product Manager</option>
-            </select>
-            <p style="font-size: 12px; color: var(--muted-foreground); margin-top: 8px;">Templates pre-configure
-              attribute requirements</p>
+            <textarea class="form-input" id="posDesc" rows="3"
+              placeholder="Brief description of this role..."></textarea>
           </div>
         </div>
-
-        <!-- Tab 2: Attributes -->
+        <!-- Tab 2: Attributes - Improved UX -->
         <div class="tab-content" id="tab-1">
-          <p style="color: var(--muted-foreground); margin-bottom: 16px;">Select attributes required for this position
-            and set minimum requirements (FM-style 1-20 scale)</p>
-
-          <!-- Core Attributes -->
-          <div style="margin-bottom: 24px;">
-            <h4 style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 12px;">🎯 Core Attributes (Soft
-              Skills)</h4>
-
-            <div class="attr-config-item" data-attr="leadership">
-              <label class="toggle-switch">
-                <input type="checkbox" checked onchange="toggleAttr('leadership', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">🎯 Leadership</span>
-              <div class="priority-stars" id="priority-leadership">
-                <span class="star active" onclick="setPriority('leadership', 1)">★</span>
-                <span class="star active" onclick="setPriority('leadership', 2)">★</span>
-                <span class="star" onclick="setPriority('leadership', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="12" class="attr-slider" id="slider-leadership"
-                  oninput="updateSliderVal('leadership')">
-                <span class="slider-val" id="val-leadership">12+</span>
-              </div>
-            </div>
-
-            <div class="attr-config-item" data-attr="teamwork">
-              <label class="toggle-switch">
-                <input type="checkbox" checked onchange="toggleAttr('teamwork', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">🤝 Teamwork</span>
-              <div class="priority-stars" id="priority-teamwork">
-                <span class="star active" onclick="setPriority('teamwork', 1)">★</span>
-                <span class="star active" onclick="setPriority('teamwork', 2)">★</span>
-                <span class="star active" onclick="setPriority('teamwork', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="14" class="attr-slider" id="slider-teamwork"
-                  oninput="updateSliderVal('teamwork')">
-                <span class="slider-val" id="val-teamwork">14+</span>
-              </div>
-            </div>
-
-            <div class="attr-config-item disabled" data-attr="communication">
-              <label class="toggle-switch">
-                <input type="checkbox" onchange="toggleAttr('communication', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">💬 Communication</span>
-              <div class="priority-stars" id="priority-communication">
-                <span class="star" onclick="setPriority('communication', 1)">★</span>
-                <span class="star" onclick="setPriority('communication', 2)">★</span>
-                <span class="star" onclick="setPriority('communication', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="10" class="attr-slider" id="slider-communication" disabled
-                  oninput="updateSliderVal('communication')">
-                <span class="slider-val" id="val-communication">-</span>
-              </div>
-            </div>
-
-            <div class="attr-config-item disabled" data-attr="adaptability">
-              <label class="toggle-switch">
-                <input type="checkbox" onchange="toggleAttr('adaptability', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">🔄 Adaptability</span>
-              <div class="priority-stars" id="priority-adaptability">
-                <span class="star" onclick="setPriority('adaptability', 1)">★</span>
-                <span class="star" onclick="setPriority('adaptability', 2)">★</span>
-                <span class="star" onclick="setPriority('adaptability', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="10" class="attr-slider" id="slider-adaptability" disabled
-                  oninput="updateSliderVal('adaptability')">
-                <span class="slider-val" id="val-adaptability">-</span>
-              </div>
+          <!-- Selected Attributes Summary -->
+          <div class="selected-attrs">
+            <div class="selected-attrs-title">✓ Selected Attributes (<span id="selectedCount">4</span>)</div>
+            <div id="selectedChips">
+              <span class="attr-chip"><span class="chip-name">💻 Coding</span><span
+                  class="chip-priority">★★★</span><span class="chip-value">15+</span><button class="chip-remove"
+                  onclick="removeAttr('coding')">×</button></span>
+              <span class="attr-chip"><span class="chip-name">🏗️ System Design</span><span
+                  class="chip-priority">★★★</span><span class="chip-value">13+</span><button class="chip-remove"
+                  onclick="removeAttr('design')">×</button></span>
+              <span class="attr-chip"><span class="chip-name">🎯 Leadership</span><span
+                  class="chip-priority">★★☆</span><span class="chip-value">12+</span><button class="chip-remove"
+                  onclick="removeAttr('leadership')">×</button></span>
+              <span class="attr-chip"><span class="chip-name">🤝 Teamwork</span><span
+                  class="chip-priority">★★★</span><span class="chip-value">14+</span><button class="chip-remove"
+                  onclick="removeAttr('teamwork')">×</button></span>
             </div>
           </div>
-
-          <!-- Specialist Attributes -->
-          <div>
-            <h4 style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 12px;">⚡ Specialist Attributes
-              (Technical Skills)</h4>
-
-            <div class="attr-config-item" data-attr="coding">
-              <label class="toggle-switch">
-                <input type="checkbox" checked onchange="toggleAttr('coding', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">💻 Coding</span>
-              <div class="priority-stars" id="priority-coding">
-                <span class="star active" onclick="setPriority('coding', 1)">★</span>
-                <span class="star active" onclick="setPriority('coding', 2)">★</span>
-                <span class="star active" onclick="setPriority('coding', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="15" class="attr-slider" id="slider-coding"
-                  oninput="updateSliderVal('coding')">
-                <span class="slider-val" id="val-coding">15+</span>
-              </div>
-            </div>
-
-            <div class="attr-config-item" data-attr="design">
-              <label class="toggle-switch">
-                <input type="checkbox" checked onchange="toggleAttr('design', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">🏗️ System Design</span>
-              <div class="priority-stars" id="priority-design">
-                <span class="star active" onclick="setPriority('design', 1)">★</span>
-                <span class="star active" onclick="setPriority('design', 2)">★</span>
-                <span class="star active" onclick="setPriority('design', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="13" class="attr-slider" id="slider-design"
-                  oninput="updateSliderVal('design')">
-                <span class="slider-val" id="val-design">13+</span>
-              </div>
-            </div>
-
-            <div class="attr-config-item" data-attr="problem">
-              <label class="toggle-switch">
-                <input type="checkbox" checked onchange="toggleAttr('problem', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">🧩 Problem Solving</span>
-              <div class="priority-stars" id="priority-problem">
-                <span class="star active" onclick="setPriority('problem', 1)">★</span>
-                <span class="star active" onclick="setPriority('problem', 2)">★</span>
-                <span class="star" onclick="setPriority('problem', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="12" class="attr-slider" id="slider-problem"
-                  oninput="updateSliderVal('problem')">
-                <span class="slider-val" id="val-problem">12+</span>
-              </div>
-            </div>
-
-            <div class="attr-config-item disabled" data-attr="ux">
-              <label class="toggle-switch">
-                <input type="checkbox" onchange="toggleAttr('ux', this.checked)">
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="attr-config-name">✨ UX Thinking</span>
-              <div class="priority-stars" id="priority-ux">
-                <span class="star" onclick="setPriority('ux', 1)">★</span>
-                <span class="star" onclick="setPriority('ux', 2)">★</span>
-                <span class="star" onclick="setPriority('ux', 3)">★</span>
-              </div>
-              <div class="attr-slider-container">
-                <input type="range" min="1" max="20" value="10" class="attr-slider" id="slider-ux" disabled
-                  oninput="updateSliderVal('ux')">
-                <span class="slider-val" id="val-ux">-</span>
-              </div>
+          <!-- Search -->
+          <input type="text" class="attr-search" id="attrSearch" placeholder="Search attributes..."
+            oninput="filterAttrs()">
+          <!-- Category: Core Attributes -->
+          <div class="attr-category">
+            <div class="attr-category-header" onclick="toggleCategory(this)">🎯 Core Attributes (Soft Skills)<span
+                class="cat-chevron">▼</span></div>
+            <div class="attr-category-content">
+              <div class="attr-item selected" data-name="leadership"><input type="checkbox" class="attr-checkbox"
+                  checked onchange="toggleAttr(this, 'leadership')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🎯</span>Leadership</span><select class="priority-select">
+                  <option>★</option>
+                  <option selected>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="12" min="1" max="20">+</div>
+              <div class="attr-item selected" data-name="teamwork"><input type="checkbox" class="attr-checkbox" checked
+                  onchange="toggleAttr(this, 'teamwork')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🤝</span>Teamwork</span><select class="priority-select">
+                  <option>★</option>
+                  <option>★★</option>
+                  <option selected>★★★</option>
+                </select><input type="number" class="min-value-input" value="14" min="1" max="20">+</div>
+              <div class="attr-item" data-name="communication"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'communication')"><span class="attr-item-name"><span
+                    class="attr-item-icon">💬</span>Communication</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
+              <div class="attr-item" data-name="adaptability"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'adaptability')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🔄</span>Adaptability</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
+              <div class="attr-item" data-name="creativity"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'creativity')"><span class="attr-item-name"><span
+                    class="attr-item-icon">💡</span>Creativity</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
             </div>
           </div>
-
-          <!-- Legend -->
-          <div
-            style="margin-top: 20px; padding: 12px; background: var(--muted); border-radius: var(--radius-md); font-size: 12px; color: var(--muted-foreground);">
-            <strong>Priority:</strong> ★ Nice-to-have | ★★ Important | ★★★ Critical
+          <!-- Category: Technical Attributes -->
+          <div class="attr-category">
+            <div class="attr-category-header" onclick="toggleCategory(this)">⚡ Technical Attributes<span
+                class="cat-chevron">▼</span></div>
+            <div class="attr-category-content">
+              <div class="attr-item selected" data-name="coding"><input type="checkbox" class="attr-checkbox" checked
+                  onchange="toggleAttr(this, 'coding')"><span class="attr-item-name"><span
+                    class="attr-item-icon">💻</span>Coding</span><select class="priority-select">
+                  <option>★</option>
+                  <option>★★</option>
+                  <option selected>★★★</option>
+                </select><input type="number" class="min-value-input" value="15" min="1" max="20">+</div>
+              <div class="attr-item selected" data-name="design"><input type="checkbox" class="attr-checkbox" checked
+                  onchange="toggleAttr(this, 'design')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🏗️</span>System Design</span><select class="priority-select">
+                  <option>★</option>
+                  <option>★★</option>
+                  <option selected>★★★</option>
+                </select><input type="number" class="min-value-input" value="13" min="1" max="20">+</div>
+              <div class="attr-item" data-name="problem"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'problem')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🧩</span>Problem Solving</span><select class="priority-select">
+                  <option>★</option>
+                  <option selected>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="12" min="1" max="20">+</div>
+              <div class="attr-item" data-name="ux"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'ux')"><span class="attr-item-name"><span class="attr-item-icon">✨</span>UX
+                  Thinking</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
+              <div class="attr-item" data-name="data"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'data')"><span class="attr-item-name"><span
+                    class="attr-item-icon">📊</span>Data Analysis</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
+            </div>
           </div>
-        </div>
-
-        <!-- Tab 3: Location -->
-        <div class="tab-content" id="tab-2">
-          <p style="color: var(--muted-foreground); margin-bottom: 16px;">Set this position's location on the formation
-            pitch</p>
-
-          <div class="mini-pitch">
-            <div class="pitch-zone attack">
-              <span class="zone-label">Attack</span>
-            </div>
-            <div class="pitch-zone midfield selected">
-              <span class="zone-label">Midfield</span>
-              <div class="position-marker" id="posMarker" draggable="true">BE</div>
-            </div>
-            <div class="pitch-zone defense">
-              <span class="zone-label">Defense</span>
-            </div>
-            <div class="pitch-zone support">
-              <span class="zone-label">Support</span>
-            </div>
-          </div>
-
-          <div class="form-row" style="margin-top: 16px;">
-            <div class="form-group">
-              <label class="form-label">X Position (%)</label>
-              <input type="number" class="form-input" value="50" min="0" max="100">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Y Position (%)</label>
-              <input type="number" class="form-input" value="45" min="0" max="100">
+          <!-- Category: Business Attributes -->
+          <div class="attr-category">
+            <div class="attr-category-header collapsed" onclick="toggleCategory(this)">📈 Business Attributes<span
+                class="cat-chevron">▼</span></div>
+            <div class="attr-category-content">
+              <div class="attr-item" data-name="negotiation"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'negotiation')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🤝</span>Negotiation</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
+              <div class="attr-item" data-name="sales"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'sales')"><span class="attr-item-name"><span
+                    class="attr-item-icon">💰</span>Sales</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
+              <div class="attr-item" data-name="strategy"><input type="checkbox" class="attr-checkbox"
+                  onchange="toggleAttr(this, 'strategy')"><span class="attr-item-name"><span
+                    class="attr-item-icon">🎯</span>Strategic Thinking</span><select class="priority-select">
+                  <option selected>★</option>
+                  <option>★★</option>
+                  <option>★★★</option>
+                </select><input type="number" class="min-value-input" value="10" min="1" max="20">+</div>
             </div>
           </div>
-
-          <p style="font-size: 12px; color: var(--muted-foreground); margin-top: 8px;">💡 Tip: Drag the marker on the
-            pitch or enter exact coordinates</p>
+          <div class="attr-legend"><strong>Priority:</strong> ★ Nice-to-have | ★★ Important | ★★★ Critical</div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="hideModal()">Save Position</button>
+        <button class="btn btn-secondary" onclick="hideModal('addEditModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save Position</button>
       </div>
     </div>
   </div>
 
-  <style>
-    /* Tab Content */
-    .tab-content {
-      display: none;
-    }
+  <!-- Detail View Modal -->
+  <div class="modal-overlay" id="detailModal" style="display: none;">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Position Details</h2>
+        <button class="modal-close" onclick="hideModal('detailModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <div class="detail-section-title">📋 Overview</div>
+          <div class="detail-row"><span class="detail-label">Position</span><span class="detail-value"
+              id="detailTitle">Senior Backend Developer</span></div>
+          <div class="detail-row"><span class="detail-label">Department</span><span class="detail-value"><span
+                id="detailDept">Engineering</span> <span class="badge badge-midfield" id="detailZoneBadge"
+                style="font-size:10px;">Midfield</span></span></div>
+          <div class="detail-row"><span class="detail-label">Description</span><span class="detail-value"
+              id="detailDesc" style="text-align:right; max-width:60%;">Designs and maintains server-side
+              applications</span></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title">🎯 Attribute Requirements</div>
+          <table class="attr-table">
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                <th>Priority</th>
+                <th>Min Value</th>
+              </tr>
+            </thead>
+            <tbody id="detailAttrs">
+              <tr>
+                <td>💻 Coding</td>
+                <td class="priority-stars">★★★</td>
+                <td>15+</td>
+              </tr>
+              <tr>
+                <td>🏗️ System Design</td>
+                <td class="priority-stars">★★★</td>
+                <td>13+</td>
+              </tr>
+              <tr>
+                <td>🤝 Teamwork</td>
+                <td class="priority-stars">★★★</td>
+                <td>14+</td>
+              </tr>
+              <tr>
+                <td>🎯 Leadership</td>
+                <td class="priority-stars">★★☆</td>
+                <td>12+</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title">👥 Team Information</div>
+          <div class="detail-row"><span class="detail-label">Current Employees</span><span class="detail-value"
+              id="detailEmployees">5 employees</span></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title">📅 Metadata</div>
+          <div class="detail-row"><span class="detail-label">Created On</span><span class="detail-value"
+              id="detailCreated">Jan 15, 2024</span></div>
+          <div class="detail-row"><span class="detail-label">Last Updated</span><span class="detail-value"
+              id="detailUpdated">Mar 20, 2024</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('detailModal')">Close</button>
+        <button class="btn btn-primary" onclick="hideModal('detailModal'); showEditModal(currentPosId)">Edit
+          Position</button>
+      </div>
+    </div>
+  </div>
 
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Attribute Config Item */
-    .attr-config-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: var(--background);
-      border-radius: var(--radius-md);
-      margin-bottom: 8px;
-      transition: all 0.2s;
-    }
-
-    .attr-config-item.disabled {
-      opacity: 0.5;
-    }
-
-    .attr-config-item.disabled .attr-slider-container,
-    .attr-config-item.disabled .priority-stars {
-      pointer-events: none;
-    }
-
-    .attr-config-name {
-      flex: 1;
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    /* Toggle Switch */
-    .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      display: inline-block;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background: var(--border);
-      border-radius: 24px;
-      transition: 0.2s;
-    }
-
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      width: 18px;
-      height: 18px;
-      left: 3px;
-      bottom: 3px;
-      background: white;
-      border-radius: 50%;
-      transition: 0.2s;
-    }
-
-    .toggle-switch input:checked+.toggle-slider {
-      background: var(--accent);
-    }
-
-    .toggle-switch input:checked+.toggle-slider:before {
-      transform: translateX(20px);
-    }
-
-    /* Priority Stars */
-    .priority-stars {
-      display: flex;
-      gap: 2px;
-    }
-
-    .priority-stars .star {
-      font-size: 16px;
-      color: var(--border);
-      cursor: pointer;
-      transition: 0.1s;
-    }
-
-    .priority-stars .star.active {
-      color: #f59e0b;
-    }
-
-    .priority-stars .star:hover {
-      transform: scale(1.2);
-    }
-
-    /* Slider Container */
-    .attr-slider-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 140px;
-    }
-
-    .attr-slider {
-      flex: 1;
-      height: 6px;
-      border-radius: 3px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: var(--border);
-    }
-
-    .attr-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--primary);
-      cursor: pointer;
-    }
-
-    .slider-val {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--primary);
-      min-width: 32px;
-      text-align: right;
-    }
-
-    /* Mini Pitch */
-    .mini-pitch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 4px;
-      height: 280px;
-      background: #0d4f24;
-      border-radius: var(--radius-lg);
-      padding: 4px;
-      position: relative;
-    }
-
-    .pitch-zone {
-      border-radius: var(--radius-md);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .pitch-zone.attack {
-      background: rgba(239, 68, 68, 0.3);
-    }
-
-    .pitch-zone.midfield {
-      background: rgba(59, 130, 246, 0.3);
-    }
-
-    .pitch-zone.defense {
-      background: rgba(168, 85, 247, 0.3);
-    }
-
-    .pitch-zone.support {
-      background: rgba(107, 114, 128, 0.3);
-    }
-
-    .pitch-zone.selected {
-      outline: 3px solid white;
-    }
-
-    .pitch-zone:hover {
-      transform: scale(1.02);
-    }
-
-    .zone-label {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .position-marker {
-      position: absolute;
-      width: 48px;
-      height: 48px;
-      background: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--primary);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      cursor: move;
-      border: 3px solid var(--accent);
-    }
-  </style>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal" style="display: none;">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Position</h2>
+        <button class="modal-close" onclick="hideModal('deleteModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning"><strong>⚠️ Warning:</strong> This action cannot be undone.</div>
+        <p style="margin-bottom: 16px;">Are you sure you want to delete the position "<strong id="deletePosName">Senior
+            Backend Developer</strong>"?</p>
+        <p style="color: var(--muted-foreground); font-size: 14px;"><span id="deleteImpact">5 employees currently hold
+            this position.</span></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('deleteModal')">Cancel</button>
+        <button class="btn btn-destructive" onclick="confirmDelete()">Delete Position</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    function showModal() {
-      document.getElementById('modal').style.display = 'flex';
-    }
-    function hideModal() {
-      document.getElementById('modal').style.display = 'none';
+    const positions = {
+      1: { title: 'Account Executive', dept: 'Sales', zone: 'attack', desc: 'Responsible for closing deals.', employees: 4, created: 'Jan 15, 2024', updated: 'Mar 20, 2024' },
+      2: { title: 'Account Manager', dept: 'Sales', zone: 'attack', desc: 'Nurtures client relationships.', employees: 5, created: 'Jan 18, 2024', updated: 'Mar 15, 2024' },
+      3: { title: 'Sales Development Rep', dept: 'Sales', zone: 'attack', desc: 'Qualifies leads.', employees: 3, created: 'Feb 01, 2024', updated: 'Mar 22, 2024' },
+      4: { title: 'Senior Backend Developer', dept: 'Engineering', zone: 'midfield', desc: 'Designs server-side applications.', employees: 5, created: 'Jan 10, 2024', updated: 'Mar 18, 2024' },
+      5: { title: 'Frontend Developer', dept: 'Engineering', zone: 'midfield', desc: 'Builds web interfaces.', employees: 4, created: 'Jan 12, 2024', updated: 'Mar 20, 2024' },
+      6: { title: 'Tech Lead', dept: 'Engineering', zone: 'midfield', desc: 'Leads technical direction.', employees: 2, created: 'Jan 08, 2024', updated: 'Mar 15, 2024' },
+      7: { title: 'DevOps Engineer', dept: 'Engineering', zone: 'midfield', desc: 'Manages CI/CD pipelines.', employees: 2, created: 'Feb 05, 2024', updated: 'Mar 10, 2024' },
+      8: { title: 'UX/UI Designer', dept: 'Design', zone: 'midfield', desc: 'Creates user-centered designs.', employees: 4, created: 'Jan 20, 2024', updated: 'Mar 12, 2024' },
+      9: { title: 'Product Designer', dept: 'Design', zone: 'midfield', desc: 'Shapes product strategy.', employees: 2, created: 'Feb 01, 2024', updated: 'Mar 08, 2024' },
+      10: { title: 'Financial Controller', dept: 'Finance', zone: 'defense', desc: 'Oversees financial operations.', employees: 3, created: 'Jan 12, 2024', updated: 'Mar 15, 2024' },
+      11: { title: 'Accountant', dept: 'Finance', zone: 'defense', desc: 'Manages transactions.', employees: 2, created: 'Jan 15, 2024', updated: 'Mar 10, 2024' }
+    };
+    const zoneMap = { attack: '⚔️ Attack', midfield: '⚙️ Midfield', defense: '🛡️ Defense', support: '🏥 Support' };
+    let currentPosId = null;
+
+    function showAddModal() {
+      document.getElementById('modalTitle').textContent = 'Add Position';
+      document.getElementById('saveBtn').textContent = 'Save Position';
+      document.getElementById('posTitle').value = '';
+      document.getElementById('posDept').value = '';
+      document.getElementById('posDesc').value = '';
+      document.getElementById('zoneIndicator').style.display = 'none';
+      switchTab(0);
+      currentPosId = null;
+      document.getElementById('addEditModal').style.display = 'flex';
     }
 
-    // Tab switching
-    function switchTab(index) {
-      document.querySelectorAll('.modal-tab').forEach((tab, i) => {
-        tab.classList.toggle('active', i === index);
+    function showEditModal(id) {
+      const pos = positions[id];
+      if (!pos) return;
+      document.getElementById('modalTitle').textContent = 'Edit Position';
+      document.getElementById('saveBtn').textContent = 'Update Position';
+      document.getElementById('posTitle').value = pos.title;
+      document.getElementById('posDept').value = pos.dept.toLowerCase();
+      document.getElementById('posDesc').value = pos.desc;
+      onDeptChange();
+      switchTab(0);
+      currentPosId = id;
+      document.getElementById('addEditModal').style.display = 'flex';
+    }
+
+    function showDetailModal(id) {
+      const pos = positions[id];
+      if (!pos) return;
+      document.getElementById('detailTitle').textContent = pos.title;
+      document.getElementById('detailDept').textContent = pos.dept;
+      document.getElementById('detailZoneBadge').textContent = zoneMap[pos.zone].split(' ')[1];
+      document.getElementById('detailZoneBadge').className = 'badge badge-' + pos.zone;
+      document.getElementById('detailDesc').textContent = pos.desc;
+      document.getElementById('detailEmployees').textContent = pos.employees + ' employees';
+      document.getElementById('detailCreated').textContent = pos.created;
+      document.getElementById('detailUpdated').textContent = pos.updated;
+      currentPosId = id;
+      document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    function showDeleteModal(id, name) {
+      const pos = positions[id];
+      document.getElementById('deletePosName').textContent = name;
+      document.getElementById('deleteImpact').textContent = pos ? pos.employees + ' employees currently hold this position.' : '';
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function hideModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    function confirmDelete() { alert('Position deleted!'); hideModal('deleteModal'); }
+    function switchTab(i) {
+      document.querySelectorAll('.modal-tab').forEach((t, j) => t.classList.toggle('active', i === j));
+      document.querySelectorAll('.tab-content').forEach((c, j) => c.classList.toggle('active', i === j));
+    }
+    function toggleDept(id) {
+      const h = document.querySelector(`[onclick="toggleDept('${id}')"]`);
+      const c = document.getElementById('dept-' + id);
+      h.classList.toggle('expanded');
+      c.classList.toggle('show');
+    }
+    function onDeptChange() {
+      const s = document.getElementById('posDept');
+      const ind = document.getElementById('zoneIndicator');
+      const opt = s.options[s.selectedIndex];
+      if (opt && opt.dataset.zone) {
+        ind.textContent = zoneMap[opt.dataset.zone];
+        ind.className = 'zone-indicator ' + opt.dataset.zone;
+        ind.style.display = 'inline-flex';
+      } else { ind.style.display = 'none'; }
+    }
+    function toggleCategory(el) { el.classList.toggle('collapsed'); }
+    function filterAttrs() {
+      const q = document.getElementById('attrSearch').value.toLowerCase();
+      document.querySelectorAll('.attr-item').forEach(item => {
+        const name = item.dataset.name;
+        item.style.display = name.includes(q) ? 'flex' : 'none';
       });
-      document.querySelectorAll('.tab-content').forEach((content, i) => {
-        content.classList.toggle('active', i === index);
-      });
     }
-
-    // Toggle attribute
-    function toggleAttr(attr, enabled) {
-      const item = document.querySelector(`[data-attr="${attr}"]`);
-      const slider = document.getElementById('slider-' + attr);
-      const val = document.getElementById('val-' + attr);
-
-      item.classList.toggle('disabled', !enabled);
-      slider.disabled = !enabled;
-      val.textContent = enabled ? slider.value + '+' : '-';
+    function toggleAttr(cb, name) {
+      const item = cb.closest('.attr-item');
+      item.classList.toggle('selected', cb.checked);
+      updateSelectedChips();
     }
-
-    // Update slider value display
-    function updateSliderVal(attr) {
-      const slider = document.getElementById('slider-' + attr);
-      document.getElementById('val-' + attr).textContent = slider.value + '+';
+    function removeAttr(name) {
+      const item = document.querySelector(`.attr-item[data-name="${name}"]`);
+      if (item) {
+        item.querySelector('.attr-checkbox').checked = false;
+        item.classList.remove('selected');
+      }
+      updateSelectedChips();
     }
-
-    // Set priority stars
-    function setPriority(attr, level) {
-      const stars = document.querySelectorAll(`#priority-${attr} .star`);
-      stars.forEach((star, i) => {
-        star.classList.toggle('active', i < level);
-      });
+    function updateSelectedChips() {
+      const selected = document.querySelectorAll('.attr-item.selected');
+      document.getElementById('selectedCount').textContent = selected.length;
+      // In a real app, we'd rebuild chips here
     }
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.style.display = 'none'; });
+    });
 
-    // Apply template (demo)
-    function applyTemplate(template) {
-      if (!template) return;
-      alert('Template "' + template + '" applied! Attributes tab updated with pre-configured values.');
-      switchTab(1); // Go to attributes tab
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('userDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
     }
+    document.addEventListener('click', function () {
+      document.getElementById('userDropdown').style.display = 'none';
+    });
   </script>
 </body>
 

@@ -11,6 +11,167 @@
 
   <style>
     /* === PAGE-SPECIFIC STYLES === */
+
+    /* Org Chart Section */
+    .org-chart-section {
+      margin-bottom: var(--space-8);
+    }
+
+    .org-chart {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+
+    .zone-column {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      border: 2px solid var(--border);
+    }
+
+    .zone-column.attack {
+      border-color: var(--zone-attack);
+    }
+
+    .zone-column.midfield {
+      border-color: var(--zone-midfield);
+    }
+
+    .zone-column.defense {
+      border-color: var(--zone-defense);
+    }
+
+    .zone-column.support {
+      border-color: var(--zone-support);
+    }
+
+    .zone-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .zone-header.attack {
+      border-bottom-color: var(--zone-attack);
+    }
+
+    .zone-header.midfield {
+      border-bottom-color: var(--zone-midfield);
+    }
+
+    .zone-header.defense {
+      border-bottom-color: var(--zone-defense);
+    }
+
+    .zone-header.support {
+      border-bottom-color: var(--zone-support);
+    }
+
+    .zone-icon {
+      font-size: 20px;
+    }
+
+    .zone-title {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-base);
+    }
+
+    .zone-count {
+      margin-left: auto;
+      font-size: var(--font-size-xs);
+      color: var(--muted-foreground);
+    }
+
+    .dept-card {
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dept-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+      border-color: var(--primary);
+    }
+
+    .dept-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .dept-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-2);
+    }
+
+    .dept-name {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+
+    .dept-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: var(--font-weight-bold);
+    }
+
+    .dept-badge.attack {
+      background: var(--zone-attack);
+    }
+
+    .dept-badge.midfield {
+      background: var(--zone-midfield);
+    }
+
+    .dept-badge.defense {
+      background: var(--zone-defense);
+    }
+
+    .dept-badge.support {
+      background: var(--zone-support);
+    }
+
+    .dept-desc {
+      font-size: var(--font-size-xs);
+      color: var(--muted-foreground);
+      margin-bottom: var(--space-2);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .dept-stats {
+      display: flex;
+      gap: var(--space-3);
+      font-size: var(--font-size-xs);
+      color: var(--muted-foreground);
+    }
+
+    .dept-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Zone Selector */
     .zone-selector {
       display: flex;
       gap: 12px;
@@ -56,7 +217,7 @@
       background: var(--zone-support-light);
     }
 
-    .zone-icon {
+    .zone-option .zone-icon {
       font-size: 24px;
       margin-bottom: 4px;
     }
@@ -66,6 +227,7 @@
       font-weight: 600;
     }
 
+    /* Mini Pitch */
     .mini-pitch {
       width: 200px;
       height: 280px;
@@ -116,19 +278,110 @@
       opacity: 0.8;
     }
 
-    .dept-count {
-      font-size: 12px;
+    /* Detail Modal Specific */
+    .detail-grid {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .detail-section {
+      background: var(--background);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .detail-section-title {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-3);
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .detail-label {
+      font-size: var(--font-size-sm);
       color: var(--muted-foreground);
-      margin-top: 2px;
+    }
+
+    .detail-value {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+    }
+
+    /* Action Icons */
+    .action-icons {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .icon-btn {
+      padding: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+      font-size: 16px;
+    }
+
+    .icon-btn:hover {
+      background: var(--muted);
+    }
+
+    .icon-btn.delete:hover {
+      background: var(--destructive-light);
+      color: var(--destructive);
+    }
+
+    /* Delete Modal */
+    .delete-warning {
+      background: var(--destructive-light);
+      border: 1px solid var(--destructive);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+      color: #991B1B;
+    }
+
+    .delete-warning-title {
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .dept-highlight {
+      background: var(--white);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: var(--font-weight-bold);
+      color: var(--destructive);
     }
   </style>
 </head>
 
 <body>
   <!-- 
-    MOCKUP: Department Management
+    MOCKUP: Department Management (Enhanced with CRUD)
     User Story: US-0.5.1
-    Flow: List departments, create/edit with zone assignment
+    Flow: Org chart view, list departments, full CRUD operations
   -->
 
   <div class="app-container">
@@ -160,7 +413,6 @@
             Departments</a>
           <a href="02-position-management.html" class="sidebar-item"><span class="icon">📍</span> Positions</a>
           <a href="03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span> Attributes</a>
-          <a href="04-role-templates.html" class="sidebar-item"><span class="icon">📋</span> Templates</a>
         </div>
       </nav>
 
@@ -171,7 +423,18 @@
           <div class="user-name">John Smith</div>
           <div class="user-role">Club Owner</div>
         </div>
-        <button class="user-menu">⋮</button>
+        <button class="user-menu" onclick="toggleUserMenu(event)">⋮</button>
+        <div class="user-dropdown" id="userDropdown"
+          style="display:none; position:absolute; bottom:60px; left:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-medium); z-index:100;">
+          <a href="#"
+            style="display:block; padding:12px 16px; color:var(--foreground); text-decoration:none; font-size:14px;"
+            onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">⚙️
+            Settings</a>
+          <a href="../football-club-setup/01-landing-registration.html"
+            style="display:block; padding:12px 16px; color:var(--destructive); text-decoration:none; font-size:14px; border-top:1px solid var(--border);"
+            onmouseover="this.style.background='var(--destructive-light)'"
+            onmouseout="this.style.background='transparent'">🚪 Logout</a>
+        </div>
       </div>
     </aside>
 
@@ -182,107 +445,312 @@
           <h1 class="page-title">Departments</h1>
           <p class="text-muted">Organize your company into zones on the pitch</p>
         </div>
-        <button class="btn btn-primary" onclick="showModal()">
+        <button class="btn btn-primary" onclick="showAddModal()">
           + Add Department
         </button>
       </header>
 
+      <!-- Org Chart Visualization -->
+      <section class="org-chart-section">
+        <h2
+          style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-2);">
+          Organization Chart</h2>
+        <p class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--space-4);">Visual hierarchy of
+          departments mapped to pitch zones</p>
+
+        <div class="org-chart">
+          <!-- Attack Zone -->
+          <div class="zone-column attack">
+            <div class="zone-header attack">
+              <span class="zone-icon">⚔️</span>
+              <span class="zone-title">Attack</span>
+              <span class="zone-count">2 depts</span>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(1)">
+              <div class="dept-card-header">
+                <span class="dept-name">Sales</span>
+                <span class="dept-badge attack">12</span>
+              </div>
+              <p class="dept-desc">Revenue generation and customer acquisition</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 5 positions</span>
+              </div>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(5)">
+              <div class="dept-card-header">
+                <span class="dept-name">Marketing</span>
+                <span class="dept-badge attack">8</span>
+              </div>
+              <p class="dept-desc">Brand awareness and customer engagement</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 4 positions</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Midfield Zone -->
+          <div class="zone-column midfield">
+            <div class="zone-header midfield">
+              <span class="zone-icon">⚙️</span>
+              <span class="zone-title">Midfield</span>
+              <span class="zone-count">2 depts</span>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(2)">
+              <div class="dept-card-header">
+                <span class="dept-name">Engineering</span>
+                <span class="dept-badge midfield">24</span>
+              </div>
+              <p class="dept-desc">Core product development and technical innovation</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 8 positions</span>
+              </div>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(6)">
+              <div class="dept-card-header">
+                <span class="dept-name">Design</span>
+                <span class="dept-badge midfield">6</span>
+              </div>
+              <p class="dept-desc">UX/UI and brand design</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 3 positions</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Defense Zone -->
+          <div class="zone-column defense">
+            <div class="zone-header defense">
+              <span class="zone-icon">🛡️</span>
+              <span class="zone-title">Defense</span>
+              <span class="zone-count">2 depts</span>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(3)">
+              <div class="dept-card-header">
+                <span class="dept-name">Finance</span>
+                <span class="dept-badge defense">5</span>
+              </div>
+              <p class="dept-desc">Financial operations and risk management</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 4 positions</span>
+              </div>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(7)">
+              <div class="dept-card-header">
+                <span class="dept-name">Legal</span>
+                <span class="dept-badge defense">3</span>
+              </div>
+              <p class="dept-desc">Legal compliance and contracts</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 2 positions</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Support Zone -->
+          <div class="zone-column support">
+            <div class="zone-header support">
+              <span class="zone-icon">🏥</span>
+              <span class="zone-title">Support</span>
+              <span class="zone-count">1 dept</span>
+            </div>
+            <div class="dept-card" onclick="showDetailModal(4)">
+              <div class="dept-card-header">
+                <span class="dept-name">Human Resources</span>
+                <span class="dept-badge support">3</span>
+              </div>
+              <p class="dept-desc">People operations and talent development</p>
+              <div class="dept-stats">
+                <span class="dept-stat">📍 2 positions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Department Table -->
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Department</th>
-              <th>Zone</th>
-              <th>Positions</th>
-              <th>Employees</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div class="font-medium">Engineering</div>
-                <div class="text-muted" style="font-size: 12px;">Core product development</div>
-              </td>
-              <td><span class="badge badge-midfield">⚙️ Midfield</span></td>
-              <td>8 positions</td>
-              <td>24 players</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Edit</button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="font-medium">Sales</div>
-                <div class="text-muted" style="font-size: 12px;">Revenue generation</div>
-              </td>
-              <td><span class="badge badge-attack">⚔️ Attack</span></td>
-              <td>5 positions</td>
-              <td>12 players</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Edit</button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="font-medium">Design</div>
-                <div class="text-muted" style="font-size: 12px;">UX/UI and brand</div>
-              </td>
-              <td><span class="badge badge-midfield">⚙️ Midfield</span></td>
-              <td>3 positions</td>
-              <td>6 players</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Edit</button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="font-medium">Finance</div>
-                <div class="text-muted" style="font-size: 12px;">Financial operations</div>
-              </td>
-              <td><span class="badge badge-defense">🛡️ Defense</span></td>
-              <td>4 positions</td>
-              <td>5 players</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Edit</button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="font-medium">Human Resources</div>
-                <div class="text-muted" style="font-size: 12px;">People operations</div>
-              </td>
-              <td><span class="badge badge-support">🏥 Support</span></td>
-              <td>2 positions</td>
-              <td>3 players</td>
-              <td>
-                <button class="btn btn-sm btn-outline">Edit</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <section style="margin-top: var(--space-8);">
+        <h2
+          style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-4);">
+          All Departments</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Zone</th>
+                <th>Department Head</th>
+                <th>Positions</th>
+                <th>Employees</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="font-medium">Sales</div>
+                  <div class="text-muted" style="font-size: 12px;">Revenue generation</div>
+                </td>
+                <td><span class="badge badge-attack">⚔️ Attack</span></td>
+                <td>Sarah Johnson</td>
+                <td>5 positions</td>
+                <td>12 players</td>
+                <td>2024-01-15</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(1)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(1)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(1, 'Sales')" title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-medium">Engineering</div>
+                  <div class="text-muted" style="font-size: 12px;">Core product development</div>
+                </td>
+                <td><span class="badge badge-midfield">⚙️ Midfield</span></td>
+                <td>Michael Chen</td>
+                <td>8 positions</td>
+                <td>24 players</td>
+                <td>2024-01-10</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(2)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(2)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(2, 'Engineering')"
+                      title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-medium">Finance</div>
+                  <div class="text-muted" style="font-size: 12px;">Financial operations</div>
+                </td>
+                <td><span class="badge badge-defense">🛡️ Defense</span></td>
+                <td>Robert Martinez</td>
+                <td>4 positions</td>
+                <td>5 players</td>
+                <td>2024-01-12</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(3)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(3)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(3, 'Finance')" title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-medium">Human Resources</div>
+                  <div class="text-muted" style="font-size: 12px;">People operations</div>
+                </td>
+                <td><span class="badge badge-support">🏥 Support</span></td>
+                <td>Emily Davis</td>
+                <td>2 positions</td>
+                <td>3 players</td>
+                <td>2024-01-08</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(4)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(4)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(4, 'Human Resources')"
+                      title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-medium">Marketing</div>
+                  <div class="text-muted" style="font-size: 12px;">Brand awareness</div>
+                </td>
+                <td><span class="badge badge-attack">⚔️ Attack</span></td>
+                <td>Jessica Lee</td>
+                <td>4 positions</td>
+                <td>8 players</td>
+                <td>2024-02-01</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(5)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(5)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(5, 'Marketing')"
+                      title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-medium">Design</div>
+                  <div class="text-muted" style="font-size: 12px;">UX/UI and brand</div>
+                </td>
+                <td><span class="badge badge-midfield">⚙️ Midfield</span></td>
+                <td>David Kim</td>
+                <td>3 positions</td>
+                <td>6 players</td>
+                <td>2024-01-20</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(6)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(6)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(6, 'Design')" title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-medium">Legal</div>
+                  <div class="text-muted" style="font-size: 12px;">Legal compliance</div>
+                </td>
+                <td><span class="badge badge-defense">🛡️ Defense</span></td>
+                <td><span class="text-muted" style="font-size: 12px; font-style: italic;">Not assigned</span></td>
+                <td>2 positions</td>
+                <td>3 players</td>
+                <td>2024-02-05</td>
+                <td>
+                  <div class="action-icons">
+                    <button class="icon-btn" onclick="showDetailModal(7)" title="View">👁️</button>
+                    <button class="icon-btn" onclick="showEditModal(7)" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="showDeleteModal(7, 'Legal')" title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   </div>
 
   <!-- Add/Edit Department Modal -->
-  <div class="modal-overlay" id="modal" style="display: none;">
+  <div class="modal-overlay" id="addEditModal" style="display: none;">
     <div class="modal" style="max-width: 520px;">
       <div class="modal-header">
-        <h2 class="modal-title">Add Department</h2>
-        <button class="modal-close" onclick="hideModal()">×</button>
+        <h2 class="modal-title" id="modalTitle">Add Department</h2>
+        <button class="modal-close" onclick="hideModal('addEditModal')">×</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label">Department Name</label>
-          <input type="text" class="form-input" placeholder="e.g., Engineering" value="Marketing">
+          <input type="text" class="form-input" id="deptName" placeholder="e.g., Engineering">
         </div>
 
         <div class="form-group">
           <label class="form-label">Description</label>
-          <textarea class="form-input" rows="2"
-            placeholder="Brief description...">Drive brand awareness and customer acquisition</textarea>
+          <textarea class="form-input" rows="2" id="deptDesc" placeholder="Brief description..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Department Head</label>
+          <select class="form-input" id="deptHead">
+            <option value="">Select a manager...</option>
+            <option value="1">Sarah Johnson</option>
+            <option value="2">Michael Chen</option>
+            <option value="3">Robert Martinez</option>
+            <option value="4">Emily Davis</option>
+            <option value="5">Jessica Lee</option>
+            <option value="6">David Kim</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -290,7 +758,7 @@
           <p class="form-hint">Where does this department sit on the pitch?</p>
 
           <div class="zone-selector">
-            <div class="zone-option attack selected" onclick="selectZone(this, 'attack')">
+            <div class="zone-option attack" onclick="selectZone(this, 'attack')">
               <div class="zone-icon">⚔️</div>
               <div class="zone-label">Attack</div>
             </div>
@@ -307,38 +775,258 @@
               <div class="zone-label">Support</div>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('addEditModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save Department</button>
+      </div>
+    </div>
+  </div>
 
-          <!-- Mini Pitch Preview -->
-          <div class="mini-pitch">
-            <div class="pitch-zone attack highlighted"></div>
-            <div class="pitch-zone midfield"></div>
-            <div class="pitch-zone defense"></div>
-            <div class="pitch-zone support"></div>
+  <!-- Detail View Modal -->
+  <div class="modal-overlay" id="detailModal" style="display: none;">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="detailTitle">Department Details</h2>
+        <button class="modal-close" onclick="hideModal('detailModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid">
+          <!-- Overview Section -->
+          <div class="detail-section">
+            <div class="detail-section-title">📋 Overview</div>
+            <div class="detail-row">
+              <span class="detail-label">Department Name</span>
+              <span class="detail-value" id="detailName">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Description</span>
+              <span class="detail-value" id="detailDesc">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Zone</span>
+              <span class="detail-value" id="detailZone">-</span>
+            </div>
+          </div>
+
+          <!-- Team Information -->
+          <div class="detail-section">
+            <div class="detail-section-title">👥 Team Information</div>
+            <div class="detail-row">
+              <span class="detail-label">Department Head</span>
+              <span class="detail-value" id="detailHead">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Total Employees</span>
+              <span class="detail-value" id="detailEmployees">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Total Positions</span>
+              <span class="detail-value" id="detailPositions">-</span>
+            </div>
+          </div>
+
+          <!-- Metadata -->
+          <div class="detail-section">
+            <div class="detail-section-title">📅 Metadata</div>
+            <div class="detail-row">
+              <span class="detail-label">Created On</span>
+              <span class="detail-value" id="detailCreated">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Last Updated</span>
+              <span class="detail-value" id="detailUpdated">-</span>
+            </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
-        <button class="btn btn-primary">Save Department</button>
+        <button class="btn btn-secondary" onclick="hideModal('detailModal')">Close</button>
+        <button class="btn btn-primary" onclick="editFromDetail()">Edit Department</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal" style="display: none;">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Department</h2>
+        <button class="modal-close" onclick="hideModal('deleteModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning">
+          <div class="delete-warning-title">
+            ⚠️ Warning: Permanent Action
+          </div>
+          <p style="font-size: var(--font-size-sm); margin: 0;">
+            This action cannot be undone. All data associated with this department will be permanently deleted.
+          </p>
+        </div>
+        <p style="font-size: var(--font-size-sm); color: var(--foreground);">
+          Are you sure you want to delete the <span class="dept-highlight" id="deleteDeptName">-</span> department?
+        </p>
+        <p style="font-size: var(--font-size-xs); color: var(--muted-foreground); margin-top: var(--space-3);">
+          This will also remove all positions and employee assignments within this department.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('deleteModal')">Cancel</button>
+        <button class="btn btn-destructive" onclick="confirmDelete()">Delete Department</button>
       </div>
     </div>
   </div>
 
   <script>
-    function showModal() {
-      document.getElementById('modal').style.display = 'flex';
+    // Sample data for demonstration
+    const departments = {
+      1: { name: 'Sales', desc: 'Revenue generation and customer acquisition', zone: 'attack', head: 'Sarah Johnson', employees: 12, positions: 5, created: '2024-01-15', updated: '2024-03-20' },
+      2: { name: 'Engineering', desc: 'Core product development and technical innovation', zone: 'midfield', head: 'Michael Chen', employees: 24, positions: 8, created: '2024-01-10', updated: '2024-03-18' },
+      3: { name: 'Finance', desc: 'Financial operations and risk management', zone: 'defense', head: 'Robert Martinez', employees: 5, positions: 4, created: '2024-01-12', updated: '2024-03-15' },
+      4: { name: 'Human Resources', desc: 'People operations and talent development', zone: 'support', head: 'Emily Davis', employees: 3, positions: 2, created: '2024-01-08', updated: '2024-03-10' },
+      5: { name: 'Marketing', desc: 'Brand awareness and customer engagement', zone: 'attack', head: 'Jessica Lee', employees: 8, positions: 4, created: '2024-02-01', updated: '2024-03-22' },
+      6: { name: 'Design', desc: 'UX/UI and brand design', zone: 'midfield', head: 'David Kim', employees: 6, positions: 3, created: '2024-01-20', updated: '2024-03-12' },
+      7: { name: 'Legal', desc: 'Legal compliance and contracts', zone: 'defense', head: null, employees: 3, positions: 2, created: '2024-02-05', updated: '2024-03-08' }
+    };
+
+    let currentDeptId = null;
+    let currentDeleteId = null;
+
+    // Show Add Modal
+    function showAddModal() {
+      document.getElementById('modalTitle').textContent = 'Add Department';
+      document.getElementById('saveBtn').textContent = 'Save Department';
+      document.getElementById('deptName').value = '';
+      document.getElementById('deptDesc').value = '';
+      document.getElementById('deptHead').value = '';
+
+      // Clear zone selection
+      document.querySelectorAll('.zone-option').forEach(o => o.classList.remove('selected'));
+      document.querySelectorAll('.pitch-zone').forEach(z => z.classList.remove('highlighted'));
+
+      currentDeptId = null;
+      document.getElementById('addEditModal').style.display = 'flex';
     }
-    function hideModal() {
-      document.getElementById('modal').style.display = 'none';
+
+    // Show Edit Modal
+    function showEditModal(id) {
+      const dept = departments[id];
+      if (!dept) return;
+
+      document.getElementById('modalTitle').textContent = 'Edit Department';
+      document.getElementById('saveBtn').textContent = 'Update Department';
+      document.getElementById('deptName').value = dept.name;
+      document.getElementById('deptDesc').value = dept.desc;
+
+      // Set department head if available
+      const headOptions = document.getElementById('deptHead').options;
+      for (let i = 0; i < headOptions.length; i++) {
+        if (headOptions[i].text === dept.head) {
+          document.getElementById('deptHead').selectedIndex = i;
+          break;
+        }
+      }
+
+      // Select the zone
+      document.querySelectorAll('.zone-option').forEach(o => o.classList.remove('selected'));
+      const zoneOption = document.querySelector('.zone-option.' + dept.zone);
+      if (zoneOption) {
+        zoneOption.classList.add('selected');
+        selectZone(zoneOption, dept.zone);
+      }
+
+      currentDeptId = id;
+      document.getElementById('addEditModal').style.display = 'flex';
     }
+
+    // Show Detail Modal
+    function showDetailModal(id) {
+      const dept = departments[id];
+      if (!dept) return;
+
+      document.getElementById('detailName').textContent = dept.name;
+      document.getElementById('detailDesc').textContent = dept.desc;
+
+      // Zone badge
+      const zoneIcons = { attack: '⚔️', midfield: '⚙️', defense: '🛡️', support: '🏥' };
+      const zoneNames = { attack: 'Attack', midfield: 'Midfield', defense: 'Defense', support: 'Support' };
+      const zoneHTML = `<span class="badge badge-${dept.zone}">${zoneIcons[dept.zone]} ${zoneNames[dept.zone]}</span>`;
+      document.getElementById('detailZone').innerHTML = zoneHTML;
+
+      document.getElementById('detailHead').textContent = dept.head || 'Not assigned';
+      document.getElementById('detailEmployees').textContent = dept.employees + ' players';
+      document.getElementById('detailPositions').textContent = dept.positions + ' positions';
+      document.getElementById('detailCreated').textContent = dept.created;
+      document.getElementById('detailUpdated').textContent = dept.updated;
+
+      currentDeptId = id;
+      document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    // Edit from Detail Modal
+    function editFromDetail() {
+      hideModal('detailModal');
+      if (currentDeptId) {
+        showEditModal(currentDeptId);
+      }
+    }
+
+    // Show Delete Modal
+    function showDeleteModal(id, name) {
+      document.getElementById('deleteDeptName').textContent = name;
+      currentDeleteId = id;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    // Confirm Delete
+    function confirmDelete() {
+      if (currentDeleteId) {
+        console.log('Deleting department:', currentDeleteId);
+        // In a real app, this would call an API
+        alert('Department deleted successfully! (Demo mode)');
+        hideModal('deleteModal');
+        currentDeleteId = null;
+      }
+    }
+
+    // Hide Modal
+    function hideModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Select Zone
     function selectZone(el, zone) {
       // Remove selected from all
       document.querySelectorAll('.zone-option').forEach(o => o.classList.remove('selected'));
       el.classList.add('selected');
+
       // Highlight zone on pitch
       document.querySelectorAll('.pitch-zone').forEach(z => z.classList.remove('highlighted'));
-      document.querySelector('.pitch-zone.' + zone).classList.add('highlighted');
+      const pitchZone = document.querySelector('.pitch-zone.' + zone);
+      if (pitchZone) {
+        pitchZone.classList.add('highlighted');
+      }
     }
+
+    // Close modal when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          overlay.style.display = 'none';
+        }
+      });
+    });
+
+    // User menu toggle
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('userDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    document.addEventListener('click', function () {
+      document.getElementById('userDropdown').style.display = 'none';
+    });
   </script>
 </body>
 
