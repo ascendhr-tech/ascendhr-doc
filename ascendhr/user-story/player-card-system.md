@@ -23,41 +23,51 @@
 > **So that** I can add them to the squad and track their skills.
 
 ### Scenario
-HR creates a new employee profile with FM-style attributes during onboarding.
+HR creates a new employee profile with FM-style attributes during onboarding using a 3-step wizard.
 
 ### Preconditions
 - Scout is logged in with `employee:create` permission
-- Departments and Positions already exist
+- Departments and Positions already exist with Zone assignments
 
-### Main Flow
+### Main Flow (3-Step Wizard)
 
 | Step | User Action | System Response |
 |------|-------------|-----------------|
-| 1 | Click "Add Employee" button | Display employee creation form |
-| 2 | Fill basic info (name, email, department, position) | Validate required fields in real-time |
-| 3 | Upload profile photo (optional) | Preview photo, validate size/format |
-| 4 | Set "Reports To" manager (optional) | Show manager dropdown |
-| 5 | Rate 10 attributes using 1-20 sliders | Calculate Current Ability score |
-| 6 | Set Potential Ability | Validate ≥ Current Ability |
-| 7 | Click "Create Player" | Create employee record |
-| 8 | - | Auto-create user account |
-| 9 | - | Send invitation email |
-| 10 | - | Show success message + link to Player Card |
+| 1 | Click "Add Player" button | Display Step 1: Basic Info form |
+| 2 | Fill name, email, phone | Validate required fields in real-time |
+| 3 | Click "Next: Assignment" | Navigate to Step 2 |
+| 4 | Select Department | Show Zone badge (Attack/Midfield/Defense/Support) |
+| 5 | Select Position | Filter positions by department, show cascading dropdown |
+| 6 | Set "Reports To" manager | Show manager dropdown |
+| 7 | Click "Next: Attributes" | Navigate to Step 3 |
+| 8 | Rate 5 core attributes using 1-20 sliders | Show **spider chart with position requirements comparison** |
+| 9 | View live Fit Score | Calculate fit % against position requirements |
+| 10 | View Gap Analysis | Show Above/Meets/Below counts for each attribute |
+| 11 | Click "Create Player" | Create employee record |
+| 12 | - | Auto-create user account with zone color |
+| 13 | - | Show success with Player Card preview |
 
 ### Alternative Flows
 
 | Alt | Condition | Flow |
 |-----|-----------|------|
 | 2a | Email already exists | Show error "Email already registered" |
-| 3a | Photo > 5MB | Show error "Photo must be under 5MB" |
-| 6a | Potential < Current | Show error "Potential must be ≥ Current Ability" |
-| 7a | Validation fails | Highlight invalid fields, stay on form |
+| 4a | Department changed | Reset position dropdown, update zone display |
+| 8a | Attribute below position requirement | Show warning icon on slider |
+
+### Key Features
+- **Zone-based Departments:** Each department has a zone color (Attack=Red, Midfield=Green, Defense=Blue, Support=Purple)
+- **Position Comparison Spider Chart:** Dashed line shows position requirements, filled area shows input values
+- **Live Fit Score:** Updates in real-time as sliders move
+- **Gap Analysis Panel:** Shows how many attributes are Above/Meets/Below expectation
 
 ### Screens
-1. Employee List (with "Add Employee" button)
-2. Create Employee Form
-3. Attribute Rating Panel (sliders + radar chart preview)
-4. Success Confirmation (with Player Card preview)
+1. Step 1: Basic Information (name, email, phone)
+2. Step 2: Assignment (department with zone, position, manager)
+3. Step 3: Attributes (sliders + spider chart + fit score panel)
+4. Live Preview Card (reflects current values with zone styling)
+
+**HTML Mockup:** [02-create-employee.html](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/player-card-system/02-create-employee.html)
 
 ---
 
@@ -78,62 +88,165 @@ HR needs to find an employee to update their profile or compare attributes.
 
 | Step | User Action | System Response |
 |------|-------------|-----------------|
-| 1 | Navigate to "Players" page | Display player gallery (FC-style Card Grid) |
-| 2 | Type in search box | Filter cards by name/position in real-time |
-| 3 | Apply filters (department, status) | Update grid with filtered results |
-| 4 | Click "Sort by Rating" | Reorder cards by Current Ability |
-| 5 | Click on player card | Navigate to Player Card detail |
+| 1 | Navigate to "Players" page | Display stats row (total, Attack, Midfield, Defense, Support counts) |
+| 2 | View player gallery | Show FIFA-style cards with zone-colored headers |
+| 3 | Click Zone filter pill (All/Attack/Midfield/Defense/Support) | Filter cards by zone, update counts |
+| 4 | Type in search box | Filter cards by name/position in real-time |
+| 5 | Click "Sort by Rating" | Reorder cards by Overall rating |
+| 6 | Hover on player card | Show action buttons (Select, Delete) |
+| 7 | Click on player card | Navigate to Player Card detail |
 
 ### Alternative Flows
 
 | Alt | Condition | Flow |
 |-----|-----------|------|
-| 2a | No results found | Show "No players match your search" |
-| 5a | Click "Import" or "Add Player" | Navigate to respective pages |
+| 3a | No players in zone | Show "No players in this zone" |
+| 4a | No search results | Show "No players match your search" |
+
+### Key Features
+- **Zone Stats Row:** Shows player count by zone with color-coded badges
+- **Zone Filter Pills:** Quick filter by Attack/Midfield/Defense/Support
+- **FIFA-style Cards:** Overall rating, position badge, zone-colored header
+- **Hover Actions:** Select (for compare) and Delete buttons
 
 ### Screens
-1. Player Gallery (Card Grid with search, filters)
-2. Filter Bar (Department, Status, Sort)
+1. Player Gallery (Card Grid with zone-colored headers)
+2. Stats Row (Total and zone counts)
+3. Filter Bar (Zone pills, search, sort)
+4. Compare Modal (side-by-side spider charts)
+
+**HTML Mockup:** [04-player-gallery.html](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/player-card-system/04-player-gallery.html)
 
 ---
 
-## US-0.4.3: View & Update Employee
+## US-0.4.3: View & Update Employee (Update Attributes Flow)
 
 > **As a** Scout (HR),  
-> **I want to** view and update an employee's Player Card,  
-> **So that** I can keep their profile and attributes current.
+> **I want to** view and update an employee's Player Card attributes,  
+> **So that** I can track their growth and maintain accurate skill profiles.
 
 ### Scenario
-HR updates an employee's skills after a performance review.
+HR updates an employee's skills after a performance review using a guided wizard.
 
 ### Preconditions
 - User is logged in with `employee:update` permission
-- Employee exists
+- Employee exists with existing attributes
 
-### Main Flow
+### Main Flow (Update Attributes - 3-Step Wizard)
 
 | Step | User Action | System Response |
 |------|-------------|-----------------|
-| 1 | Click on employee from list | Navigate to Player Card detail page |
-| 2 | View Player Card (photo, info, radar chart) | Display full profile |
-| 3 | Click "Edit" button | Switch to edit mode |
-| 4 | Update fields or attributes | Validate changes in real-time |
-| 5 | Click "Save Changes" | Save updates with audit log |
-| 6 | - | Recalculate Current Ability if attributes changed |
-| 7 | - | Show success notification |
+| 1 | Click on player from gallery | Navigate to Player Card detail page |
+| 2 | View Hero Section | Display **large spider chart** comparing actual vs position requirements |
+| 3 | View Fit Score | Show 92% badge with gap analysis (Above/Meets/Below counts) |
+| 4 | View Attribute Cards | Display 8 attributes in grid with value, required, and +/- indicators |
+| 5 | Click **"📊 Update Attributes"** button | Open 3-step Update Wizard |
+| 6 | **Step 1:** Select trigger type | Choose from: Performance Review, Training, Project, Observation, Peer Feedback |
+| 7 | Click Continue | Navigate to Step 2 |
+| 8 | **Step 2:** Adjust attribute sliders | Show current vs new value with ▲+X / ▼-X indicators |
+| 9 | Add justification for each change | Enter text explaining why attribute changed |
+| 10 | Click "Preview Impact" | Navigate to Step 3 |
+| 11 | **Step 3:** Review before/after fit scores | Show 85% → 92% comparison |
+| 12 | View changes summary | List all attribute changes with justifications |
+| 13 | Add evidence link (optional) | Link to review document, certificate, etc. |
+| 14 | Click "Confirm & Save" | Save changes to history |
+| 15 | - | Update player card with new values |
 
 ### Alternative Flows
 
 | Alt | Condition | Flow |
 |-----|-----------|------|
-| 4a | Invalid input | Show field-level error |
-| 5a | No changes made | "Save" button disabled |
+| 8a | No changes made | Show "No changes" in preview |
+| 14a | Cancel clicked | Discard changes, return to detail page |
+
+### Key Features
+- **Hero Spider Chart:** Large chart showing position requirements (dashed) vs actual (filled)
+- **Fit Score Display:** Prominent percentage with color coding (green=high, red=low)
+- **Attribute Cards Grid:** 8 cards showing value, requirement, and gap indicator
+- **Trigger Selection:** Captures WHY the update is happening (for analytics)
+- **Justification Fields:** Free text explaining each change (for audit trail)
+- **Impact Preview:** Before/After comparison of fit score
 
 ### Screens
-1. Player Card Detail (view mode)
-2. Player Card Detail (edit mode)
-3. Attribute Edit Panel (sliders)
-4. Change History Tab (audit log)
+1. Player Card Detail (hero spider chart, fit score, attribute cards)
+2. Update Wizard Step 1: Trigger Selection
+3. Update Wizard Step 2: Attribute Adjustment with Justification
+4. Update Wizard Step 3: Impact Preview
+5. Attribute History Timeline
+
+**HTML Mockup:** [03-employee-detail.html](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/player-card-system/03-employee-detail.html)
+
+---
+
+## US-0.4.3b: Change Position/Department (Transfer Flow)
+
+> **As a** Scout (HR),  
+> **I want to** change an employee's position or department,  
+> **So that** I can track promotions, demotions, lateral moves, and department transfers like player transfers in football.
+
+### Scenario
+HR promotes an employee or transfers them to a different department using a guided wizard with fit analysis.
+
+### Preconditions
+- User is logged in with `employee:update` permission
+- Employee exists with current position and department
+
+### Main Flow (Change Position - 4-Step Wizard)
+
+| Step | User Action | System Response |
+|------|-------------|-----------------|
+| 1 | Click **"🔄 Change Position"** button | Open 4-step Position Change Wizard |
+| 2 | **Step 1:** Select change type | Choose: ⬆️ Promotion, ↔️ Lateral Move, 🔄 Department Transfer, ⬇️ Demotion |
+| 3 | Click Continue | Navigate to Step 2 |
+| 4 | **Step 2:** Select new department | Show Zone badge change (Midfield → Attack) |
+| 5 | Select new position | Cascading dropdown filtered by department |
+| 6 | Select new reporting manager | Dropdown of eligible managers |
+| 7 | Set effective date | Calendar picker |
+| 8 | Click "Analyze Fit" | Navigate to Step 3 |
+| 9 | **Step 3:** View Fit Score Comparison | Show Current Role (92%) vs New Role (72%) |
+| 10 | View Attribute Gap Analysis | List gaps (⚠️ Communication: -2) and strengths (✅ Technical: +8) |
+| 11 | View Development Recommendations | Show suggested training/coaching |
+| 12 | Click Continue | Navigate to Step 4 |
+| 13 | **Step 4:** Review confirmation summary | Show FROM → TO with zone color change |
+| 14 | Enter reason for change | Text field for justification |
+| 15 | Attach approval document (optional) | Link to document |
+| 16 | Click "Confirm Change" | Save position change to history |
+| 17 | - | Update employee's position and department |
+
+### Alternative Flows
+
+| Alt | Condition | Flow |
+|-----|-----------|------|
+| 4a | Same department selected | Position dropdown shows same-department roles |
+| 9a | Fit score very low (<50%) | Show warning about skill gaps |
+| 14a | Cancel clicked | Discard changes, return to detail page |
+
+### Key Features
+- **Change Type Selection:** Captures promotion/lateral/transfer/demotion for analytics
+- **Zone Color Change:** Visual indicator when department changes (e.g., Midfield Green → Attack Red)
+- **Fit Score Comparison:** Like FM position familiarity - shows how suited the employee is for new role
+- **Gap Analysis:** Lists attributes that need development for new role
+- **Development Recommendations:** Suggests training based on gaps (like FM training suggestions)
+
+### Data Model
+```javascript
+{
+  type: "lateral_transfer",
+  previousPosition: { department: "Engineering", position: "Tech Lead", zone: "midfield", fitScore: 92 },
+  newPosition: { department: "Product", position: "Product Manager", zone: "attack", fitScore: 72 },
+  effectiveDate: "2025-01-15",
+  reason: "Career development interest",
+  developmentPlan: ["Stakeholder management training", "Product roadmap workshop"]
+}
+```
+
+### Screens
+1. Position Change Wizard Step 1: Change Type Selection
+2. Position Change Wizard Step 2: New Position Selection
+3. Position Change Wizard Step 3: Fit Score Comparison & Gap Analysis
+4. Position Change Wizard Step 4: Confirmation & Reason
+
+**HTML Mockup:** [03-employee-detail.html](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/player-card-system/03-employee-detail.html)
 
 ---
 

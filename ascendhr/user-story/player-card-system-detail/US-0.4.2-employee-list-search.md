@@ -1,100 +1,145 @@
 # Player Gallery & Search
 
-**Story ID:** US-0.4.2
-**Epic:** 0.4 - Player Card System
+**Story ID:** US-0.4.2  
+**Epic:** 0.4 - Player Card System  
 **Persona:** Scout (HR)
 
 ---
 
 ## User Story
 
-> **As a** Scout (HR),
-> **I want to** search and filter the player gallery,
+> **As a** Scout (HR),  
+> **I want to** search and filter the player gallery,  
 > **So that** I can visually browse the squad and find specific players.
 
 ---
 
 ## Business Requirement/Logic
 
-The system must display all employees as "Player Cards" (FC26 style) in a responsive grid layout. It includes a filter bar for real-time searching and filtering.
+Player Gallery แสดง employees แบบ **FIFA-style Card Grid** โดยมี:
+
+### Stats Row
+- แสดงจำนวนพนักงานทั้งหมดและแยกตาม Zone
+- Total Players, Attack (🔴), Midfield (🟢), Defense (🔵), Support (🟣)
+
+### Zone Filter Pills
+- Quick filter โดย click ที่ Zone pill
+- Update counts และ cards ทันที
+
+### FIFA-style Cards
+- Header สีตาม Zone ของพนักงาน
+- Overall rating badge
+- Position และ Department
+- Hover actions: Select (สำหรับ compare), Delete
+
+### Compare Feature
+- Select หลาย cards เพื่อเปรียบเทียบ
+- Spider chart แสดง side-by-side
 
 **Key Business Rules:**
-- **Card View:** Display employees as cards (Gold/Silver/Bronze tiers based on rating).
-- **Search:** Real-time filtering by Name or Position.
-- **Filters:** Dropdowns for Department and Status.
-- **Sorting:** Sort by Rating (High to Low).
-- **Interactions:** Clicking a card opens the Employee Detail page.
-- **Visuals:** Hover effects should be interactive but not simple underlines.
+- ต้อง compare เฉพาะพนักงานใน department เดียวกัน
+- Filter ทำงาน real-time
 
 ---
 
 ## Acceptance Criteria
 
-### Scenario 1: Successfully View and Search Player Gallery
+### Scenario 1: View Player Gallery with Zone Stats
 
 **Given**
-- User is logged in with `employee:read` permission
-- There are multiple employees in the system
+- Scout is logged in with `employee:read` permission
+- 10 employees exist (2 Attack, 5 Midfield, 2 Defense, 1 Support)
 
 **When**
-- User navigates to "Players" page
-- User types "John" in the search box
+- Scout navigates to "Players" page
 
 **Then**
-- System displays employees as player cards in a grid
-- System filters cards in real-time to show only matches for "John"
-- Results count (e.g., "Showing 5 players") updates automatically
+- Stats row shows: Total (10), Attack (2), Midfield (5), Defense (2), Support (1)
+- All 10 player cards displayed in grid
+- Each card has zone-colored header
+- Zone badges shown on filter bar
 
 ---
 
-### Scenario 2: Filter by Department and Status
+### Scenario 2: Filter by Zone
 
 **Given**
-- User is on the Player Gallery page
+- Scout is viewing Player Gallery
+- All zones pill is currently active
 
 **When**
-- User selects "Engineering" from Department filter
-- User selects "Active" from Status filter
+- Scout clicks "Midfield" zone pill
 
 **Then**
-- System updates the grid to show only Active engineers
-- Non-matching cards are hidden
+- Only Midfield zone players shown (5 cards)
+- Other zone cards hidden
+- Midfield pill shows active state
+- Stats row still shows all counts
 
 ---
 
-### Scenario 3: Sort by Rating
+### Scenario 3: Search Players
 
 **Given**
-- User is on the Player Gallery page
+- Scout is viewing Player Gallery
 
 **When**
-- User clicks "Sort by Rating" button
+- Scout types "Alex" in search box
 
 **Then**
-- System reorders cards by their Overall Rating (Attribute Average) from High to Low
+- Cards filter in real-time to show only players with "Alex" in name
+- No full page reload
+- Clear search shows all cards again
 
 ---
 
-### Scenario 4: No Results Found
+### Scenario 4: Compare Two Players
 
 **Given**
-- User is on the Player Gallery page
+- Scout is viewing Player Gallery
+- Two players from same department exist
 
 **When**
-- User enters a search term that matches no players
+- Scout clicks "Select" on first player card
+- Scout clicks "Select" on second player card
+- Scout clicks "Compare Selected" button
 
 **Then**
-- System hides all cards
-- Results count shows "Showing 0 players"
+- Compare modal opens
+- Side-by-side spider charts shown
+- Attribute differences highlighted (green=better, red=worse)
+
+---
+
+### Scenario 5: No Players in Zone
+
+**Given**
+- Scout is viewing Player Gallery
+- No employees in "Support" zone
+
+**When**
+- Scout clicks "Support" zone pill
+
+**Then**
+- Empty state shows "No players in this zone"
+- Add Player button visible
 
 ---
 
 ## UI/UX Notes
 
 **Screens Involved:**
-1. **Player Gallery:** Main view with Card Grid.
+1. Player Gallery (Card Grid with zone-colored headers)
+2. Stats Row (Total and zone counts)
+3. Filter Bar (Zone pills, search, sort dropdown)
+4. Compare Modal (side-by-side spider charts)
 
 **Key UI Elements:**
-- **Filter Bar:** Contains Search Box, Dept Dropdown, Status Dropdown, Sort Button.
-- **Player Card:** Displays Photo, Rating, Position, Name, Flag, Club Crest.
-- **Grid Layout:** Responsive grid adapting to screen size.
+- **Stats Row**: 5 stat cards showing count per zone with colors
+- **Zone Pills**: All / Attack / Midfield / Defense / Support filter buttons
+- **Player Card**: Zone-colored header, Overall rating, Position badge, Avatar
+- **Hover Actions**: Select checkbox, Delete button
+- **Compare Bar**: Shows selected count, Compare button
+- **Compare Modal**: Two spider charts side-by-side, attribute table with +/- diff
+
+**HTML Mockup:** [04-player-gallery.html](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/player-card-system/04-player-gallery.html)

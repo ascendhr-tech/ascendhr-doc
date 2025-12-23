@@ -16,129 +16,118 @@
 
 ## Business Requirement/Logic
 
-เมื่อ HR สร้างพนักงานใหม่ ระบบจะต้องสร้างทั้ง Employee record และ User account พร้อมกัน จากนั้นจะส่งอีเมลเชิญให้พนักงานตั้งรหัสผ่านเพื่อเข้าใช้งานระบบ
+เมื่อ HR สร้างพนักงานใหม่ ระบบจะใช้ **3-Step Wizard** เพื่อนำทางการกรอกข้อมูล:
 
-Player Card ของพนักงานจะประกอบด้วย:
-- ข้อมูลพื้นฐาน (ชื่อ, อีเมล, แผนก, ตำแหน่ง)
-- รูปโปรไฟล์
-- Attributes 10 ค่า (1-20 คะแนน)
-- Current Ability (คำนวณจาก Attributes)
-- Potential Ability (ต้อง ≥ Current Ability)
+### Step 1: Basic Info
+- ชื่อ, อีเมล, เบอร์โทร
+
+### Step 2: Assignment
+- แผนก (มี Zone color: Attack=Red, Midfield=Green, Defense=Blue, Support=Purple)
+- ตำแหน่ง (Cascading จากแผนก)
+- Reports To Manager
+
+### Step 3: Attributes
+- Rate 5 core attributes (1-20)
+- แสดง **Spider Chart** เปรียบเทียบค่าที่กรอกกับ Position Requirements
+- แสดง **Fit Score** แบบ real-time
+- แสดง **Gap Analysis** (Above/Meets/Below)
 
 **Key Business Rules:**
 - Email ต้องไม่ซ้ำในระบบ
-- รูปโปรไฟล์ต้องไม่เกิน 5MB
-- Potential Ability ต้องมากกว่าหรือเท่ากับ Current Ability
-- ต้องมี Departments และ Positions ในระบบก่อน
+- ต้องมี Departments และ Positions พร้อม Zone assignments
+- Fit Score คำนวณจาก attributes เทียบกับ position requirements
 
 ---
 
 ## Acceptance Criteria
 
-### Scenario 1: Successfully Create Employee with Player Card
+### Scenario 1: Successfully Create Employee with 3-Step Wizard
 
 **Given**
 - Scout is logged in with `employee:create` permission
-- Departments and Positions already exist in the system
+- Departments and Positions exist with Zone assignments
 
 **When**
-- Scout clicks "Add Employee" button
-- Scout fills all required fields (name, email, department, position)
-- Scout uploads profile photo (optional)
-- Scout sets "Reports To" manager (optional)
-- Scout rates 10 attributes using 1-20 sliders
-- Scout sets Potential Ability ≥ Current Ability
+- Scout clicks "Add Player" button
+- Scout completes Step 1: Basic Info (name, email, phone)
+- Scout clicks "Next: Assignment"
+- Scout completes Step 2: Assignment (department with zone, position, manager)
+- Scout clicks "Next: Attributes"
+- Scout rates 5 attributes using sliders
+- Scout views spider chart showing position comparison
+- Scout views live Fit Score and Gap Analysis
 - Scout clicks "Create Player"
 
 **Then**
-- System creates employee record in database
-- System auto-creates user account with generated password
-- System sends invitation email to employee
-- System shows success message with link to Player Card
-- Current Ability is calculated from the 10 attributes
+- System creates employee record with zone assignment
+- System shows success with Player Card preview (zone-styled)
+- Spider chart and Fit Score update in real-time during input
 
 ---
 
 ### Scenario 2: Email Already Registered
 
 **Given**
-- Scout is on the Create Employee form
+- Scout is on Step 1 of Create Employee wizard
 - An employee with email "john@company.com" already exists
 
 **When**
 - Scout enters "john@company.com" in email field
-- Scout attempts to submit the form
+- Scout attempts to proceed to next step
 
 **Then**
 - System shows error "Email already registered"
-- Form remains open for correction
-- No employee record is created
+- Form remains on Step 1 for correction
 
 ---
 
-### Scenario 3: Photo Exceeds Size Limit
+### Scenario 3: Department Change Updates Position Options
 
 **Given**
-- Scout is on the Create Employee form
-- Scout has filled all required fields
+- Scout is on Step 2 of Create Employee wizard
+- Scout has already selected a department
 
 **When**
-- Scout uploads a profile photo that is larger than 5MB
+- Scout changes department selection
 
 **Then**
-- System shows error "Photo must be under 5MB"
-- Photo is rejected and not uploaded
-- Form remains open for correction
+- Position dropdown resets
+- Position options update to match new department
+- Zone badge updates to show new zone color
 
 ---
 
-### Scenario 4: Potential Less Than Current Ability
+### Scenario 4: Attribute Below Position Requirement
 
 **Given**
-- Scout is on the Create Employee form
-- Scout has rated attributes resulting in Current Ability of 15
+- Scout is on Step 3 of Create Employee wizard
+- Position requires Leadership: 14
 
 **When**
-- Scout sets Potential Ability to 12 (less than Current)
-- Scout attempts to submit
+- Scout sets Leadership attribute to 10
 
 **Then**
-- System shows error "Potential must be ≥ Current Ability"
-- Form remains open for correction
-
----
-
-### Scenario 5: Form Validation Fails
-
-**Given**
-- Scout is on the Create Employee form
-
-**When**
-- Scout leaves required fields empty (name, email, department, position)
-- Scout attempts to submit
-
-**Then**
-- System highlights all invalid/empty required fields
-- System shows field-level validation errors
-- Form stays on the same page
-- No employee record is created
+- Spider chart shows gap visually (dashed line vs filled area)
+- Gap Analysis shows "Below" count increases
+- Fit Score decreases accordingly
+- Warning indicator shown on slider
 
 ---
 
 ## UI/UX Notes
 
 **Screens Involved:**
-1. Employee List (with "Add Employee" button)
-2. Create Employee Form
-3. Attribute Rating Panel (sliders + radar chart preview)
-4. Success Confirmation (with Player Card preview)
+1. Step 1: Basic Information (name, email, phone)
+2. Step 2: Assignment (department with zone badge, position, manager)
+3. Step 3: Attributes (sliders + spider chart + fit score panel)
+4. Live Preview Card (right panel, zone-styled)
 
 **Key UI Elements:**
-- **Add Employee Button**: Primary action on Employee List page
-- **Basic Info Form**: Name, Email, Department (dropdown), Position (dropdown)
-- **Photo Upload**: Drag-drop zone with preview, max 5MB indicator
-- **Reports To Dropdown**: Searchable manager selector
-- **Attribute Sliders**: 10 sliders with 1-20 range, real-time radar chart update
-- **Current Ability Display**: Auto-calculated from attributes (read-only)
-- **Potential Ability Slider**: Must be ≥ Current Ability
-- **Create Player Button**: Primary submit action
+- **Step Indicator**: 1-2-3 wizard progress
+- **Zone Badge**: Color-coded department zone (Attack/Midfield/Defense/Support)
+- **Spider Chart**: Dashed line = position requirements, Filled = input values
+- **Fit Score Panel**: Percentage with color coding (green=high, red=low)
+- **Gap Analysis**: Above/Meets/Below counts
+- **Position Requirement Badges**: Show required value next to each slider
+
+**HTML Mockup:** [02-create-employee.html](file:///Users/gdrom/Desktop/allkons/ascend-hr-docs/ascendhr/design/player-card-system/02-create-employee.html)

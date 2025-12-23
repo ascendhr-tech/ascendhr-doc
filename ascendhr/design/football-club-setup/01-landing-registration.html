@@ -454,6 +454,213 @@
       text-decoration: none;
       cursor: pointer;
     }
+
+    /* === Email Client Mockup === */
+    .email-client {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 16px 64px -16px rgba(0, 0, 0, 0.3);
+    }
+
+    .email-header {
+      background: #f1f5f9;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .email-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .email-dots span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e2e8f0;
+    }
+
+    .email-dots span:first-child {
+      background: #ef4444;
+    }
+
+    .email-dots span:nth-child(2) {
+      background: #f59e0b;
+    }
+
+    .email-dots span:last-child {
+      background: #22c55e;
+    }
+
+    .email-title {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .email-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--primary-light);
+      border-left: 3px solid var(--primary);
+    }
+
+    .email-sender-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .email-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .email-sender {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--foreground);
+    }
+
+    .email-subject {
+      font-size: 14px;
+      color: var(--foreground);
+      margin: 2px 0;
+      font-weight: 500;
+    }
+
+    .email-preview {
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-time {
+      font-size: 12px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .email-body {
+      padding: 20px;
+      background: #f8fafc;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .email-content {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    /* Email Template Styling */
+    .email-template {
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .email-template-header {
+      background: var(--gradient-primary);
+      padding: 24px;
+      text-align: center;
+    }
+
+    .email-logo {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .email-template-body {
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .email-trophy {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .email-template-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+
+    .email-template-subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .email-template-text {
+      font-size: 14px;
+      color: var(--foreground);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .email-verify-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 24px 0;
+      display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .email-verify-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .email-template-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .email-template-footer {
+      background: #f8fafc;
+      padding: 20px 24px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .email-template-footer p {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
   </style>
 </head>
 
@@ -603,11 +810,83 @@
         Click the link in the email to verify your account and start creating your club.
       </p>
 
-      <button class="btn-simulate" onclick="goToState('state-success')">
-        📧 Simulate: Click Email Link
+      <button class="btn-simulate" onclick="goToState('state-email-preview')">
+        📧 Open Email (Preview Template)
       </button>
 
       <a class="resend-link">Didn't receive the email? Resend</a>
+    </div>
+  </div>
+
+  <!-- STATE 3b: Email Template Preview -->
+  <div id="state-email-preview" class="state verify-state">
+    <a class="back-link" onclick="goToState('state-verify')">← Back</a>
+
+    <!-- Email Client Mockup -->
+    <div class="email-client">
+      <!-- Email Header -->
+      <div class="email-header">
+        <div class="email-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="email-title">� Inbox - john@acmecorp.com</div>
+      </div>
+
+      <!-- Email List Item (Selected) -->
+      <div class="email-list-item selected">
+        <div class="email-sender-avatar">A</div>
+        <div class="email-meta">
+          <div class="email-sender">AscendHR</div>
+          <div class="email-subject">🏆 Welcome to the Squad! Verify Your Email</div>
+          <div class="email-preview">Click the button below to verify your email and start building your...</div>
+        </div>
+        <div class="email-time">Just now</div>
+      </div>
+
+      <!-- Email Body -->
+      <div class="email-body">
+        <div class="email-content">
+          <!-- Email Template -->
+          <div class="email-template">
+            <div class="email-template-header">
+              <div class="email-logo">⚽ AscendHR</div>
+            </div>
+
+            <div class="email-template-body">
+              <div class="email-trophy">🏆</div>
+              <h2 class="email-template-title">Welcome to the Squad!</h2>
+              <p class="email-template-subtitle">
+                You're one step away from building your championship team.
+              </p>
+
+              <p class="email-template-text">
+                Hi <strong>John Smith</strong>,
+              </p>
+              <p class="email-template-text">
+                Thanks for signing up for AscendHR! We're excited to have you join the league.
+                To get started, please verify your email address by clicking the button below.
+              </p>
+
+              <button class="email-verify-btn" onclick="goToState('state-success')">
+                ✓ Verify My Email
+              </button>
+
+              <p class="email-template-note">
+                This link will expire in <strong>24 hours</strong>.<br>
+                If you didn't create an account, you can safely ignore this email.
+              </p>
+            </div>
+
+            <div class="email-template-footer">
+              <p>AscendHR - Manage Talent Like a Pro</p>
+              <p style="font-size: 11px; margin-top: 8px;">
+                You're receiving this because you signed up at ascendhr.com<br>
+                © 2024 AscendHR. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

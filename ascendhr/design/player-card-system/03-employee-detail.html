@@ -10,59 +10,74 @@
   <link rel="stylesheet" href="../_shared/base.css">
 
   <style>
-    /* Feature-specific styles */
+    /* === Player Detail Styles === */
     .detail-container {
       display: grid;
-      grid-template-columns: 350px 1fr;
+      grid-template-columns: 340px 1fr;
       gap: var(--space-8);
     }
 
-    /* Player Card (Left) */
+    /* Zone-styled Player Card (Left) */
     .player-card {
-      background: var(--gradient-primary);
       border-radius: var(--radius-xl);
-      padding: var(--space-8);
+      padding: 32px;
       color: white;
       text-align: center;
       position: sticky;
-      top: var(--space-8);
+      top: 24px;
+    }
+
+    .player-card.zone-attack {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .player-card.zone-midfield {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .player-card.zone-defense {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .player-card.zone-support {
+      background: linear-gradient(135deg, #a855f7, #9333ea);
     }
 
     .player-photo {
-      width: 140px;
-      height: 140px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
-      margin: 0 auto var(--space-4);
+      margin: 0 auto 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 48px;
+      font-size: 42px;
       border: 4px solid rgba(255, 255, 255, 0.5);
     }
 
     .player-name {
-      font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      margin-bottom: var(--space-1);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     .player-position {
-      opacity: 0.85;
-      margin-bottom: var(--space-2);
+      opacity: 0.9;
+      margin-bottom: 4px;
     }
 
-    .player-dept {
-      font-size: var(--font-size-sm);
-      opacity: 0.7;
-      margin-bottom: var(--space-6);
+    .player-zone {
+      opacity: 0.8;
+      font-size: 13px;
+      margin-bottom: 24px;
     }
 
     .ability-row {
       display: flex;
       justify-content: center;
-      gap: var(--space-8);
-      margin-bottom: var(--space-6);
+      gap: 32px;
+      margin-bottom: 24px;
     }
 
     .ability-box {
@@ -70,36 +85,22 @@
     }
 
     .ability-number {
-      font-size: 42px;
-      font-weight: var(--font-weight-bold);
+      font-size: 36px;
+      font-weight: 700;
       line-height: 1;
     }
 
     .ability-label {
-      font-size: var(--font-size-xs);
+      font-size: 12px;
       opacity: 0.8;
-    }
-
-    /* Radar Chart */
-    .radar-container {
-      width: 200px;
-      height: 200px;
-      margin: 0 auto var(--space-4);
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      opacity: 0.7;
     }
 
     .player-meta {
       display: flex;
       justify-content: space-around;
-      padding-top: var(--space-4);
+      padding-top: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: var(--font-size-sm);
+      font-size: 13px;
     }
 
     .meta-item {
@@ -107,112 +108,52 @@
     }
 
     .meta-value {
-      font-weight: var(--font-weight-semibold);
+      font-weight: 600;
     }
 
     .meta-label {
       opacity: 0.7;
-      font-size: var(--font-size-xs);
+      font-size: 11px;
     }
 
-    /* Detail Panel (Right) */
+    /* Detail Panel */
     .detail-section {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      margin-bottom: var(--space-6);
+      margin-bottom: 20px;
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: var(--space-4) var(--space-6);
+      padding: 16px 24px;
       border-bottom: 1px solid var(--border);
     }
 
     .section-title {
-      font-weight: var(--font-weight-semibold);
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: var(--space-2);
+      gap: 8px;
     }
 
     .section-body {
-      padding: var(--space-6);
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-4);
-    }
-
-    .info-item {
-      margin-bottom: var(--space-4);
-    }
-
-    .info-label {
-      font-size: var(--font-size-sm);
-      color: var(--muted-foreground);
-      margin-bottom: var(--space-1);
-    }
-
-    .info-value {
-      font-weight: var(--font-weight-medium);
-    }
-
-    /* Attribute Grid */
-    .attr-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-3);
-    }
-
-    .attr-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-3);
-      background: var(--background);
-      border-radius: var(--radius-md);
-    }
-
-    .attr-name {
-      font-size: var(--font-size-sm);
-    }
-
-    .attr-value {
-      font-weight: var(--font-weight-bold);
-      color: var(--primary);
-    }
-
-    .attr-bar {
-      width: 60px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      margin-left: var(--space-2);
-      overflow: hidden;
-    }
-
-    .attr-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 3px;
+      padding: 24px;
     }
 
     /* Tabs */
     .tabs {
       display: flex;
-      gap: var(--space-1);
-      padding: 0 var(--space-6);
+      gap: 4px;
+      padding: 0 24px;
       border-bottom: 1px solid var(--border);
     }
 
     .tab {
-      padding: var(--space-3) var(--space-4);
-      font-size: var(--font-size-sm);
+      padding: 12px 16px;
+      font-size: 14px;
       color: var(--muted-foreground);
       cursor: pointer;
       border-bottom: 2px solid transparent;
@@ -222,30 +163,184 @@
     .tab.active {
       color: var(--primary);
       border-bottom-color: var(--primary);
-      font-weight: var(--font-weight-medium);
+      font-weight: 500;
     }
 
-    /* Status Badge Large */
-    .status-large {
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Attribute Grid with Scale Labels */
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .attr-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--background);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .attr-name {
+      font-size: 14px;
+    }
+
+    .attr-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .attr-value {
+      font-weight: 700;
+      font-size: 16px;
+      min-width: 24px;
+      text-align: right;
+    }
+
+    .attr-bar {
+      width: 60px;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .attr-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    .attr-fill.low {
+      background: #ef4444;
+    }
+
+    .attr-fill.developing {
+      background: #f59e0b;
+    }
+
+    .attr-fill.proficient {
+      background: #22c55e;
+    }
+
+    .attr-fill.exceptional {
+      background: #3b82f6;
+    }
+
+    .attr-scale {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .attr-scale.low {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .attr-scale.developing {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .attr-scale.proficient {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .attr-scale.exceptional {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Fit Score Section */
+    .fit-score-display {
+      text-align: center;
+      padding: 24px;
+      background: var(--background);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+    }
+
+    .fit-score-value {
+      font-size: 48px;
+      font-weight: 700;
+    }
+
+    .fit-score-value.excellent {
+      color: #22c55e;
+    }
+
+    .fit-score-value.good {
+      color: #3b82f6;
+    }
+
+    .fit-score-value.fair {
+      color: #f59e0b;
+    }
+
+    .fit-score-value.poor {
+      color: #ef4444;
+    }
+
+    .fit-score-label {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+    }
+
+    .fit-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .fit-table th,
+    .fit-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fit-table th {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      font-weight: 600;
+    }
+
+    .fit-match {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      padding: 6px 14px;
-      border-radius: var(--radius-full);
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
+      gap: 4px;
+      font-size: 12px;
     }
 
-    .status-active {
-      background: var(--accent-light);
-      color: #166534;
+    .fit-match.exceeds {
+      color: #22c55e;
+    }
+
+    .fit-match.meets {
+      color: #3b82f6;
+    }
+
+    .fit-match.gap {
+      color: #ef4444;
     }
 
     /* History Timeline */
     .history-item {
       display: flex;
-      gap: var(--space-4);
-      padding: var(--space-4) 0;
+      gap: 16px;
+      padding: 16px 0;
       border-bottom: 1px solid var(--border);
     }
 
@@ -255,7 +350,7 @@
 
     .history-date {
       width: 100px;
-      font-size: var(--font-size-sm);
+      font-size: 13px;
       color: var(--muted-foreground);
     }
 
@@ -264,49 +359,122 @@
     }
 
     .history-title {
-      font-weight: var(--font-weight-medium);
+      font-weight: 500;
       margin-bottom: 2px;
     }
 
     .history-desc {
-      font-size: var(--font-size-sm);
+      font-size: 13px;
       color: var(--muted-foreground);
     }
 
-    /* Action Buttons */
+    /* Action Bar */
     .action-bar {
-      position: sticky;
-      top: 0;
-      background: var(--background);
-      z-index: 10;
-      padding: var(--space-4) 0;
-      margin-bottom: var(--space-4);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 24px;
     }
 
-    /* Modal visible state */
+    /* Status Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-badge.active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    /* Info Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .info-item {
+      margin-bottom: 16px;
+    }
+
+    .info-label {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-weight: 500;
+    }
+
+    /* Modal */
     .modal-overlay {
       display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
     }
 
     .modal-overlay.visible {
       display: flex;
     }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow: auto;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--muted-foreground);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
   </style>
 </head>
 
 <body>
-  <!-- 
-    MOCKUP: Employee Detail / Player Card
-    User Story: US-0.4.3, US-0.4.4, US-0.4.5, US-0.4.7
-    
-    INTERACTIVE: View profile, change status, edit info
-  -->
-
   <div class="app-container">
-    <!-- Unified Sidebar -->
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand">
@@ -336,7 +504,6 @@
             Positions</a>
           <a href="../formation-view/03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span>
             Attributes</a>
-            Templates</a>
         </div>
       </nav>
       <div class="sidebar-user">
@@ -345,249 +512,390 @@
           <div class="user-name">John Smith</div>
           <div class="user-role">Club Owner</div>
         </div>
-        <button class="user-menu">⋮</button>
+        <button class="user-menu" onclick="toggleUserMenu(event)">⋮</button>
+        <div class="user-dropdown" id="userDropdown"
+          style="display:none; position:absolute; bottom:60px; left:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-medium); z-index:100;">
+          <a href="#"
+            style="display:block; padding:12px 16px; color:var(--foreground); text-decoration:none; font-size:14px;"
+            onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">⚙️
+            Settings</a>
+          <a href="../football-club-setup/01-landing-registration.html"
+            style="display:block; padding:12px 16px; color:var(--destructive); text-decoration:none; font-size:14px; border-top:1px solid var(--border);"
+            onmouseover="this.style.background='var(--destructive-light)'"
+            onmouseout="this.style.background='transparent'">🚪 Logout</a>
+        </div>
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
       <!-- Action Bar -->
       <div class="action-bar">
-        <a href="01-employee-list.html" style="color: var(--muted-foreground); text-decoration: none;">← Back to
-          List</a>
-        <div style="display: flex; gap: var(--space-3);">
+        <a href="04-player-gallery.html" style="color: var(--muted-foreground); text-decoration: none;">← Back to
+          Gallery</a>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-primary" onclick="openUpdateAttributesModal()"
+            style="background: linear-gradient(135deg, #3b82f6, #2563eb);">📊 Update Attributes</button>
+          <button class="btn btn-primary" onclick="openChangePositionModal()"
+            style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🔄 Change Position</button>
           <button class="btn btn-secondary" onclick="showModal('statusModal')">🔄 Change Status</button>
-          <button class="btn btn-primary">✏️ Edit Profile</button>
+          <button class="btn btn-secondary" onclick="showModal('editModal')">✏️ Edit</button>
+          <button class="btn btn-danger" onclick="showModal('deleteModal')">🗑️ Delete</button>
         </div>
       </div>
 
-      <div class="detail-container">
-        <!-- Player Card (Left) -->
-        <div class="player-card">
-          <div class="player-photo">JS</div>
-          <h1 class="player-name">John Smith</h1>
+      <!-- HERO SECTION: Spider Chart + Player Card -->
+      <div style="display: grid; grid-template-columns: 280px 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- Compact Player Card -->
+        <div class="player-card zone-midfield" id="playerCard" style="padding: 24px;">
+          <div class="player-photo" style="width: 80px; height: 80px; font-size: 28px;">AC</div>
+          <h1 class="player-name" style="font-size: 20px;">Alex Chen</h1>
           <p class="player-position">Tech Lead</p>
-          <p class="player-dept">Engineering</p>
-
-          <div class="ability-row">
+          <p class="player-zone" style="margin-bottom: 16px;">⚙️ Engineering</p>
+          <div class="ability-row" style="gap: 20px;">
             <div class="ability-box">
-              <div class="ability-number">156</div>
-              <div class="ability-label">Current</div>
+              <div class="ability-number" style="font-size: 28px;">87</div>
+              <div class="ability-label">Overall</div>
             </div>
             <div class="ability-box">
-              <div class="ability-number">175</div>
-              <div class="ability-label">Potential</div>
-            </div>
-          </div>
-
-          <div class="radar-container">📊 Radar Chart</div>
-
-          <div class="player-meta">
-            <div class="meta-item">
-              <div class="meta-value">2 years</div>
-              <div class="meta-label">Tenure</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-value">EMP001</div>
-              <div class="meta-label">ID</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-value">4</div>
-              <div class="meta-label">Reports</div>
+              <div class="ability-number" style="font-size: 28px; color: #4ade80;">92%</div>
+              <div class="ability-label">Fit Score</div>
             </div>
           </div>
         </div>
 
-        <!-- Detail Panel (Right) -->
-        <div class="detail-area">
-          <!-- Basic Info -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span class="section-title">👤 Basic Information</span>
-              <span class="status-large status-active">● Active</span>
-            </div>
-            <div class="section-body">
-              <div class="info-grid">
-                <div class="info-item">
-                  <div class="info-label">Email</div>
-                  <div class="info-value">john.smith@company.com</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Phone</div>
-                  <div class="info-value">+66 89 123 4567</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Department</div>
-                  <div class="info-value">Engineering</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Position</div>
-                  <div class="info-value">Tech Lead</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Reports To</div>
-                  <div class="info-value">Sarah Johnson (VP Engineering)</div>
-                </div>
-                <div class="info-item">
-                  <div class="info-label">Start Date</div>
-                  <div class="info-value">January 15, 2022</div>
-                </div>
+        <!-- HERO Spider Chart -->
+        <div
+          style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px;">
+          <div style="display: flex; align-items: center; gap: 32px;">
+            <div style="text-align: center;">
+              <h2 style="font-size: 16px; color: var(--foreground); margin-bottom: 16px;">🕸️ Attribute Profile vs
+                Position Requirements</h2>
+              <svg width="320" height="320" viewBox="0 0 320 320">
+                <!-- Grid lines -->
+                <polygon points="160,30 290,95 255,255 65,255 30,95" fill="none" stroke="#e5e7eb" stroke-width="1" />
+                <polygon points="160,62 258,110 230,222 90,222 62,110" fill="none" stroke="#e5e7eb" stroke-width="1" />
+                <polygon points="160,95 226,126 206,190 114,190 94,126" fill="none" stroke="#e5e7eb" stroke-width="1" />
+                <polygon points="160,127 194,142 182,158 138,158 126,142" fill="none" stroke="#e5e7eb"
+                  stroke-width="1" />
+                <!-- Axis lines -->
+                <line x1="160" y1="160" x2="160" y2="30" stroke="#e5e7eb" stroke-width="1" />
+                <line x1="160" y1="160" x2="290" y2="95" stroke="#e5e7eb" stroke-width="1" />
+                <line x1="160" y1="160" x2="255" y2="255" stroke="#e5e7eb" stroke-width="1" />
+                <line x1="160" y1="160" x2="65" y2="255" stroke="#e5e7eb" stroke-width="1" />
+                <line x1="160" y1="160" x2="30" y2="95" stroke="#e5e7eb" stroke-width="1" />
+                <!-- Position Requirements (dashed gray) - Tech Lead: L14, Te16, Co12, Pr14, Tw15 -->
+                <polygon points="160,69 251,108 220,215 82,227 51,102" fill="none" stroke="#9ca3af" stroke-width="2"
+                  stroke-dasharray="8,4" />
+                <!-- Actual Values (filled blue) - L17, Te18, Co16, Pr17, Tw14 -->
+                <polygon points="160,40 282,98 248,248 72,245 38,98" fill="#3b82f630" stroke="#3b82f6"
+                  stroke-width="3" />
+                <circle cx="160" cy="40" r="6" fill="#3b82f6" />
+                <circle cx="282" cy="98" r="6" fill="#3b82f6" />
+                <circle cx="248" cy="248" r="6" fill="#3b82f6" />
+                <circle cx="72" cy="245" r="6" fill="#3b82f6" />
+                <circle cx="38" cy="98" r="6" fill="#3b82f6" />
+                <!-- Labels -->
+                <text x="160" y="16" text-anchor="middle" font-size="13" fill="#374151"
+                  font-weight="600">Leadership</text>
+                <text x="305" y="95" text-anchor="start" font-size="13" fill="#374151"
+                  font-weight="600">Technical</text>
+                <text x="268" y="270" text-anchor="start" font-size="13" fill="#374151"
+                  font-weight="600">Communication</text>
+                <text x="52" y="270" text-anchor="end" font-size="13" fill="#374151" font-weight="600">Problem
+                  Solving</text>
+                <text x="15" y="95" text-anchor="end" font-size="13" fill="#374151" font-weight="600">Teamwork</text>
+              </svg>
+              <div style="display: flex; justify-content: center; gap: 24px; margin-top: 12px; font-size: 13px;">
+                <span><span
+                    style="display:inline-block; width:20px; height:3px; background:#9ca3af; border:1px dashed #6b7280; margin-right:6px;"></span>
+                  Position Requirement</span>
+                <span><span
+                    style="display:inline-block; width:20px; height:12px; background:#3b82f640; border:2px solid #3b82f6; border-radius:3px; margin-right:6px;"></span>
+                  Actual</span>
               </div>
             </div>
-          </div>
-
-          <!-- Attributes -->
-          <div class="detail-section">
-            <div class="tabs">
-              <div class="tab active">Core Attributes</div>
-              <div class="tab">Specialist</div>
-              <div class="tab">History</div>
-            </div>
-            <div class="section-body">
-              <div class="attr-grid">
-                <div class="attr-item">
-                  <span class="attr-name">🎯 Leadership</span>
-                  <span class="attr-value">17</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 85%;"></div>
-                  </div>
+            <!-- Fit Score Panel -->
+            <div style="min-width: 200px;">
+              <div
+                style="text-align: center; padding: 24px; background: linear-gradient(135deg, #22c55e20, #22c55e10); border-radius: 16px; border: 2px solid #22c55e40; margin-bottom: 16px;">
+                <div style="font-size: 56px; font-weight: 800; color: #22c55e;">92%</div>
+                <div style="font-size: 14px; color: #16a34a; font-weight: 600;">EXCELLENT FIT</div>
+              </div>
+              <div style="background: var(--background); border-radius: 12px; padding: 16px;">
+                <div
+                  style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                  <span style="color: #22c55e; font-weight: 500;">▲ Exceeds</span>
+                  <span style="font-weight: 700;">4</span>
                 </div>
-                <div class="attr-item">
-                  <span class="attr-name">🤝 Teamwork</span>
-                  <span class="attr-value">15</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 75%;"></div>
-                  </div>
+                <div
+                  style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                  <span style="color: #6b7280; font-weight: 500;">— Meets</span>
+                  <span style="font-weight: 700;">0</span>
                 </div>
-                <div class="attr-item">
-                  <span class="attr-name">💬 Communication</span>
-                  <span class="attr-value">16</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 80%;"></div>
-                  </div>
-                </div>
-                <div class="attr-item">
-                  <span class="attr-name">🔄 Adaptability</span>
-                  <span class="attr-value">14</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 70%;"></div>
-                  </div>
-                </div>
-                <div class="attr-item">
-                  <span class="attr-name">💪 Determination</span>
-                  <span class="attr-value">18</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 90%;"></div>
-                  </div>
-                </div>
-                <div class="attr-item">
-                  <span class="attr-name">💻 Coding</span>
-                  <span class="attr-value">18</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 90%;"></div>
-                  </div>
-                </div>
-                <div class="attr-item">
-                  <span class="attr-name">🏗️ System Design</span>
-                  <span class="attr-value">17</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 85%;"></div>
-                  </div>
-                </div>
-                <div class="attr-item">
-                  <span class="attr-name">🧩 Problem Solving</span>
-                  <span class="attr-value">16</span>
-                  <div class="attr-bar">
-                    <div class="attr-fill" style="width: 80%;"></div>
-                  </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                  <span style="color: #ef4444; font-weight: 500;">▼ Below</span>
+                  <span style="font-weight: 700;">1</span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Direct Reports -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span class="section-title">👥 Direct Reports (4)</span>
-              <button class="btn btn-sm btn-secondary">View All</button>
-            </div>
-            <div class="section-body" style="padding: var(--space-4);">
-              <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
-                <div
-                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
-                  <div
-                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                    MW</div>
-                  <div>
-                    <div style="font-weight: 500; font-size: 14px;">Mike Wilson</div>
-                    <div style="font-size: 12px; color: var(--muted-foreground);">Backend Dev</div>
-                  </div>
-                </div>
-                <div
-                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
-                  <div
-                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                    DK</div>
-                  <div>
-                    <div style="font-weight: 500; font-size: 14px;">David Kim</div>
-                    <div style="font-size: 12px; color: var(--muted-foreground);">Frontend Dev</div>
-                  </div>
-                </div>
-                <div
-                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
-                  <div
-                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--zone-midfield); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                    MG</div>
-                  <div>
-                    <div style="font-weight: 500; font-size: 14px;">Maria Garcia</div>
-                    <div style="font-size: 12px; color: var(--muted-foreground);">QA Engineer</div>
-                  </div>
-                </div>
-                <div
-                  style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--background); border-radius: var(--radius-md);">
-                  <div
-                    style="width: 36px; height: 36px; border-radius: 50%; background: var(--zone-support); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                    RB</div>
-                  <div>
-                    <div style="font-weight: 500; font-size: 14px;">Robert Brown</div>
-                    <div style="font-size: 12px; color: var(--muted-foreground);">DevOps Eng</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Roles -->
-          <div class="detail-section">
-            <div class="section-header">
-              <span class="section-title">🔐 Assigned Roles</span>
-              <button class="btn btn-sm btn-secondary">Manage</button>
-            </div>
-            <div class="section-body" style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-              <span class="badge badge-primary">Team Lead</span>
-              <span class="badge badge-muted">Employee</span>
             </div>
           </div>
         </div>
       </div>
-    </main>
+
+      <!-- ATTRIBUTES SECTION (Primary Focus) -->
+      <div
+        style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 24px;">
+        <h2
+          style="font-size: 18px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+          🎯 Player Attributes
+          <span style="font-size: 13px; font-weight: normal; color: var(--muted-foreground);">(Tech Lead requirements in
+            parentheses)</span>
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+          <!-- Leadership -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">🎯 Leadership</span>
+              <span
+                style="font-size: 11px; color: #22c55e; background: #22c55e20; padding: 2px 8px; border-radius: 10px;">▲
+                +3</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">17</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Required: 14</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 85%; height: 100%; background: #3b82f6;"></div>
+            </div>
+          </div>
+          <!-- Technical -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">💻 Technical</span>
+              <span
+                style="font-size: 11px; color: #22c55e; background: #22c55e20; padding: 2px 8px; border-radius: 10px;">▲
+                +2</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">18</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Required: 16</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 90%; height: 100%; background: #3b82f6;"></div>
+            </div>
+          </div>
+          <!-- Communication -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">💬 Communication</span>
+              <span
+                style="font-size: 11px; color: #22c55e; background: #22c55e20; padding: 2px 8px; border-radius: 10px;">▲
+                +4</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">16</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Required: 12</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 80%; height: 100%; background: #3b82f6;"></div>
+            </div>
+          </div>
+          <!-- Problem Solving -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">🧩 Problem Solving</span>
+              <span
+                style="font-size: 11px; color: #22c55e; background: #22c55e20; padding: 2px 8px; border-radius: 10px;">▲
+                +3</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">17</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Required: 14</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 85%; height: 100%; background: #3b82f6;"></div>
+            </div>
+          </div>
+          <!-- Teamwork -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">🤝 Teamwork</span>
+              <span
+                style="font-size: 11px; color: #ef4444; background: #ef444420; padding: 2px 8px; border-radius: 10px;">▼
+                -1</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #f59e0b;">14</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Required: 15</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 70%; height: 100%; background: #f59e0b;"></div>
+            </div>
+          </div>
+          <!-- Adaptability -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">🔄 Adaptability</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">13</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Proficient</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 65%; height: 100%; background: #22c55e;"></div>
+            </div>
+          </div>
+          <!-- Attention to Detail -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">✨ Attention</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">15</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Proficient</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 75%; height: 100%; background: #22c55e;"></div>
+            </div>
+          </div>
+          <!-- Initiative -->
+          <div
+            style="background: var(--background); border-radius: 12px; padding: 16px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--muted-foreground);">🚀 Initiative</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">16</div>
+            <div style="font-size: 11px; color: var(--muted-foreground);">Exceptional</div>
+            <div style="margin-top: 8px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+              <div style="width: 80%; height: 100%; background: #3b82f6;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECONDARY SECTIONS: History & Contact -->
+      <div style="display: grid; grid-template-columns: 1fr 300px; gap: 24px;">
+        <!-- History -->
+        <div
+          style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px;">
+          <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📜 Attribute History</h2>
+          <div class="history-item">
+            <div class="history-date">Dec 15, 2024</div>
+            <div class="history-content">
+              <div class="history-title">Leadership increased from 15 to 17</div>
+              <div class="history-desc">Based on Q4 performance review</div>
+            </div>
+          </div>
+          <div class="history-item">
+            <div class="history-date">Sep 1, 2024</div>
+            <div class="history-content">
+              <div class="history-title">Promoted to Tech Lead</div>
+              <div class="history-desc">Previously: Senior Developer</div>
+            </div>
+          </div>
+          <div class="history-item">
+            <div class="history-date">Jun 15, 2023</div>
+            <div class="history-content">
+              <div class="history-title">Technical Skills updated from 16 to 18</div>
+              <div class="history-desc">Completed advanced architecture certification</div>
+            </div>
+          </div>
+          <div class="history-item">
+            <div class="history-date">Jan 15, 2021</div>
+            <div class="history-content">
+              <div class="history-title">Joined as Senior Developer</div>
+              <div class="history-desc">Initial player card created</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div
+          style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px;">
+          <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📞 Contact Info</h2>
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 13px; color: var(--muted-foreground);">Email</div>
+            <div style="font-weight: 500;">alex.chen@company.com</div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 13px; color: var(--muted-foreground);">Phone</div>
+            <div style="font-weight: 500;">+1 (555) 123-4567</div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 13px; color: var(--muted-foreground);">Slack</div>
+            <div style="font-weight: 500;">@alexchen</div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: var(--muted-foreground);">Location</div>
+            <div style="font-weight: 500;">San Francisco, CA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct Reports -->
+      <div class="detail-section">
+        <div class="section-header">
+          <span class="section-title">👥 Direct Reports (4)</span>
+          <button class="btn btn-sm btn-secondary">View All</button>
+        </div>
+        <div class="section-body" style="padding: 16px;">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="03-employee-detail.html?id=5"
+              style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--background); border-radius: var(--radius-md); text-decoration: none; color: inherit;">
+              <div
+                style="width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                MW</div>
+              <div>
+                <div style="font-weight: 500; font-size: 14px;">Mike Wang</div>
+                <div style="font-size: 12px; color: var(--muted-foreground);">Backend Dev</div>
+              </div>
+            </a>
+            <a href="03-employee-detail.html?id=6"
+              style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--background); border-radius: var(--radius-md); text-decoration: none; color: inherit;">
+              <div
+                style="width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                DL</div>
+              <div>
+                <div style="font-weight: 500; font-size: 14px;">David Liu</div>
+                <div style="font-size: 12px; color: var(--muted-foreground);">Backend Dev</div>
+              </div>
+            </a>
+            <a href="03-employee-detail.html?id=7"
+              style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--background); border-radius: var(--radius-md); text-decoration: none; color: inherit;">
+              <div
+                style="width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                LT</div>
+              <div>
+                <div style="font-weight: 500; font-size: 14px;">Lisa Tran</div>
+                <div style="font-size: 12px; color: var(--muted-foreground);">Frontend Dev</div>
+              </div>
+            </a>
+            <a href="03-employee-detail.html?id=9"
+              style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--background); border-radius: var(--radius-md); text-decoration: none; color: inherit;">
+              <div
+                style="width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                KP</div>
+              <div>
+                <div style="font-weight: 500; font-size: 14px;">Kevin Park</div>
+                <div style="font-size: 12px; color: var(--muted-foreground);">QA Engineer</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+  </main>
   </div>
 
   <!-- Status Change Modal -->
-  <div class="modal-overlay" id="statusModal" onclick="hideModal('statusModal')">
-    <div class="modal" style="max-width: 480px;" onclick="event.stopPropagation()">
+  <div class="modal-overlay" id="statusModal">
+    <div class="modal">
       <div class="modal-header">
-        <h2 class="modal-title">Change Employment Status</h2>
+        <h2 class="modal-title">🔄 Change Status</h2>
         <button class="modal-close" onclick="hideModal('statusModal')">×</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label">Current Status</label>
-          <span class="status-large status-active">● Active</span>
+          <span class="status-badge active">● Active</span>
         </div>
         <div class="form-group">
           <label class="form-label">New Status *</label>
-          <select class="form-select" id="newStatus">
+          <select class="form-select">
             <option value="">Select new status</option>
             <option value="leave">On Leave</option>
             <option value="suspended">Suspended</option>
@@ -600,15 +908,916 @@
         </div>
         <div class="form-group">
           <label class="form-label">Reason</label>
-          <textarea class="form-input" rows="3" placeholder="Enter reason for status change..."></textarea>
+          <textarea class="form-input" rows="3" placeholder="Enter reason..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="hideModal('statusModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="hideModal('statusModal')">Confirm Change</button>
+        <button class="btn btn-primary" onclick="hideModal('statusModal')">Confirm</button>
       </div>
     </div>
   </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">✏️ Edit Player</h2>
+        <button class="modal-close" onclick="hideModal('editModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-input" value="Alex Chen">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" value="alex.chen@company.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select class="form-select">
+              <option value="Engineering" selected>⚙️ Engineering</option>
+              <option value="Product">⚔️ Product</option>
+              <option value="Design">⚙️ Design</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Position</label>
+            <select class="form-select">
+              <option value="Tech Lead" selected>Tech Lead</option>
+              <option value="Senior Developer">Senior Developer</option>
+              <option value="Backend Developer">Backend Developer</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reports To</label>
+          <select class="form-select">
+            <option value="1" selected>Sarah Johnson (VP Engineering)</option>
+            <option value="2">John Smith (CTO)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('editModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="hideModal('editModal')">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🗑️ Delete Player?</h2>
+        <button class="modal-close" onclick="hideModal('deleteModal')">×</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+        <p>Are you sure you want to delete:</p>
+        <p style="font-weight: 600; font-size: 18px; margin: 12px 0;">Alex Chen - Tech Lead</p>
+        <p style="color: var(--destructive); font-size: 13px;">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="btn btn-secondary" onclick="hideModal('deleteModal')">Cancel</button>
+        <button class="btn btn-danger" onclick="deletePlayer()">Delete Player</button>
+      </div>
+    </div>
+  </div>
+  <!-- Change Position Modal -->
+  <div class="modal-overlay" id="changePositionModal">
+    <div class="modal" style="max-width: 750px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🔄 Change Position</h2>
+        <button class="modal-close" onclick="hideModal('changePositionModal')">×</button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div
+        style="display: flex; justify-content: center; gap: 20px; padding: 16px; background: var(--background); border-bottom: 1px solid var(--border);">
+        <div class="position-step active" id="positionStepIndicator1">
+          <span class="step-num">1</span>
+          <span class="step-label">Type</span>
+        </div>
+        <div class="position-step" id="positionStepIndicator2">
+          <span class="step-num">2</span>
+          <span class="step-label">Position</span>
+        </div>
+        <div class="position-step" id="positionStepIndicator3">
+          <span class="step-num">3</span>
+          <span class="step-label">Analysis</span>
+        </div>
+        <div class="position-step" id="positionStepIndicator4">
+          <span class="step-num">4</span>
+          <span class="step-label">Confirm</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Change Type -->
+      <div class="modal-body position-step-content active" id="positionStep1">
+        <p style="color: var(--muted-foreground); margin-bottom: 20px;">What type of position change is this?</p>
+
+        <div style="display: grid; gap: 12px;">
+          <label class="change-type-option" onclick="selectChangeType(this, 'promotion')">
+            <input type="radio" name="changeType" value="promotion">
+            <div class="change-type-icon" style="background: #22c55e20; color: #22c55e;">⬆️</div>
+            <div class="change-type-content">
+              <div class="change-type-title">Promotion</div>
+              <div class="change-type-desc">Moving to a higher-level role with more responsibility</div>
+            </div>
+          </label>
+          <label class="change-type-option" onclick="selectChangeType(this, 'lateral')">
+            <input type="radio" name="changeType" value="lateral">
+            <div class="change-type-icon" style="background: #3b82f620; color: #3b82f6;">↔️</div>
+            <div class="change-type-content">
+              <div class="change-type-title">Lateral Move</div>
+              <div class="change-type-desc">Same level, different role or specialization</div>
+            </div>
+          </label>
+          <label class="change-type-option" onclick="selectChangeType(this, 'transfer')">
+            <input type="radio" name="changeType" value="transfer">
+            <div class="change-type-icon" style="background: #8b5cf620; color: #8b5cf6;">🔄</div>
+            <div class="change-type-content">
+              <div class="change-type-title">Department Transfer</div>
+              <div class="change-type-desc">Moving to a different zone/department</div>
+            </div>
+          </label>
+          <label class="change-type-option" onclick="selectChangeType(this, 'demotion')">
+            <input type="radio" name="changeType" value="demotion">
+            <div class="change-type-icon" style="background: #f59e0b20; color: #f59e0b;">⬇️</div>
+            <div class="change-type-content">
+              <div class="change-type-title">Demotion</div>
+              <div class="change-type-desc">Moving to a lower-level role</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Step 2: Select Position -->
+      <div class="modal-body position-step-content" id="positionStep2">
+        <div
+          style="background: #8b5cf610; border: 1px solid #8b5cf630; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span id="selectedChangeTypeIcon">↔️</span>
+          <span id="selectedChangeTypeLabel">Lateral Move</span>
+        </div>
+
+        <div style="background: var(--background); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px;">📍 Current Position</h4>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="zone-badge" style="background: #22c55e20; color: #22c55e;">⚙️ Midfield</span>
+            <span style="font-weight: 600;">Tech Lead</span>
+            <span style="color: var(--muted-foreground);">Engineering</span>
+          </div>
+        </div>
+
+        <h4 style="font-size: 14px; margin-bottom: 12px;">🎯 New Position</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select class="form-select" id="newDepartment" onchange="updatePositionOptions()">
+              <option value="">Select Department...</option>
+              <option value="product">⚔️ Product (Attack Zone)</option>
+              <option value="engineering">⚙️ Engineering (Midfield Zone)</option>
+              <option value="operations">🛡️ Operations (Defense Zone)</option>
+              <option value="hr">💜 HR (Support Zone)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Position</label>
+            <select class="form-select" id="newPosition">
+              <option value="">Select Position...</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Reports To</label>
+            <select class="form-select" id="newManager">
+              <option value="">Select Manager...</option>
+              <option value="vp-product">VP of Product</option>
+              <option value="cto">CTO</option>
+              <option value="coo">COO</option>
+              <option value="hr-director">HR Director</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Effective Date</label>
+            <input type="date" class="form-input" id="effectiveDate" value="2025-01-01">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Fit Analysis -->
+      <div class="modal-body position-step-content" id="positionStep3">
+        <h3 style="font-size: 16px; margin-bottom: 16px; text-align: center;">📊 Position Fit Analysis</h3>
+
+        <!-- Fit Score Comparison -->
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; margin-bottom: 24px;">
+          <div
+            style="text-align: center; padding: 20px; background: var(--background); border-radius: 12px; border: 2px solid #22c55e40;">
+            <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">CURRENT ROLE</div>
+            <div style="font-weight: 600; margin-bottom: 8px;">Tech Lead</div>
+            <div class="zone-badge" style="background: #22c55e20; color: #22c55e; margin-bottom: 8px;">⚙️ Midfield</div>
+            <div style="font-size: 36px; font-weight: 700; color: #22c55e;">92%</div>
+            <div style="font-size: 12px; color: #22c55e;">Fit Score</div>
+          </div>
+          <div style="display: flex; align-items: center; font-size: 28px; color: #8b5cf6;">→</div>
+          <div
+            style="text-align: center; padding: 20px; background: #f59e0b10; border-radius: 12px; border: 2px solid #f59e0b40;"
+            id="newRolePreview">
+            <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">NEW ROLE</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" id="newRoleName">Product Manager</div>
+            <div class="zone-badge" style="background: #ef444420; color: #ef4444; margin-bottom: 8px;" id="newRoleZone">
+              ⚔️ Attack</div>
+            <div style="font-size: 36px; font-weight: 700; color: #f59e0b;" id="newFitScore">72%</div>
+            <div style="font-size: 12px; color: #f59e0b;">Fit Score</div>
+          </div>
+        </div>
+
+        <!-- Gap Analysis -->
+        <div style="background: var(--background); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px;">📉 Attribute Gap Analysis</h4>
+          <div id="gapAnalysis">
+            <div class="gap-item">
+              <span class="gap-attr">💬 Communication</span>
+              <span class="gap-current">16</span>
+              <span>→ Need</span>
+              <span class="gap-required">18</span>
+              <span class="gap-badge red">⚠️ Gap: -2</span>
+            </div>
+            <div class="gap-item">
+              <span class="gap-attr">🎯 Leadership</span>
+              <span class="gap-current">17</span>
+              <span>→ Need</span>
+              <span class="gap-required">15</span>
+              <span class="gap-badge green">✅ Exceeds: +2</span>
+            </div>
+            <div class="gap-item">
+              <span class="gap-attr">💻 Technical</span>
+              <span class="gap-current">18</span>
+              <span>→ Need</span>
+              <span class="gap-required">10</span>
+              <span class="gap-badge green">✅ Exceeds: +8</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Development Recommendations -->
+        <div style="background: #3b82f610; border: 1px solid #3b82f630; border-radius: 12px; padding: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px; color: #3b82f6;">💡 Recommended Development</h4>
+          <div id="devRecommendations">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="color: #3b82f6;">•</span>
+              <span>Stakeholder management training program</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="color: #3b82f6;">•</span>
+              <span>Product roadmap & strategy workshop</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #3b82f6;">•</span>
+              <span>Cross-functional communication coaching</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Confirm -->
+      <div class="modal-body position-step-content" id="positionStep4">
+        <h3 style="font-size: 16px; margin-bottom: 16px; text-align: center;">✅ Confirm Position Change</h3>
+
+        <div style="background: var(--background); border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+          <div style="text-align: center; margin-bottom: 16px;">
+            <div style="font-size: 48px; margin-bottom: 8px;">👤</div>
+            <div style="font-size: 18px; font-weight: 600;">Alex Chen</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px;">
+            <div style="text-align: center;">
+              <div style="font-size: 13px; color: var(--muted-foreground);">FROM</div>
+              <div style="font-weight: 600;">Tech Lead</div>
+              <div class="zone-badge" style="background: #22c55e20; color: #22c55e;">⚙️ Engineering</div>
+            </div>
+            <div style="font-size: 24px; color: #8b5cf6;">→</div>
+            <div style="text-align: center;">
+              <div style="font-size: 13px; color: var(--muted-foreground);">TO</div>
+              <div style="font-weight: 600;" id="confirmNewPosition">Product Manager</div>
+              <div class="zone-badge" style="background: #ef444420; color: #ef4444;" id="confirmNewZone">⚔️ Product
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; text-align: center; padding-top: 16px; border-top: 1px solid var(--border);">
+            <div>
+              <div style="font-size: 13px; color: var(--muted-foreground);">Type</div>
+              <div style="font-weight: 500;" id="confirmChangeType">Lateral Move</div>
+            </div>
+            <div>
+              <div style="font-size: 13px; color: var(--muted-foreground);">Effective</div>
+              <div style="font-weight: 500;" id="confirmEffectiveDate">Jan 1, 2025</div>
+            </div>
+            <div>
+              <div style="font-size: 13px; color: var(--muted-foreground);">New Fit</div>
+              <div style="font-weight: 500; color: #f59e0b;" id="confirmFitScore">72%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">📝 Reason for Change</label>
+          <textarea class="form-input" rows="3" placeholder="Describe the reason for this position change..."
+            id="positionChangeReason" style="resize: none;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">📎 Attach Approval Document (Optional)</label>
+          <input type="text" class="form-input" placeholder="Link to approval document..." id="positionApprovalDoc">
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="positionBackBtn" onclick="prevPositionStep()" style="display: none;">←
+          Back</button>
+        <div style="flex: 1;"></div>
+        <button class="btn btn-secondary" onclick="hideModal('changePositionModal')">Cancel</button>
+        <button class="btn btn-primary" id="positionNextBtn" onclick="nextPositionStep()" disabled
+          style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Attributes Modal -->
+  <div class="modal-overlay" id="updateAttributesModal">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="updateModalTitle">📊 Update Attributes</h2>
+        <button class="modal-close" onclick="hideModal('updateAttributesModal')">×</button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div
+        style="display: flex; justify-content: center; gap: 24px; padding: 16px; background: var(--background); border-bottom: 1px solid var(--border);">
+        <div class="update-step active" id="stepIndicator1">
+          <span class="step-num">1</span>
+          <span class="step-label">Trigger</span>
+        </div>
+        <div class="update-step" id="stepIndicator2">
+          <span class="step-num">2</span>
+          <span class="step-label">Adjust</span>
+        </div>
+        <div class="update-step" id="stepIndicator3">
+          <span class="step-num">3</span>
+          <span class="step-label">Confirm</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Trigger Selection -->
+      <div class="modal-body update-step-content active" id="updateStep1">
+        <p style="color: var(--muted-foreground); margin-bottom: 20px;">Select the reason for this attribute update:</p>
+
+        <div style="display: grid; gap: 12px;">
+          <label class="trigger-option" onclick="selectTrigger(this, 'performance_review')">
+            <input type="radio" name="triggerType" value="performance_review">
+            <div class="trigger-icon">📊</div>
+            <div class="trigger-content">
+              <div class="trigger-title">Performance Review</div>
+              <div class="trigger-desc">Quarterly or annual performance assessment</div>
+            </div>
+          </label>
+          <label class="trigger-option" onclick="selectTrigger(this, 'training')">
+            <input type="radio" name="triggerType" value="training">
+            <div class="trigger-icon">🎓</div>
+            <div class="trigger-content">
+              <div class="trigger-title">Training/Certification</div>
+              <div class="trigger-desc">Completed course or earned certification</div>
+            </div>
+          </label>
+          <label class="trigger-option" onclick="selectTrigger(this, 'project')">
+            <input type="radio" name="triggerType" value="project">
+            <div class="trigger-icon">🏆</div>
+            <div class="trigger-content">
+              <div class="trigger-title">Project Outcome</div>
+              <div class="trigger-desc">Based on project delivery or results</div>
+            </div>
+          </label>
+          <label class="trigger-option" onclick="selectTrigger(this, 'observation')">
+            <input type="radio" name="triggerType" value="observation">
+            <div class="trigger-icon">👁️</div>
+            <div class="trigger-content">
+              <div class="trigger-title">Manager Observation</div>
+              <div class="trigger-desc">Direct observation of skills/behavior</div>
+            </div>
+          </label>
+          <label class="trigger-option" onclick="selectTrigger(this, 'peer')">
+            <input type="radio" name="triggerType" value="peer">
+            <div class="trigger-icon">🤝</div>
+            <div class="trigger-content">
+              <div class="trigger-title">Peer Feedback</div>
+              <div class="trigger-desc">360 review or colleague input</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Step 2: Attribute Adjustment -->
+      <div class="modal-body update-step-content" id="updateStep2" style="max-height: 500px; overflow-y: auto;">
+        <div
+          style="background: #3b82f610; border: 1px solid #3b82f630; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span id="selectedTriggerIcon">📊</span>
+          <span id="selectedTriggerLabel">Performance Review</span>
+          <span style="color: var(--muted-foreground); font-size: 13px;">• Q4 2024</span>
+        </div>
+
+        <p style="color: var(--muted-foreground); margin-bottom: 16px; font-size: 13px;">
+          Adjust attributes and provide justification for each change. Current values shown with position requirements.
+        </p>
+
+        <!-- Attribute Adjustment Cards -->
+        <div style="display: grid; gap: 16px;">
+          <!-- Leadership -->
+          <div class="attr-adjust-card">
+            <div class="attr-adjust-header">
+              <span class="attr-adjust-name">🎯 Leadership</span>
+              <div class="attr-adjust-values">
+                <span class="attr-old" id="oldLeadership">15</span>
+                <span>→</span>
+                <span class="attr-new" id="newLeadership">15</span>
+                <span class="attr-diff neutral" id="diffLeadership">—</span>
+              </div>
+            </div>
+            <div class="attr-adjust-req">Required: 14 (Tech Lead)</div>
+            <input type="range" min="1" max="20" value="15" class="attribute-slider" id="update-leadership"
+              oninput="updateNewValue('leadership')">
+            <input type="text" class="justification-input" placeholder="Justification for change (optional)"
+              id="justify-leadership">
+          </div>
+
+          <!-- Technical -->
+          <div class="attr-adjust-card">
+            <div class="attr-adjust-header">
+              <span class="attr-adjust-name">💻 Technical</span>
+              <div class="attr-adjust-values">
+                <span class="attr-old" id="oldTechnical">17</span>
+                <span>→</span>
+                <span class="attr-new" id="newTechnical">17</span>
+                <span class="attr-diff neutral" id="diffTechnical">—</span>
+              </div>
+            </div>
+            <div class="attr-adjust-req">Required: 16 (Tech Lead)</div>
+            <input type="range" min="1" max="20" value="17" class="attribute-slider" id="update-technical"
+              oninput="updateNewValue('technical')">
+            <input type="text" class="justification-input" placeholder="Justification for change (optional)"
+              id="justify-technical">
+          </div>
+
+          <!-- Communication -->
+          <div class="attr-adjust-card">
+            <div class="attr-adjust-header">
+              <span class="attr-adjust-name">💬 Communication</span>
+              <div class="attr-adjust-values">
+                <span class="attr-old" id="oldCommunication">14</span>
+                <span>→</span>
+                <span class="attr-new" id="newCommunication">14</span>
+                <span class="attr-diff neutral" id="diffCommunication">—</span>
+              </div>
+            </div>
+            <div class="attr-adjust-req">Required: 12 (Tech Lead)</div>
+            <input type="range" min="1" max="20" value="14" class="attribute-slider" id="update-communication"
+              oninput="updateNewValue('communication')">
+            <input type="text" class="justification-input" placeholder="Justification for change (optional)"
+              id="justify-communication">
+          </div>
+
+          <!-- Problem Solving -->
+          <div class="attr-adjust-card">
+            <div class="attr-adjust-header">
+              <span class="attr-adjust-name">🧩 Problem Solving</span>
+              <div class="attr-adjust-values">
+                <span class="attr-old" id="oldProblem">16</span>
+                <span>→</span>
+                <span class="attr-new" id="newProblem">16</span>
+                <span class="attr-diff neutral" id="diffProblem">—</span>
+              </div>
+            </div>
+            <div class="attr-adjust-req">Required: 14 (Tech Lead)</div>
+            <input type="range" min="1" max="20" value="16" class="attribute-slider" id="update-problem"
+              oninput="updateNewValue('problem')">
+            <input type="text" class="justification-input" placeholder="Justification for change (optional)"
+              id="justify-problem">
+          </div>
+
+          <!-- Teamwork -->
+          <div class="attr-adjust-card">
+            <div class="attr-adjust-header">
+              <span class="attr-adjust-name">🤝 Teamwork</span>
+              <div class="attr-adjust-values">
+                <span class="attr-old" id="oldTeamwork">14</span>
+                <span>→</span>
+                <span class="attr-new" id="newTeamwork">14</span>
+                <span class="attr-diff neutral" id="diffTeamwork">—</span>
+              </div>
+            </div>
+            <div class="attr-adjust-req">Required: 15 (Tech Lead)</div>
+            <input type="range" min="1" max="20" value="14" class="attribute-slider" id="update-teamwork"
+              oninput="updateNewValue('teamwork')">
+            <input type="text" class="justification-input" placeholder="Justification for change (optional)"
+              id="justify-teamwork">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Impact Preview -->
+      <div class="modal-body update-step-content" id="updateStep3">
+        <h3 style="font-size: 16px; margin-bottom: 16px; text-align: center;">📊 Impact Preview</h3>
+
+        <!-- Before/After Comparison -->
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; margin-bottom: 24px;">
+          <div style="text-align: center; padding: 16px; background: var(--background); border-radius: 12px;">
+            <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 8px;">BEFORE</div>
+            <div style="font-size: 36px; font-weight: 700; color: #6b7280;" id="beforeFitScore">85%</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">Fit Score</div>
+          </div>
+          <div style="display: flex; align-items: center; font-size: 24px; color: #22c55e;">→</div>
+          <div
+            style="text-align: center; padding: 16px; background: linear-gradient(135deg, #22c55e20, #22c55e10); border: 2px solid #22c55e40; border-radius: 12px;">
+            <div style="font-size: 12px; color: #16a34a; margin-bottom: 8px;">AFTER</div>
+            <div style="font-size: 36px; font-weight: 700; color: #22c55e;" id="afterFitScore">92%</div>
+            <div style="font-size: 12px; color: #16a34a;">Fit Score</div>
+          </div>
+        </div>
+
+        <!-- Changes Summary -->
+        <div style="background: var(--background); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px;">📝 Changes Summary</h4>
+          <div id="changesSummary">
+            <div class="change-summary-item">
+              <span class="change-attr">🎯 Leadership</span>
+              <span class="change-values">15 → 17</span>
+              <span class="change-badge green">▲ +2</span>
+            </div>
+            <div class="change-summary-item">
+              <span class="change-attr">💻 Technical</span>
+              <span class="change-values">17 → 18</span>
+              <span class="change-badge green">▲ +1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Evidence Link -->
+        <div class="form-group">
+          <label class="form-label">📎 Link Evidence (Optional)</label>
+          <input type="text" class="form-input" placeholder="Link to review document, certificate, or project..."
+            id="evidenceLink">
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer" id="updateModalFooter">
+        <button class="btn btn-secondary" onclick="hideModal('updateAttributesModal')">Cancel</button>
+        <button class="btn btn-primary" id="updateNextBtn" onclick="nextUpdateStep()" disabled>Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .update-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.5;
+    }
+
+    .update-step.active {
+      opacity: 1;
+    }
+
+    .update-step.completed {
+      opacity: 1;
+      color: #22c55e;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .update-step.active .step-num {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .update-step.completed .step-num {
+      background: #22c55e;
+      color: white;
+    }
+
+    .step-label {
+      font-size: 13px;
+    }
+
+    .update-step-content {
+      display: none;
+    }
+
+    .update-step-content.active {
+      display: block;
+    }
+
+    .trigger-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .trigger-option:hover {
+      border-color: #3b82f6;
+      background: #3b82f610;
+    }
+
+    .trigger-option.selected {
+      border-color: #3b82f6;
+      background: #3b82f610;
+    }
+
+    .trigger-option input {
+      display: none;
+    }
+
+    .trigger-icon {
+      font-size: 28px;
+    }
+
+    .trigger-title {
+      font-weight: 600;
+    }
+
+    .trigger-desc {
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+
+    .attr-adjust-card {
+      background: var(--background);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .attr-adjust-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .attr-adjust-name {
+      font-weight: 600;
+    }
+
+    .attr-adjust-values {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .attr-old {
+      color: var(--muted-foreground);
+    }
+
+    .attr-new {
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    .attr-diff {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .attr-diff.positive {
+      background: #22c55e20;
+      color: #22c55e;
+    }
+
+    .attr-diff.negative {
+      background: #ef444420;
+      color: #ef4444;
+    }
+
+    .attr-diff.neutral {
+      background: #6b728020;
+      color: #6b7280;
+    }
+
+    .attr-adjust-req {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+
+    .justification-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .justification-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    .change-summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .change-summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .change-attr {
+      font-size: 14px;
+    }
+
+    .change-values {
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+
+    .change-badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .change-badge.green {
+      background: #22c55e20;
+      color: #22c55e;
+    }
+
+    .change-badge.red {
+      background: #ef444420;
+      color: #ef4444;
+    }
+
+    /* Change Position Modal Styles */
+    .position-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.5;
+    }
+
+    .position-step.active {
+      opacity: 1;
+    }
+
+    .position-step.completed {
+      opacity: 1;
+      color: #22c55e;
+    }
+
+    .position-step.active .step-num {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .position-step.completed .step-num {
+      background: #22c55e;
+      color: white;
+    }
+
+    .position-step-content {
+      display: none;
+    }
+
+    .position-step-content.active {
+      display: block;
+    }
+
+    .change-type-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .change-type-option:hover {
+      border-color: #8b5cf6;
+      background: #8b5cf610;
+    }
+
+    .change-type-option.selected {
+      border-color: #8b5cf6;
+      background: #8b5cf610;
+    }
+
+    .change-type-option input {
+      display: none;
+    }
+
+    .change-type-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .change-type-title {
+      font-weight: 600;
+    }
+
+    .change-type-desc {
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+
+    .zone-badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .gap-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .gap-item:last-child {
+      border-bottom: none;
+    }
+
+    .gap-attr {
+      flex: 1;
+    }
+
+    .gap-current {
+      font-weight: 600;
+    }
+
+    .gap-required {
+      font-weight: 600;
+    }
+
+    .gap-badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .gap-badge.green {
+      background: #22c55e20;
+      color: #22c55e;
+    }
+
+    .gap-badge.red {
+      background: #ef444420;
+      color: #ef4444;
+    }
+  </style>
 
   <script>
     function showModal(id) {
@@ -619,15 +1828,347 @@
       document.getElementById(id).classList.remove('visible');
     }
 
-    // Click overlay to close - handle on the overlay element
+    function switchDetailTab(index) {
+      document.querySelectorAll('.tabs .tab').forEach((t, i) => t.classList.toggle('active', i === index));
+      document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === index));
+    }
+
+    function deletePlayer() {
+      hideModal('deleteModal');
+      // Redirect to gallery after delete
+      window.location.href = '04-player-gallery.html';
+    }
+
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('userDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    document.addEventListener('click', function () {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    });
+
+    // Close modals on overlay click
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
       overlay.addEventListener('click', function (e) {
-        // Only close if clicking directly on the overlay (not the modal content)
-        if (e.target === overlay) {
-          overlay.classList.remove('visible');
-        }
+        if (e.target === overlay) overlay.classList.remove('visible');
       });
     });
+
+    // ==================== Update Attributes Flow ====================
+    let currentUpdateStep = 1;
+    let selectedTrigger = null;
+    const triggerLabels = {
+      'performance_review': { icon: '📊', label: 'Performance Review' },
+      'training': { icon: '🎓', label: 'Training/Certification' },
+      'project': { icon: '🏆', label: 'Project Outcome' },
+      'observation': { icon: '👁️', label: 'Manager Observation' },
+      'peer': { icon: '🤝', label: 'Peer Feedback' }
+    };
+
+    function openUpdateAttributesModal() {
+      currentUpdateStep = 1;
+      selectedTrigger = null;
+      showUpdateStep(1);
+      document.getElementById('updateNextBtn').disabled = true;
+      document.querySelectorAll('.trigger-option').forEach(t => t.classList.remove('selected'));
+      showModal('updateAttributesModal');
+    }
+
+    function selectTrigger(element, type) {
+      document.querySelectorAll('.trigger-option').forEach(t => t.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedTrigger = type;
+      document.getElementById('updateNextBtn').disabled = false;
+    }
+
+    function showUpdateStep(step) {
+      currentUpdateStep = step;
+
+      // Update step indicators
+      for (let i = 1; i <= 3; i++) {
+        const indicator = document.getElementById('stepIndicator' + i);
+        indicator.classList.remove('active', 'completed');
+        if (i < step) indicator.classList.add('completed');
+        if (i === step) indicator.classList.add('active');
+      }
+
+      // Show step content
+      for (let i = 1; i <= 3; i++) {
+        const content = document.getElementById('updateStep' + i);
+        content.classList.toggle('active', i === step);
+      }
+
+      // Update button text
+      const btn = document.getElementById('updateNextBtn');
+      if (step === 1) {
+        btn.textContent = 'Continue →';
+        btn.onclick = () => nextUpdateStep();
+      } else if (step === 2) {
+        btn.textContent = 'Preview Impact →';
+        btn.onclick = () => nextUpdateStep();
+        btn.disabled = false;
+
+        // Update trigger display
+        if (selectedTrigger) {
+          document.getElementById('selectedTriggerIcon').textContent = triggerLabels[selectedTrigger].icon;
+          document.getElementById('selectedTriggerLabel').textContent = triggerLabels[selectedTrigger].label;
+        }
+      } else if (step === 3) {
+        btn.textContent = '✓ Confirm & Save';
+        btn.onclick = () => confirmUpdate();
+        btn.disabled = false;
+        calculateImpact();
+      }
+    }
+
+    function nextUpdateStep() {
+      if (currentUpdateStep < 3) {
+        showUpdateStep(currentUpdateStep + 1);
+      }
+    }
+
+    function updateNewValue(attr) {
+      const slider = document.getElementById('update-' + attr);
+      const newVal = parseInt(slider.value);
+      const oldVal = parseInt(document.getElementById('old' + capitalize(attr)).textContent);
+
+      document.getElementById('new' + capitalize(attr)).textContent = newVal;
+
+      const diff = newVal - oldVal;
+      const diffEl = document.getElementById('diff' + capitalize(attr));
+      if (diff > 0) {
+        diffEl.textContent = '▲ +' + diff;
+        diffEl.className = 'attr-diff positive';
+      } else if (diff < 0) {
+        diffEl.textContent = '▼ ' + diff;
+        diffEl.className = 'attr-diff negative';
+      } else {
+        diffEl.textContent = '—';
+        diffEl.className = 'attr-diff neutral';
+      }
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function calculateImpact() {
+      const attrs = ['leadership', 'technical', 'communication', 'problem', 'teamwork'];
+      let changes = [];
+      let oldTotal = 0, newTotal = 0;
+
+      attrs.forEach(attr => {
+        const oldVal = parseInt(document.getElementById('old' + capitalize(attr)).textContent);
+        const newVal = parseInt(document.getElementById('update-' + attr).value);
+        oldTotal += oldVal;
+        newTotal += newVal;
+
+        if (newVal !== oldVal) {
+          const diff = newVal - oldVal;
+          changes.push({
+            attr: attr,
+            oldVal: oldVal,
+            newVal: newVal,
+            diff: diff
+          });
+        }
+      });
+
+      // Calculate fit scores (simplified)
+      const oldFit = Math.min(100, Math.round((oldTotal / 90) * 100));
+      const newFit = Math.min(100, Math.round((newTotal / 90) * 100));
+
+      document.getElementById('beforeFitScore').textContent = oldFit + '%';
+      document.getElementById('afterFitScore').textContent = newFit + '%';
+
+      // Build changes summary
+      const summaryEl = document.getElementById('changesSummary');
+      if (changes.length === 0) {
+        summaryEl.innerHTML = '<div style="color: var(--muted-foreground); text-align: center; padding: 16px;">No changes made</div>';
+      } else {
+        const attrIcons = { leadership: '🎯', technical: '💻', communication: '💬', problem: '🧩', teamwork: '🤝' };
+        summaryEl.innerHTML = changes.map(c => `
+          <div class="change-summary-item">
+            <span class="change-attr">${attrIcons[c.attr]} ${capitalize(c.attr)}</span>
+            <span class="change-values">${c.oldVal} → ${c.newVal}</span>
+            <span class="change-badge ${c.diff > 0 ? 'green' : 'red'}">${c.diff > 0 ? '▲ +' : '▼ '}${Math.abs(c.diff)}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function confirmUpdate() {
+      // In real app, this would save to backend
+      hideModal('updateAttributesModal');
+
+      // Show success (refresh page to show updated history)
+      alert('✅ Attributes updated successfully!\n\nChanges have been recorded in the history.');
+      location.reload();
+    }
+
+    // ==================== Change Position Flow ====================
+    let currentPositionStep = 1;
+    let selectedChangeType = null;
+    const changeTypeLabels = {
+      'promotion': { icon: '⬆️', label: 'Promotion' },
+      'lateral': { icon: '↔️', label: 'Lateral Move' },
+      'transfer': { icon: '🔄', label: 'Department Transfer' },
+      'demotion': { icon: '⬇️', label: 'Demotion' }
+    };
+
+    const departmentPositions = {
+      'product': ['Product Manager', 'Senior Product Manager', 'VP of Product', 'Product Owner'],
+      'engineering': ['Developer', 'Senior Developer', 'Tech Lead', 'Engineering Manager', 'CTO'],
+      'operations': ['Operations Analyst', 'Operations Manager', 'COO', 'Facilities Manager'],
+      'hr': ['HR Specialist', 'HR Manager', 'HR Director', 'Recruiter', 'CHRO']
+    };
+
+    const departmentZones = {
+      'product': { zone: 'Attack', color: '#ef4444', icon: '⚔️' },
+      'engineering': { zone: 'Midfield', color: '#22c55e', icon: '⚙️' },
+      'operations': { zone: 'Defense', color: '#3b82f6', icon: '🛡️' },
+      'hr': { zone: 'Support', color: '#8b5cf6', icon: '💜' }
+    };
+
+    function openChangePositionModal() {
+      currentPositionStep = 1;
+      selectedChangeType = null;
+      showPositionStep(1);
+      document.getElementById('positionNextBtn').disabled = true;
+      document.getElementById('positionBackBtn').style.display = 'none';
+      document.querySelectorAll('.change-type-option').forEach(t => t.classList.remove('selected'));
+      showModal('changePositionModal');
+    }
+
+    function selectChangeType(element, type) {
+      document.querySelectorAll('.change-type-option').forEach(t => t.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedChangeType = type;
+      document.getElementById('positionNextBtn').disabled = false;
+    }
+
+    function showPositionStep(step) {
+      currentPositionStep = step;
+
+      // Update step indicators
+      for (let i = 1; i <= 4; i++) {
+        const indicator = document.getElementById('positionStepIndicator' + i);
+        indicator.classList.remove('active', 'completed');
+        if (i < step) indicator.classList.add('completed');
+        if (i === step) indicator.classList.add('active');
+      }
+
+      // Show step content
+      for (let i = 1; i <= 4; i++) {
+        const content = document.getElementById('positionStep' + i);
+        content.classList.toggle('active', i === step);
+      }
+
+      // Update buttons
+      const nextBtn = document.getElementById('positionNextBtn');
+      const backBtn = document.getElementById('positionBackBtn');
+
+      backBtn.style.display = step > 1 ? 'block' : 'none';
+
+      if (step === 1) {
+        nextBtn.textContent = 'Continue →';
+        nextBtn.onclick = () => nextPositionStep();
+      } else if (step === 2) {
+        nextBtn.textContent = 'Analyze Fit →';
+        nextBtn.onclick = () => nextPositionStep();
+        nextBtn.disabled = false;
+
+        // Update change type display
+        if (selectedChangeType) {
+          document.getElementById('selectedChangeTypeIcon').textContent = changeTypeLabels[selectedChangeType].icon;
+          document.getElementById('selectedChangeTypeLabel').textContent = changeTypeLabels[selectedChangeType].label;
+        }
+      } else if (step === 3) {
+        nextBtn.textContent = 'Continue →';
+        nextBtn.onclick = () => nextPositionStep();
+        nextBtn.disabled = false;
+        updateFitAnalysis();
+      } else if (step === 4) {
+        nextBtn.textContent = '✓ Confirm Change';
+        nextBtn.onclick = () => confirmPositionChange();
+        nextBtn.disabled = false;
+        updateConfirmation();
+      }
+    }
+
+    function nextPositionStep() {
+      if (currentPositionStep < 4) {
+        showPositionStep(currentPositionStep + 1);
+      }
+    }
+
+    function prevPositionStep() {
+      if (currentPositionStep > 1) {
+        showPositionStep(currentPositionStep - 1);
+      }
+    }
+
+    function updatePositionOptions() {
+      const dept = document.getElementById('newDepartment').value;
+      const posSelect = document.getElementById('newPosition');
+      posSelect.innerHTML = '<option value="">Select Position...</option>';
+
+      if (dept && departmentPositions[dept]) {
+        departmentPositions[dept].forEach(pos => {
+          const opt = document.createElement('option');
+          opt.value = pos.toLowerCase().replace(/\s+/g, '-');
+          opt.textContent = pos;
+          posSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function updateFitAnalysis() {
+      const dept = document.getElementById('newDepartment').value;
+      const pos = document.getElementById('newPosition');
+      const posText = pos.options[pos.selectedIndex]?.text || 'New Position';
+
+      if (dept && departmentZones[dept]) {
+        const zoneInfo = departmentZones[dept];
+        document.getElementById('newRoleName').textContent = posText;
+        document.getElementById('newRoleZone').textContent = zoneInfo.icon + ' ' + zoneInfo.zone;
+        document.getElementById('newRoleZone').style.background = zoneInfo.color + '20';
+        document.getElementById('newRoleZone').style.color = zoneInfo.color;
+      }
+    }
+
+    function updateConfirmation() {
+      const dept = document.getElementById('newDepartment').value;
+      const pos = document.getElementById('newPosition');
+      const posText = pos.options[pos.selectedIndex]?.text || 'New Position';
+      const effectiveDate = document.getElementById('effectiveDate').value;
+
+      document.getElementById('confirmNewPosition').textContent = posText;
+      document.getElementById('confirmChangeType').textContent = changeTypeLabels[selectedChangeType]?.label || 'Change';
+
+      if (effectiveDate) {
+        const date = new Date(effectiveDate);
+        document.getElementById('confirmEffectiveDate').textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      if (dept && departmentZones[dept]) {
+        const zoneInfo = departmentZones[dept];
+        document.getElementById('confirmNewZone').textContent = zoneInfo.icon + ' ' + dept.charAt(0).toUpperCase() + dept.slice(1);
+        document.getElementById('confirmNewZone').style.background = zoneInfo.color + '20';
+        document.getElementById('confirmNewZone').style.color = zoneInfo.color;
+      }
+    }
+
+    function confirmPositionChange() {
+      // In real app, this would save to backend
+      hideModal('changePositionModal');
+
+      // Show success
+      alert('✅ Position change confirmed!\n\nThe change has been recorded and will take effect on the specified date.');
+      location.reload();
+    }
   </script>
 </body>
 

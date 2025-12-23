@@ -4,17 +4,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Employee | AscendHR</title>
+  <title>Create Player | AscendHR</title>
 
   <!-- SHARED CSS -->
   <link rel="stylesheet" href="../_shared/base.css">
 
   <style>
-    /* Feature-specific styles */
+    /* === Create Player Enhanced Styles === */
     .create-container {
       display: grid;
-      grid-template-columns: 1fr 400px;
+      grid-template-columns: 1fr 360px;
       gap: var(--space-8);
+    }
+
+    /* Tab Navigation */
+    .form-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: var(--muted);
+      padding: 4px;
+      border-radius: var(--radius-lg);
+    }
+
+    .form-tab {
+      flex: 1;
+      padding: 12px 16px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      transition: all 0.2s;
+    }
+
+    .form-tab:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-tab.active {
+      background: white;
+      color: var(--foreground);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .form-tab .tab-icon {
+      margin-right: 8px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     .form-section {
@@ -34,58 +78,68 @@
       gap: var(--space-2);
     }
 
-    .photo-upload {
+    /* Department with Zone Badge */
+    .dept-option {
       display: flex;
       align-items: center;
-      gap: var(--space-6);
-      margin-bottom: var(--space-6);
+      gap: 8px;
     }
 
-    .photo-preview {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      color: white;
-      border: 4px solid var(--border);
+    .zone-badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
     }
 
-    .photo-actions {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
+    .zone-badge.attack {
+      background: #fef2f2;
+      color: #dc2626;
     }
 
-    /* Attribute Sliders */
+    .zone-badge.midfield {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .zone-badge.defense {
+      background: #f0fdf4;
+      color: #16a34a;
+    }
+
+    .zone-badge.support {
+      background: #faf5ff;
+      color: #9333ea;
+    }
+
+    /* Attribute Sliders with Scale Hints */
     .attribute-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
+      gap: 16px;
     }
 
     .attribute-item {
       background: var(--background);
-      padding: var(--space-4);
+      padding: 16px;
       border-radius: var(--radius-md);
+      border: 1px solid var(--border);
     }
 
     .attribute-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: var(--space-2);
+      margin-bottom: 8px;
     }
 
     .attribute-name {
-      font-weight: var(--font-weight-medium);
-      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-size: 14px;
     }
 
     .attribute-value {
-      font-weight: var(--font-weight-bold);
+      font-weight: 700;
+      font-size: 16px;
       color: var(--primary);
     }
 
@@ -108,50 +162,101 @@
       box-shadow: var(--shadow-medium);
     }
 
-    /* Preview Card */
+    .scale-hint {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scale-hint.low {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .scale-hint.developing {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .scale-hint.proficient {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .scale-hint.exceptional {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* Preview Panel */
     .preview-panel {
       position: sticky;
-      top: var(--space-8);
+      top: 24px;
     }
 
     .player-card-preview {
-      background: var(--gradient-primary);
       border-radius: var(--radius-xl);
-      padding: var(--space-6);
+      padding: 24px;
       color: white;
       text-align: center;
+      transition: all 0.3s;
+    }
+
+    .player-card-preview.zone-attack {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .player-card-preview.zone-midfield {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .player-card-preview.zone-defense {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .player-card-preview.zone-support {
+      background: linear-gradient(135deg, #a855f7, #9333ea);
     }
 
     .preview-avatar {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
-      margin: 0 auto var(--space-4);
+      margin: 0 auto 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
+      font-size: 32px;
       border: 3px solid rgba(255, 255, 255, 0.5);
     }
 
     .preview-name {
-      font-size: var(--font-size-xl);
-      font-weight: var(--font-weight-bold);
-      margin-bottom: var(--space-1);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     .preview-position {
+      opacity: 0.9;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .preview-zone {
       opacity: 0.8;
-      font-size: var(--font-size-sm);
-      margin-bottom: var(--space-4);
+      font-size: 12px;
+      margin-bottom: 16px;
     }
 
     .ability-display {
       display: flex;
       justify-content: center;
-      gap: var(--space-6);
-      margin-bottom: var(--space-4);
+      gap: 24px;
     }
 
     .ability-box {
@@ -159,35 +264,43 @@
     }
 
     .ability-value {
-      font-size: 32px;
-      font-weight: var(--font-weight-bold);
+      font-size: 28px;
+      font-weight: 700;
     }
 
     .ability-label {
-      font-size: var(--font-size-xs);
+      font-size: 11px;
       opacity: 0.8;
     }
 
-    /* Radar Chart placeholder */
-    .radar-chart {
-      width: 200px;
-      height: 200px;
-      margin: var(--space-4) auto;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      opacity: 0.7;
-    }
-
+    /* Form Footer */
     .form-footer {
       display: flex;
       justify-content: space-between;
-      padding-top: var(--space-6);
+      padding-top: 24px;
       border-top: 1px solid var(--border);
-      margin-top: var(--space-6);
+      margin-top: 24px;
+    }
+
+    /* Photo Upload */
+    .photo-upload {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .photo-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      border: 4px solid var(--border);
     }
 
     /* Success State */
@@ -201,43 +314,36 @@
 
     .success-container {
       text-align: center;
-      padding: var(--space-12);
+      padding: 48px;
     }
 
     .success-icon {
       font-size: 64px;
-      margin-bottom: var(--space-4);
+      margin-bottom: 16px;
     }
 
     .success-title {
-      font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      margin-bottom: var(--space-2);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
     .success-subtitle {
       color: var(--muted-foreground);
-      margin-bottom: var(--space-6);
+      margin-bottom: 24px;
     }
 
     .success-actions {
       display: flex;
       justify-content: center;
-      gap: var(--space-4);
+      gap: 16px;
     }
   </style>
 </head>
 
 <body>
-  <!-- 
-    MOCKUP: Create Employee
-    User Story: US-0.4.1
-    
-    INTERACTIVE: Fill form, adjust sliders, see preview update
-  -->
-
   <div class="app-container">
-    <!-- Unified Sidebar -->
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand">
@@ -267,7 +373,6 @@
             Positions</a>
           <a href="../formation-view/03-attribute-library.html" class="sidebar-item"><span class="icon">🎯</span>
             Attributes</a>
-            Templates</a>
         </div>
       </nav>
       <div class="sidebar-user">
@@ -276,239 +381,294 @@
           <div class="user-name">John Smith</div>
           <div class="user-role">Club Owner</div>
         </div>
-        <button class="user-menu">⋮</button>
+        <button class="user-menu" onclick="toggleUserMenu(event)">⋮</button>
+        <div class="user-dropdown" id="userDropdown"
+          style="display:none; position:absolute; bottom:60px; left:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-medium); z-index:100;">
+          <a href="#"
+            style="display:block; padding:12px 16px; color:var(--foreground); text-decoration:none; font-size:14px;"
+            onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">⚙️
+            Settings</a>
+          <a href="../football-club-setup/01-landing-registration.html"
+            style="display:block; padding:12px 16px; color:var(--destructive); text-decoration:none; font-size:14px; border-top:1px solid var(--border);"
+            onmouseover="this.style.background='var(--destructive-light)'"
+            onmouseout="this.style.background='transparent'">🚪 Logout</a>
+        </div>
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
-
       <!-- FORM STATE -->
       <div id="form-state" class="state active">
         <header class="page-header">
           <div>
-            <h1 class="page-title">Add New Employee</h1>
+            <h1 class="page-title">Add New Player</h1>
             <p style="color: var(--muted-foreground); margin-top: 4px;">Create a player card for your squad</p>
           </div>
+          <a href="04-player-gallery.html" class="btn btn-secondary">← Back to Gallery</a>
         </header>
+
+        <!-- Tabs -->
+        <div class="form-tabs">
+          <div class="form-tab active" onclick="switchTab(0)"><span class="tab-icon">📋</span>Basic Info</div>
+          <div class="form-tab" onclick="switchTab(1)"><span class="tab-icon">🏢</span>Assignment</div>
+          <div class="form-tab" onclick="switchTab(2)"><span class="tab-icon">🎯</span>Attributes</div>
+        </div>
 
         <div class="create-container">
           <div class="form-area">
-            <!-- Basic Info -->
-            <div class="form-section">
-              <h2 class="section-title">👤 Basic Information</h2>
-
-              <div class="photo-upload">
-                <div class="photo-preview" id="photoPreview">👤</div>
-                <div class="photo-actions">
-                  <button class="btn btn-secondary btn-sm">📷 Upload Photo</button>
-                  <p style="font-size: 12px; color: var(--muted-foreground);">JPG or PNG, max 5MB</p>
+            <!-- Tab 1: Basic Info -->
+            <div class="tab-content active" id="tab-0">
+              <div class="form-section">
+                <h2 class="section-title">👤 Basic Information</h2>
+                <div class="photo-upload">
+                  <div class="photo-preview" id="photoPreview">👤</div>
+                  <div class="photo-actions">
+                    <button class="btn btn-secondary btn-sm">📷 Upload Photo</button>
+                    <p style="font-size: 12px; color: var(--muted-foreground);">JPG or PNG, max 5MB</p>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-input" id="employeeName" placeholder="John Smith"
+                      oninput="updatePreview()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-input" placeholder="john.smith@company.com">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" placeholder="+1 (555) 123-4567">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Hire Date</label>
+                    <input type="date" class="form-input">
+                  </div>
                 </div>
               </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Full Name *</label>
-                  <input type="text" class="form-input" id="employeeName" placeholder="John Smith"
-                    oninput="updatePreview()">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Email *</label>
-                  <input type="email" class="form-input" placeholder="john.smith@company.com">
-                </div>
+              <div class="form-footer">
+                <a href="04-player-gallery.html" class="btn btn-secondary">Cancel</a>
+                <button class="btn btn-primary" onclick="switchTab(1)">Next: Assignment →</button>
               </div>
+            </div>
 
-              <div class="form-row">
+            <!-- Tab 2: Assignment -->
+            <div class="tab-content" id="tab-1">
+              <div class="form-section">
+                <h2 class="section-title">🏢 Department & Position</h2>
                 <div class="form-group">
                   <label class="form-label">Department *</label>
-                  <select class="form-select" id="employeeDept" onchange="checkSelections()">
+                  <select class="form-select" id="employeeDept" onchange="onDeptChange()">
                     <option value="">Select department</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Design">Design</option>
-                    <option value="Sales">Sales</option>
-                    <option value="HR">HR</option>
+                    <option value="Engineering" data-zone="midfield">⚙️ Engineering (Midfield Zone)</option>
+                    <option value="Product" data-zone="attack">⚔️ Product (Attack Zone)</option>
+                    <option value="Sales" data-zone="attack">⚔️ Sales (Attack Zone)</option>
+                    <option value="Design" data-zone="midfield">⚙️ Design (Midfield Zone)</option>
+                    <option value="Finance" data-zone="defense">🛡️ Finance (Defense Zone)</option>
+                    <option value="HR" data-zone="support">🏠 HR (Support Zone)</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label class="form-label">Position *</label>
-                  <select class="form-select" id="employeePosition" onchange="checkSelections()">
-                    <option value="">Select position</option>
-                    <option value="Frontend Developer">Frontend Developer</option>
-                    <option value="Backend Developer">Backend Developer</option>
-                    <option value="UX Designer">UX Designer</option>
-                    <option value="Product Manager">Product Manager</option>
-                    <option value="Tech Lead">Tech Lead</option>
+                  <select class="form-select" id="employeePosition" onchange="onPositionChange()" disabled>
+                    <option value="">Select department first</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Reports To</label>
+                  <select class="form-select">
+                    <option value="">Select manager (optional)</option>
+                    <option value="1">Alex Chen - Tech Lead</option>
+                    <option value="2">Sarah Kim - Product Manager</option>
+                    <option value="3">Emma Lee - Design Lead</option>
                   </select>
                 </div>
               </div>
-
-              <div class="form-group">
-                <label class="form-label">Reports To</label>
-                <select class="form-select">
-                  <option value="">Select manager (optional)</option>
-                  <option value="1">John Smith - Tech Lead</option>
-                  <option value="2">Sarah Johnson - Design Lead</option>
-                  <option value="3">Lisa Taylor - HR Manager</option>
-                </select>
+              <div class="form-footer">
+                <button class="btn btn-secondary" onclick="switchTab(0)">← Back</button>
+                <button class="btn btn-primary" onclick="switchTab(2)" id="nextToAttrsBtn" disabled>Next: Attributes
+                  →</button>
               </div>
             </div>
 
-            <!-- Attributes Section -->
+            <!-- Tab 3: Attributes -->
+            <div class="tab-content" id="tab-2">
+              <div class="form-section">
+                <h2 class="section-title">🎯 Player Attributes <span id="roleInfo"
+                    style="font-size: 14px; font-weight: normal; color: var(--muted-foreground);"></span></h2>
 
-            <!-- Placeholder: Select dept + position first -->
-            <div class="form-section" id="attributePlaceholder">
-              <h2 class="section-title">⚡ Player Attributes</h2>
-              <div style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
-                <div style="font-size: 48px; margin-bottom: var(--space-4);">🎯</div>
-                <h3 style="margin-bottom: var(--space-2);">Select Department & Position First</h3>
-                <p>Attributes will be loaded based on the role template for the selected position.</p>
+                <!-- Spider Chart with Position Expectation -->
+                <div
+                  style="display: flex; gap: 24px; margin-bottom: 24px; padding: 20px; background: var(--background); border-radius: var(--radius-lg);">
+                  <div style="flex: 1; text-align: center;">
+                    <h4 style="font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px;">🕸️ Attribute
+                      Profile vs Position Requirements</h4>
+                    <div id="attributeSpiderChart"></div>
+                    <div style="display: flex; justify-content: center; gap: 16px; margin-top: 8px; font-size: 12px;">
+                      <span><span
+                          style="display:inline-block; width:16px; height:3px; background:#9ca3af; border:1px dashed #6b7280; margin-right:4px;"></span>
+                        Position Requirement</span>
+                      <span><span
+                          style="display:inline-block; width:16px; height:10px; background:#3b82f640; border:2px solid #3b82f6; border-radius:2px; margin-right:4px;"></span>
+                        Your Values</span>
+                    </div>
+                  </div>
+                  <div style="min-width: 180px;">
+                    <h4 style="font-size: 13px; color: var(--muted-foreground); margin-bottom: 12px;">📊 Position Fit
+                    </h4>
+                    <div
+                      style="text-align: center; padding: 16px; background: white; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px;">
+                      <div style="font-size: 36px; font-weight: 700;" id="livePositionFit">--%</div>
+                      <div style="font-size: 12px; color: var(--muted-foreground);">Fit Score</div>
+                    </div>
+                    <div id="gapAnalysis" style="font-size: 12px;">
+                      <div
+                        style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border);">
+                        <span style="color: #22c55e;">▲ Above</span>
+                        <span id="aboveCount">0</span>
+                      </div>
+                      <div
+                        style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border);">
+                        <span style="color: #6b7280;">— Meets</span>
+                        <span id="meetsCount">0</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                        <span style="color: #ef4444;">▼ Below</span>
+                        <span id="belowCount">0</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 12px;">Core Attributes</h3>
+                <div class="attribute-grid" style="margin-bottom: 24px;">
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">🎯 Leadership <span class="req-badge"
+                          id="req-leadership"></span></span>
+                      <span class="attribute-value" id="attr-leadership-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-leadership"
+                      oninput="updateAttribute('leadership')">
+                    <div class="scale-hint developing" id="hint-leadership">🟡 6-10: Developing - Learning to guide
+                      others</div>
+                  </div>
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">🤝 Teamwork <span class="req-badge" id="req-teamwork"></span></span>
+                      <span class="attribute-value" id="attr-teamwork-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-teamwork"
+                      oninput="updateAttribute('teamwork')">
+                    <div class="scale-hint developing" id="hint-teamwork">🟡 6-10: Developing - Works with guidance
+                    </div>
+                  </div>
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">💬 Communication <span class="req-badge"
+                          id="req-communication"></span></span>
+                      <span class="attribute-value" id="attr-communication-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-communication"
+                      oninput="updateAttribute('communication')">
+                    <div class="scale-hint developing" id="hint-communication">🟡 6-10: Developing - Adequate clarity
+                    </div>
+                  </div>
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">🔄 Adaptability <span class="req-badge"
+                          id="req-adaptability"></span></span>
+                      <span class="attribute-value" id="attr-adaptability-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-adaptability"
+                      oninput="updateAttribute('adaptability')">
+                    <div class="scale-hint developing" id="hint-adaptability">🟡 6-10: Developing - Adjusts with support
+                    </div>
+                  </div>
+                </div>
+
+                <h3 style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 12px;">Technical Attributes
+                </h3>
+                <div class="attribute-grid">
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">💻 Technical Skills <span class="req-badge"
+                          id="req-technical"></span></span>
+                      <span class="attribute-value" id="attr-technical-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-technical"
+                      oninput="updateAttribute('technical')">
+                    <div class="scale-hint developing" id="hint-technical">🟡 6-10: Developing - Basic proficiency</div>
+                  </div>
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">🧩 Problem Solving <span class="req-badge"
+                          id="req-problem"></span></span>
+                      <span class="attribute-value" id="attr-problem-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-problem"
+                      oninput="updateAttribute('problem')">
+                    <div class="scale-hint developing" id="hint-problem">🟡 6-10: Developing - Solves with guidance
+                    </div>
+                  </div>
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">✨ Attention to Detail <span class="req-badge"
+                          id="req-attention"></span></span>
+                      <span class="attribute-value" id="attr-attention-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-attention"
+                      oninput="updateAttribute('attention')">
+                    <div class="scale-hint developing" id="hint-attention">🟡 6-10: Developing - Catches some errors
+                    </div>
+                  </div>
+                  <div class="attribute-item">
+                    <div class="attribute-header">
+                      <span class="attribute-name">🚀 Initiative <span class="req-badge"
+                          id="req-initiative"></span></span>
+                      <span class="attribute-value" id="attr-initiative-val">10</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-initiative"
+                      oninput="updateAttribute('initiative')">
+                    <div class="scale-hint developing" id="hint-initiative">🟡 6-10: Developing - Some proactivity</div>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <!-- Actual Attributes (hidden by default) -->
-            <div class="form-section" id="attributesSection" style="display: none;">
-              <h2 class="section-title">⚡ Player Attributes <span id="roleInfo"
-                  style="font-size: 14px; font-weight: normal; color: var(--muted-foreground);">(Tech Lead
-                  Template)</span></h2>
-              <p style="color: var(--muted-foreground); margin-bottom: var(--space-4);">Rate each skill from 1-20
-                (Football Manager style)</p>
-
-              <h3 style="font-size: 14px; color: var(--muted-foreground); margin-bottom: var(--space-3);">Core
-                Attributes</h3>
-              <div class="attribute-grid" style="margin-bottom: var(--space-6);">
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">🎯 Leadership</span>
-                    <span class="attribute-value" id="attr-leadership-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-leadership"
-                    oninput="updateAttribute('leadership')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">🤝 Teamwork</span>
-                    <span class="attribute-value" id="attr-teamwork-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-teamwork"
-                    oninput="updateAttribute('teamwork')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">💬 Communication</span>
-                    <span class="attribute-value" id="attr-communication-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-communication"
-                    oninput="updateAttribute('communication')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">🔄 Adaptability</span>
-                    <span class="attribute-value" id="attr-adaptability-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-adaptability"
-                    oninput="updateAttribute('adaptability')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">💪 Determination</span>
-                    <span class="attribute-value" id="attr-determination-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-determination"
-                    oninput="updateAttribute('determination')">
-                </div>
+              <div class="form-footer">
+                <button class="btn btn-secondary" onclick="switchTab(1)">← Back</button>
+                <button class="btn btn-primary" onclick="createEmployee()">🎮 Create Player</button>
               </div>
-
-              <h3 style="font-size: 14px; color: var(--muted-foreground); margin-bottom: var(--space-3);">Specialist
-                Attributes</h3>
-              <div class="attribute-grid">
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">💻 Coding</span>
-                    <span class="attribute-value" id="attr-coding-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-coding"
-                    oninput="updateAttribute('coding')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">🏗️ System Design</span>
-                    <span class="attribute-value" id="attr-design-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-design"
-                    oninput="updateAttribute('design')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">🧩 Problem Solving</span>
-                    <span class="attribute-value" id="attr-problem-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-problem"
-                    oninput="updateAttribute('problem')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">✨ Code Quality</span>
-                    <span class="attribute-value" id="attr-quality-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-quality"
-                    oninput="updateAttribute('quality')">
-                </div>
-                <div class="attribute-item">
-                  <div class="attribute-header">
-                    <span class="attribute-name">📚 Tech Learning</span>
-                    <span class="attribute-value" id="attr-learning-val">10</span>
-                  </div>
-                  <input type="range" min="1" max="20" value="10" class="attribute-slider" id="attr-learning"
-                    oninput="updateAttribute('learning')">
-                </div>
-              </div>
-            </div>
-
-            <!-- Potential -->
-            <div class="form-section" id="potentialSection" style="display: none;">
-              <h2 class="section-title">📈 Potential Ability</h2>
-              <p style="color: var(--muted-foreground); margin-bottom: var(--space-4);">Estimate this player's growth
-                potential (must be ≥ current)</p>
-
-              <div class="attribute-item" style="max-width: 400px;">
-                <div class="attribute-header">
-                  <span class="attribute-name">⭐ Potential Ability</span>
-                  <span class="attribute-value" id="potentialVal">150</span>
-                </div>
-                <input type="range" min="1" max="200" value="150" class="attribute-slider" id="potentialSlider"
-                  oninput="updatePotential()">
-              </div>
-            </div>
-
-            <!-- Form Footer -->
-            <div class="form-footer">
-              <a href="01-employee-list.html" class="btn btn-secondary">Cancel</a>
-              <button class="btn btn-primary" onclick="createEmployee()">🎮 Create Player</button>
             </div>
           </div>
 
           <!-- Preview Panel -->
           <div class="preview-panel">
-            <h3 style="margin-bottom: var(--space-4); color: var(--muted-foreground);">Player Card Preview</h3>
-            <div class="player-card-preview">
-              <div class="preview-avatar">👤</div>
+            <h3 style="margin-bottom: 16px; color: var(--muted-foreground);">Player Card Preview</h3>
+            <div class="player-card-preview zone-midfield" id="previewCard">
+              <div class="preview-avatar" id="previewAvatar">👤</div>
               <div class="preview-name" id="previewName">New Player</div>
               <div class="preview-position" id="previewPosition">Position</div>
-
+              <div class="preview-zone" id="previewZone">⚙️ Midfield Zone</div>
               <div class="ability-display">
                 <div class="ability-box">
-                  <div class="ability-value" id="previewCurrent">100</div>
-                  <div class="ability-label">Current</div>
+                  <div class="ability-value" id="previewOverall">80</div>
+                  <div class="ability-label">Overall</div>
                 </div>
                 <div class="ability-box">
-                  <div class="ability-value" id="previewPotential">150</div>
-                  <div class="ability-label">Potential</div>
+                  <div class="ability-value" id="previewFit">--</div>
+                  <div class="ability-label">Fit Score</div>
                 </div>
               </div>
-
-              <div class="radar-chart">
-                📊 Radar Chart
-              </div>
+            </div>
+            <!-- Spider Chart Preview -->
+            <div
+              style="margin-top: 20px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; text-align: center;">
+              <h4 style="font-size: 13px; color: var(--muted-foreground); margin-bottom: 12px;">🕸️ Attribute Profile
+              </h4>
+              <div id="previewSpiderChart"></div>
             </div>
           </div>
         </div>
@@ -519,27 +679,21 @@
         <div class="success-container">
           <div class="success-icon">🎉</div>
           <h2 class="success-title">Player Created!</h2>
-          <p class="success-subtitle">The new employee has been added to your squad and an invitation email has been
-            sent.</p>
-
-          <div class="player-card-preview" style="max-width: 300px; margin: 0 auto var(--space-6);">
+          <p class="success-subtitle">The new player has been added to your squad.</p>
+          <div class="player-card-preview zone-midfield" id="successCard"
+            style="max-width: 300px; margin: 0 auto 24px;">
             <div class="preview-avatar">👤</div>
             <div class="preview-name" id="successName">New Player</div>
             <div class="preview-position" id="successPosition">Position</div>
             <div class="ability-display">
               <div class="ability-box">
-                <div class="ability-value" id="successCurrent">100</div>
-                <div class="ability-label">Current</div>
-              </div>
-              <div class="ability-box">
-                <div class="ability-value" id="successPotential">150</div>
-                <div class="ability-label">Potential</div>
+                <div class="ability-value" id="successOverall">80</div>
+                <div class="ability-label">Overall</div>
               </div>
             </div>
           </div>
-
           <div class="success-actions">
-            <a href="01-employee-list.html" class="btn btn-secondary">← Back to List</a>
+            <a href="04-player-gallery.html" class="btn btn-secondary">← Back to Gallery</a>
             <a href="03-employee-detail.html" class="btn btn-primary">View Player Card →</a>
           </div>
         </div>
@@ -548,63 +702,181 @@
   </div>
 
   <script>
-    function updateAttribute(name) {
-      const slider = document.getElementById('attr-' + name);
-      const display = document.getElementById('attr-' + name + '-val');
-      display.textContent = slider.value;
-      calculateAbility();
+    // Data
+    const departments = {
+      'Engineering': { zone: 'midfield', icon: '⚙️', positions: ['Tech Lead', 'Backend Developer', 'Frontend Developer', 'QA Engineer', 'DevOps Engineer'] },
+      'Product': { zone: 'attack', icon: '⚔️', positions: ['Product Manager', 'Product Owner', 'Business Analyst'] },
+      'Sales': { zone: 'attack', icon: '⚔️', positions: ['Sales Manager', 'Account Executive', 'Sales Rep'] },
+      'Design': { zone: 'midfield', icon: '⚙️', positions: ['UX Designer', 'UI Designer', 'Design Lead'] },
+      'Finance': { zone: 'defense', icon: '🛡️', positions: ['Finance Director', 'Accountant', 'Financial Analyst'] },
+      'HR': { zone: 'support', icon: '🏠', positions: ['HR Director', 'HR Manager', 'Recruiter'] }
+    };
+
+    const zoneLabels = {
+      'attack': '⚔️ Attack Zone',
+      'midfield': '⚙️ Midfield Zone',
+      'defense': '🛡️ Defense Zone',
+      'support': '🏠 Support Zone'
+    };
+
+    const scaleHints = {
+      low: { class: 'low', icon: '🔴', text: '1-5: Low - Needs significant improvement' },
+      developing: { class: 'developing', icon: '🟡', text: '6-10: Developing - Learning, needs guidance' },
+      proficient: { class: 'proficient', icon: '🟢', text: '11-15: Proficient - Competent, meets expectations' },
+      exceptional: { class: 'exceptional', icon: '🔵', text: '16-20: Exceptional - Mastery level' }
+    };
+
+    // Position requirements for fit scoring
+    const positionRequirements = {
+      'Tech Lead': { leadership: 14, teamwork: 15, communication: 12, technical: 16, problem: 14 },
+      'Backend Developer': { leadership: 8, teamwork: 13, communication: 10, technical: 17, problem: 16 },
+      'Frontend Developer': { leadership: 8, teamwork: 13, communication: 12, technical: 16, problem: 14 },
+      'QA Engineer': { leadership: 8, teamwork: 14, communication: 12, technical: 14, problem: 15 },
+      'DevOps Engineer': { leadership: 10, teamwork: 12, communication: 10, technical: 18, problem: 16 },
+      'Product Manager': { leadership: 15, teamwork: 14, communication: 16, technical: 10, problem: 16 },
+      'Product Owner': { leadership: 14, teamwork: 14, communication: 15, technical: 10, problem: 15 },
+      'Business Analyst': { leadership: 10, teamwork: 14, communication: 15, technical: 12, problem: 16 },
+      'Sales Manager': { leadership: 16, teamwork: 14, communication: 18, technical: 8, problem: 12 },
+      'Account Executive': { leadership: 12, teamwork: 13, communication: 17, technical: 8, problem: 12 },
+      'Sales Rep': { leadership: 10, teamwork: 12, communication: 16, technical: 6, problem: 10 },
+      'UX Designer': { leadership: 10, teamwork: 14, communication: 14, technical: 12, problem: 15 },
+      'UI Designer': { leadership: 8, teamwork: 13, communication: 12, technical: 14, problem: 12 },
+      'Design Lead': { leadership: 14, teamwork: 14, communication: 14, technical: 14, problem: 14 },
+      'Finance Director': { leadership: 16, teamwork: 12, communication: 14, technical: 14, problem: 16 },
+      'Accountant': { leadership: 8, teamwork: 12, communication: 12, technical: 15, problem: 14 },
+      'Financial Analyst': { leadership: 10, teamwork: 12, communication: 13, technical: 16, problem: 17 },
+      'HR Director': { leadership: 16, teamwork: 16, communication: 17, technical: 8, problem: 14 },
+      'HR Manager': { leadership: 14, teamwork: 16, communication: 16, technical: 8, problem: 12 },
+      'Recruiter': { leadership: 10, teamwork: 14, communication: 17, technical: 6, problem: 12 }
+    };
+
+    let currentZone = 'midfield';
+    let currentPosition = null;
+
+    function switchTab(index) {
+      document.querySelectorAll('.form-tab').forEach((t, i) => t.classList.toggle('active', i === index));
+      document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === index));
     }
 
-    function calculateAbility() {
-      const attrs = ['leadership', 'teamwork', 'communication', 'adaptability', 'determination',
-        'coding', 'design', 'problem', 'quality', 'learning'];
-      let total = 0;
-      attrs.forEach(attr => {
-        const slider = document.getElementById('attr-' + attr);
-        if (slider) total += parseInt(slider.value);
+    function onDeptChange() {
+      const dept = document.getElementById('employeeDept').value;
+      const posSelect = document.getElementById('employeePosition');
+      const nextBtn = document.getElementById('nextToAttrsBtn');
+
+      posSelect.innerHTML = '<option value="">Select position</option>';
+
+      if (dept && departments[dept]) {
+        const deptData = departments[dept];
+        currentZone = deptData.zone;
+
+        deptData.positions.forEach(pos => {
+          posSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
+        });
+        posSelect.disabled = false;
+
+        // Update preview zone
+        updatePreviewZone();
+      } else {
+        posSelect.disabled = true;
+        nextBtn.disabled = true;
+      }
+      updatePreview();
+    }
+
+    function onPositionChange() {
+      const dept = document.getElementById('employeeDept').value;
+      const pos = document.getElementById('employeePosition').value;
+      const nextBtn = document.getElementById('nextToAttrsBtn');
+
+      nextBtn.disabled = !(dept && pos);
+      currentPosition = pos || null;
+
+      if (pos) {
+        document.getElementById('roleInfo').textContent = `(${pos} requirements)`;
+        updatePositionRequirementBadges();
+      }
+      updatePreview();
+      generateAttributeSpiderChart();
+      updateFitScore();
+    }
+
+    function updatePositionRequirementBadges() {
+      const req = positionRequirements[currentPosition];
+      if (!req) return;
+
+      const badges = ['leadership', 'teamwork', 'communication', 'technical', 'problem'];
+      badges.forEach(attr => {
+        const badge = document.getElementById('req-' + attr);
+        if (badge && req[attr]) {
+          badge.textContent = `(Req: ${req[attr]})`;
+          badge.style.cssText = 'font-size: 11px; color: var(--muted-foreground); font-weight: normal;';
+        }
       });
-      document.getElementById('previewCurrent').textContent = total;
     }
 
-    function updatePotential() {
-      const val = document.getElementById('potentialSlider').value;
-      document.getElementById('potentialVal').textContent = val;
-      document.getElementById('previewPotential').textContent = val;
+    function updatePreviewZone() {
+      const card = document.getElementById('previewCard');
+      card.className = 'player-card-preview zone-' + currentZone;
+      document.getElementById('previewZone').textContent = zoneLabels[currentZone];
     }
 
     function updatePreview() {
       const name = document.getElementById('employeeName').value || 'New Player';
       const position = document.getElementById('employeePosition').value || 'Position';
+
       document.getElementById('previewName').textContent = name;
       document.getElementById('previewPosition').textContent = position;
+
+      // Update avatar initials
+      if (name !== 'New Player') {
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+        document.getElementById('previewAvatar').textContent = initials;
+      }
+
+      calculateOverall();
     }
 
-    function checkSelections() {
-      const dept = document.getElementById('employeeDept').value;
-      const position = document.getElementById('employeePosition').value;
+    function updateAttribute(name) {
+      const slider = document.getElementById('attr-' + name);
+      const display = document.getElementById('attr-' + name + '-val');
+      const hint = document.getElementById('hint-' + name);
+      const val = parseInt(slider.value);
 
-      updatePreview();
+      display.textContent = val;
 
-      // Show attributes only when both are selected
-      if (dept && position) {
-        document.getElementById('attributePlaceholder').style.display = 'none';
-        document.getElementById('attributesSection').style.display = 'block';
-        document.getElementById('potentialSection').style.display = 'block';
-        document.getElementById('roleInfo').textContent = '(' + position + ' Template)';
-        calculateAbility();
-      } else {
-        document.getElementById('attributePlaceholder').style.display = 'block';
-        document.getElementById('attributesSection').style.display = 'none';
-        document.getElementById('potentialSection').style.display = 'none';
-      }
+      // Update scale hint
+      let scale;
+      if (val <= 5) scale = scaleHints.low;
+      else if (val <= 10) scale = scaleHints.developing;
+      else if (val <= 15) scale = scaleHints.proficient;
+      else scale = scaleHints.exceptional;
+
+      hint.className = 'scale-hint ' + scale.class;
+      hint.textContent = scale.icon + ' ' + scale.text;
+
+      calculateOverall();
+      generatePreviewSpiderChart();
+      generateAttributeSpiderChart();
+      updateFitScore();
+    }
+
+    function calculateOverall() {
+      const attrs = ['leadership', 'teamwork', 'communication', 'adaptability', 'technical', 'problem', 'attention', 'initiative'];
+      let total = 0;
+      attrs.forEach(attr => {
+        const slider = document.getElementById('attr-' + attr);
+        if (slider) total += parseInt(slider.value);
+      });
+      const overall = Math.round(total / attrs.length * 5); // Scale to 0-100
+      document.getElementById('previewOverall').textContent = overall;
     }
 
     function createEmployee() {
-      // Copy values to success state
+      // Copy to success state
       document.getElementById('successName').textContent = document.getElementById('previewName').textContent;
       document.getElementById('successPosition').textContent = document.getElementById('previewPosition').textContent;
-      document.getElementById('successCurrent').textContent = document.getElementById('previewCurrent').textContent;
-      document.getElementById('successPotential').textContent = document.getElementById('previewPotential').textContent;
+      document.getElementById('successOverall').textContent = document.getElementById('previewOverall').textContent;
+      document.getElementById('successCard').className = 'player-card-preview zone-' + currentZone;
 
       // Switch states
       document.getElementById('form-state').classList.remove('active');
@@ -612,8 +884,233 @@
       window.scrollTo(0, 0);
     }
 
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('userDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    document.addEventListener('click', function () {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    });
+
+    // Spider Chart for Attributes tab with position requirements comparison
+    function generateAttributeSpiderChart() {
+      const container = document.getElementById('attributeSpiderChart');
+      if (!container) return;
+
+      const size = 280;
+      const center = size / 2;
+      const maxRadius = 90;
+      const attrs = ['leadership', 'teamwork', 'communication', 'technical', 'problem'];
+      const labels = ['Leadership', 'Teamwork', 'Communication', 'Technical', 'Problem'];
+      const angleStep = (2 * Math.PI) / 5;
+      const startAngle = -Math.PI / 2;
+
+      // Get current values
+      const values = attrs.map(attr => {
+        const slider = document.getElementById('attr-' + attr);
+        return slider ? parseInt(slider.value) : 10;
+      });
+
+      // Get position requirements
+      const req = positionRequirements[currentPosition] || null;
+      const reqValues = req ? attrs.map(a => req[a] || 10) : null;
+
+      const zoneColors = {
+        'attack': '#ef4444',
+        'midfield': '#3b82f6',
+        'defense': '#22c55e',
+        'support': '#a855f7'
+      };
+      const color = zoneColors[currentZone] || '#3b82f6';
+
+      let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+
+      // Draw grid lines
+      [0.25, 0.5, 0.75, 1].forEach(level => {
+        const r = maxRadius * level;
+        let points = '';
+        for (let i = 0; i < 5; i++) {
+          const angle = startAngle + i * angleStep;
+          const x = center + r * Math.cos(angle);
+          const y = center + r * Math.sin(angle);
+          points += `${x},${y} `;
+        }
+        svg += `<polygon points="${points.trim()}" fill="none" stroke="#e5e7eb" stroke-width="1"/>`;
+      });
+
+      // Draw axis lines
+      for (let i = 0; i < 5; i++) {
+        const angle = startAngle + i * angleStep;
+        const x = center + maxRadius * Math.cos(angle);
+        const y = center + maxRadius * Math.sin(angle);
+        svg += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="#e5e7eb" stroke-width="1"/>`;
+      }
+
+      // Draw position requirements polygon (dashed gray)
+      if (reqValues) {
+        let reqPoints = '';
+        for (let i = 0; i < 5; i++) {
+          const angle = startAngle + i * angleStep;
+          const r = (reqValues[i] / 20) * maxRadius;
+          const x = center + r * Math.cos(angle);
+          const y = center + r * Math.sin(angle);
+          reqPoints += `${x},${y} `;
+        }
+        svg += `<polygon points="${reqPoints.trim()}" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="6,4"/>`;
+      }
+
+      // Draw actual values polygon (filled)
+      let points = '';
+      for (let i = 0; i < 5; i++) {
+        const angle = startAngle + i * angleStep;
+        const r = (values[i] / 20) * maxRadius;
+        const x = center + r * Math.cos(angle);
+        const y = center + r * Math.sin(angle);
+        points += `${x},${y} `;
+      }
+      svg += `<polygon points="${points.trim()}" fill="${color}30" stroke="${color}" stroke-width="2"/>`;
+
+      // Draw dots for actual values
+      for (let i = 0; i < 5; i++) {
+        const angle = startAngle + i * angleStep;
+        const r = (values[i] / 20) * maxRadius;
+        const x = center + r * Math.cos(angle);
+        const y = center + r * Math.sin(angle);
+        svg += `<circle cx="${x}" cy="${y}" r="5" fill="${color}"/>`;
+      }
+
+      // Draw labels with more space
+      const labelRadius = maxRadius + 25;
+      const labelPositions = [
+        { dx: 0, dy: -8 },   // top
+        { dx: 10, dy: 4 },   // right-top
+        { dx: 8, dy: 8 },    // right-bottom
+        { dx: -8, dy: 8 },   // left-bottom
+        { dx: -10, dy: 4 }   // left-top
+      ];
+      const anchors = ['middle', 'start', 'start', 'end', 'end'];
+
+      for (let i = 0; i < 5; i++) {
+        const angle = startAngle + i * angleStep;
+        const x = center + labelRadius * Math.cos(angle) + labelPositions[i].dx;
+        const y = center + labelRadius * Math.sin(angle) + labelPositions[i].dy;
+        svg += `<text x="${x}" y="${y}" text-anchor="${anchors[i]}" font-size="11" fill="#374151" font-weight="500">${labels[i]}</text>`;
+      }
+
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
+
+    function updateFitScore() {
+      if (!currentPosition) {
+        document.getElementById('livePositionFit').textContent = '--%';
+        document.getElementById('livePositionFit').style.color = '#6b7280';
+        return;
+      }
+
+      const req = positionRequirements[currentPosition];
+      if (!req) return;
+
+      const attrs = ['leadership', 'teamwork', 'communication', 'technical', 'problem'];
+      let above = 0, meets = 0, below = 0;
+      let totalScore = 0;
+
+      attrs.forEach(attr => {
+        const slider = document.getElementById('attr-' + attr);
+        const val = slider ? parseInt(slider.value) : 10;
+        const reqVal = req[attr] || 10;
+
+        if (val >= reqVal + 2) {
+          above++;
+          totalScore += 100;
+        } else if (val >= reqVal - 1) {
+          meets++;
+          totalScore += 100;
+        } else {
+          below++;
+          totalScore += Math.max(0, 100 - ((reqVal - val) * 15));
+        }
+      });
+
+      const fitScore = Math.round(totalScore / 5);
+      const fitDisplay = document.getElementById('livePositionFit');
+      fitDisplay.textContent = fitScore + '%';
+
+      if (fitScore >= 90) {
+        fitDisplay.style.color = '#22c55e';
+      } else if (fitScore >= 70) {
+        fitDisplay.style.color = '#3b82f6';
+      } else if (fitScore >= 50) {
+        fitDisplay.style.color = '#f59e0b';
+      } else {
+        fitDisplay.style.color = '#ef4444';
+      }
+
+      document.getElementById('aboveCount').textContent = above;
+      document.getElementById('meetsCount').textContent = meets;
+      document.getElementById('belowCount').textContent = below;
+
+      // Update preview fit score
+      document.getElementById('previewFit').textContent = fitScore + '%';
+    }
+
+    // Spider Chart for preview panel (simpler version)
+    function generatePreviewSpiderChart() {
+      const container = document.getElementById('previewSpiderChart');
+      if (!container) return;
+
+      const size = 180;
+      const center = size / 2;
+      const maxRadius = 60;
+      const attrs = ['leadership', 'teamwork', 'communication', 'technical', 'problem'];
+      const angleStep = (2 * Math.PI) / 5;
+      const startAngle = -Math.PI / 2;
+
+      const values = attrs.map(attr => {
+        const slider = document.getElementById('attr-' + attr);
+        return slider ? parseInt(slider.value) : 10;
+      });
+
+      const zoneColors = {
+        'attack': '#ef4444',
+        'midfield': '#3b82f6',
+        'defense': '#22c55e',
+        'support': '#a855f7'
+      };
+      const color = zoneColors[currentZone] || '#3b82f6';
+
+      let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+
+      // Grid
+      [0.5, 1].forEach(level => {
+        const r = maxRadius * level;
+        let pts = '';
+        for (let i = 0; i < 5; i++) {
+          const angle = startAngle + i * angleStep;
+          pts += `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)} `;
+        }
+        svg += `<polygon points="${pts.trim()}" fill="none" stroke="#e5e7eb" stroke-width="1"/>`;
+      });
+
+      // Value polygon
+      let pts = '';
+      for (let i = 0; i < 5; i++) {
+        const angle = startAngle + i * angleStep;
+        const r = (values[i] / 20) * maxRadius;
+        pts += `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)} `;
+      }
+      svg += `<polygon points="${pts.trim()}" fill="${color}40" stroke="${color}" stroke-width="2"/>`;
+
+      svg += '</svg>';
+      container.innerHTML = svg;
+    }
+
     // Initialize
-    calculateAbility();
+    calculateOverall();
+    generatePreviewSpiderChart();
+    generateAttributeSpiderChart();
   </script>
 </body>
 
