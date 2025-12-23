@@ -58,6 +58,26 @@
 - System updates the definition globally
 - All Player Cards displaying this attribute now show the label "Agility"
 
+### Scenario 3: Delete Attribute
+
+**Given**
+- "Rust" specialist attribute exists in the attribute library
+- Some employees have been rated on this attribute
+
+**When**
+- Owner clicks the 🗑️ delete button on the "Rust" attribute card
+- Delete confirmation modal appears with warning
+
+**Then**
+- Modal shows "Delete Rust?" with warning icon
+- Warning message states: "Employees currently rated on this attribute will lose their scores"
+- Owner can click "Cancel" to abort or "Delete Attribute" to confirm
+- If confirmed:
+  - System removes the attribute from the library
+  - All employee ratings for "Rust" are cleared
+  - Positions requiring "Rust" are updated (attribute removed from requirements)
+  - Success notification: "Attribute 'Rust' has been deleted"
+
 ---
 
 ## UI/UX Notes
@@ -66,7 +86,13 @@
 1. **Attribute Library**:
    - Two main sections: **Core Attributes** (Top) and **Specialist Attributes** (Bottom, grouped by Zone).
    - Each attribute card shows: Icon, Name, Category badge.
+   - Hover reveals action buttons: 👁️ View, ✏️ Edit, 🗑️ Delete
 2. **Attribute Editor**:
    - Form fields: Name, Code (auto-generated slug), Description, Icon picker.
    - Category Toggle (Core vs Specialist).
    - Zone Dropdown (Visible only if Specialist).
+3. **Delete Confirmation Modal**:
+   - Warning icon and red-themed header
+   - Attribute name in message
+   - Warning about employee score impact
+   - Cancel and Delete buttons

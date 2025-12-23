@@ -158,12 +158,36 @@
 
 ---
 
+### Scenario 6: Delete Position from Formation
+
+**Given**
+- Manager is viewing a Position Details modal for "QA Engineer" (3 players)
+
+**When**
+- Manager clicks 🗑️ "Delete Position" button in modal footer
+
+**Then**
+- Delete confirmation modal opens with warning styling
+- Modal shows "Delete 'QA Engineer'?" with warning icon
+- Warning states: "Players assigned to this position will need to be reassigned"
+- Manager can click:
+  - "Cancel" → Returns to position details
+  - "Delete Position" → Confirms deletion
+- If confirmed:
+  - Position card is removed from the pitch zone
+  - 3 players are now unassigned
+  - Analytics bar updates (gaps count increases)
+  - Success notification: "Position 'QA Engineer' has been deleted from the formation"
+
+---
+
 ## UI/UX Notes
 
 **Screens Involved:**
 1. **Formation View Page** (main page)
 2. **Add Position Modal**
 3. **Position Details Modal** (with player list)
+4. **Delete Position Confirmation Modal**
 
 **Key UI Elements:**
 
@@ -176,6 +200,7 @@
 | Zone Add Button | Circular "+" button at end of each zone row |
 | Bench Bar | Light purple horizontal cards |
 | Stats Bar | Zone counts with colored dots, total badge |
+| Delete Position Btn | Red danger button in modal footer, left-aligned |
 
 **Color Scheme:**
 - Attack Zone: `#ef4444` (red)
@@ -184,9 +209,11 @@
 - Bench/Support: `#a855f7` (purple)
 - Rating Gold: `#f59e0b`
 - Rating Silver: `#94a3b8`
+- Delete/Danger: `#ef4444` (red)
 
 **Interactions:**
 - Hover on position card → lift + shadow glow
 - Click position card → opens Position Details modal
 - Click zone "+" button → opens Add Position modal with zone pre-selected
 - Click bench "+ Add" → opens Add Position modal with Bench pre-selected
+- Click "Delete Position" → opens Delete Confirmation modal

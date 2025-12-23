@@ -233,6 +233,67 @@
       background: var(--muted);
     }
 
+    .icon-btn.delete:hover {
+      background: var(--destructive-light);
+      color: var(--destructive);
+    }
+
+    /* Delete Modal Styles */
+    .delete-modal-body {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .delete-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--destructive-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 16px;
+    }
+
+    .delete-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .delete-message {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+
+    .delete-warning {
+      background: #FEF3C7;
+      border: 1px solid #F59E0B;
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-size: 13px;
+      color: #92400E;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-danger {
+      background: var(--destructive);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-danger:hover {
+      background: #DC2626;
+    }
+
     /* Detail Modal Styles */
     .detail-section {
       background: var(--background);
@@ -551,7 +612,9 @@
             <div class="attr-card" onclick="showDetailModal('leadership')">
               <div class="attr-actions"><button class="icon-btn"
                   onclick="event.stopPropagation(); showDetailModal('leadership')">👁️</button><button class="icon-btn"
-                  onclick="event.stopPropagation(); showEditModal('leadership')">✏️</button></div>
+                  onclick="event.stopPropagation(); showEditModal('leadership')">✏️</button><button
+                  class="icon-btn delete"
+                  onclick="event.stopPropagation(); showDeleteModal('leadership', 'Leadership')">🗑️</button></div>
               <div class="attr-header">
                 <div class="attr-icon">👑</div>
                 <div class="attr-name">Leadership</div>
@@ -563,7 +626,9 @@
             <div class="attr-card" onclick="showDetailModal('teamwork')">
               <div class="attr-actions"><button class="icon-btn"
                   onclick="event.stopPropagation(); showDetailModal('teamwork')">👁️</button><button class="icon-btn"
-                  onclick="event.stopPropagation(); showEditModal('teamwork')">✏️</button></div>
+                  onclick="event.stopPropagation(); showEditModal('teamwork')">✏️</button><button
+                  class="icon-btn delete"
+                  onclick="event.stopPropagation(); showDeleteModal('teamwork', 'Teamwork')">🗑️</button></div>
               <div class="attr-header">
                 <div class="attr-icon">🤝</div>
                 <div class="attr-name">Teamwork</div>
@@ -575,7 +640,10 @@
             <div class="attr-card" onclick="showDetailModal('communication')">
               <div class="attr-actions"><button class="icon-btn"
                   onclick="event.stopPropagation(); showDetailModal('communication')">👁️</button><button
-                  class="icon-btn" onclick="event.stopPropagation(); showEditModal('communication')">✏️</button></div>
+                  class="icon-btn" onclick="event.stopPropagation(); showEditModal('communication')">✏️</button><button
+                  class="icon-btn delete"
+                  onclick="event.stopPropagation(); showDeleteModal('communication', 'Communication')">🗑️</button>
+              </div>
               <div class="attr-header">
                 <div class="attr-icon">💬</div>
                 <div class="attr-name">Communication</div>
@@ -977,6 +1045,30 @@
     </div>
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal" style="display: none;">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🗑️ Delete Attribute</h2>
+        <button class="modal-close" onclick="hideModal('deleteModal')">×</button>
+      </div>
+      <div class="delete-modal-body">
+        <div class="delete-icon">⚠️</div>
+        <div class="delete-title">Delete "<span id="deleteAttrName">Leadership</span>"?</div>
+        <p class="delete-message">
+          This action cannot be undone. This will permanently remove the attribute from your library.
+        </p>
+        <div class="delete-warning">
+          ⚠️ <span>Employees currently rated on this attribute will lose their scores.</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center; gap: 12px;">
+        <button class="btn btn-secondary" onclick="hideModal('deleteModal')">Cancel</button>
+        <button class="btn-danger" onclick="confirmDelete()">🗑️ Delete Attribute</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const attributes = {
       'leadership': { icon: '👑', name: 'Leadership', category: '🎯 Core (Soft Skills)', desc: 'Ability to guide, inspire, and motivate teams toward goals', weight: 'High (×1.5)', sources: ['360° Feedback', 'Manager Evaluation', 'Self-Assessment'], scale: { low: ['Rarely takes initiative or responsibility', 'Struggles to motivate or guide others', 'Avoids decision-making situations'], developing: ['Can lead small tasks with guidance', 'Developing ability to motivate peers', 'Makes decisions in familiar situations'], proficient: ['Proactively leads projects and initiatives', 'Effectively motivates and guides team members', 'Confident decision-maker in most situations'], exceptional: ['Strategic visionary who inspires others', 'Creates high-performing teams', 'Mentors future leaders, trusted advisor'] } },
@@ -1015,6 +1107,21 @@
       document.getElementById('saveBtn').textContent = 'Update Attribute';
       switchTab(0);
       document.getElementById('addEditModal').style.display = 'flex';
+    }
+
+    let deleteAttrId = null;
+    function showDeleteModal(id, name) {
+      deleteAttrId = id;
+      document.getElementById('deleteAttrName').textContent = name;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function confirmDelete() {
+      if (deleteAttrId) {
+        alert(`Attribute "${document.getElementById('deleteAttrName').textContent}" has been deleted.`);
+        hideModal('deleteModal');
+        // In real app: remove from DOM and send to server
+      }
     }
 
     function hideModal(id) { document.getElementById(id).style.display = 'none'; }

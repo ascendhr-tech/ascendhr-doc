@@ -1243,8 +1243,38 @@
         </div>
       </div>
       <div class="modal-footer">
+        <button class="modal-btn danger" onclick="showDeletePositionModal()">🗑️ Delete Position</button>
+        <div style="flex: 1;"></div>
         <button class="modal-btn secondary" onclick="hideDetails()">Close</button>
         <button class="modal-btn primary" onclick="addPlayerToPosition()">➕ Add Player</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Position Confirmation Modal -->
+  <div class="modal-overlay" id="deletePositionModal">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+        <h3 style="color: white;">🗑️ Delete Position</h3>
+        <button class="modal-close" style="color: white;" onclick="hideDeletePositionModal()">×</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+        <div
+          style="width: 64px; height: 64px; background: #FEE2E2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px;">
+          ⚠️</div>
+        <h4 style="font-size: 18px; margin-bottom: 8px;">Delete "<span id="deletePositionName">Product Manager</span>"?
+        </h4>
+        <p style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px;">
+          This will remove the position from the formation view.
+        </p>
+        <div
+          style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 12px; font-size: 13px; color: #92400E; display: flex; align-items: center; gap: 8px;">
+          ⚠️ <span>Players assigned to this position will need to be reassigned.</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center; gap: 12px;">
+        <button class="modal-btn secondary" onclick="hideDeletePositionModal()">Cancel</button>
+        <button class="modal-btn danger" onclick="confirmDeletePosition()">🗑️ Delete Position</button>
       </div>
     </div>
   </div>
@@ -1307,6 +1337,22 @@
     function addPlayerToPosition() {
       alert('Opening player selection to add to ' + currentPosition.title + '...');
       hideDetails();
+    }
+
+    function showDeletePositionModal() {
+      document.getElementById('deletePositionName').textContent = currentPosition.title;
+      document.getElementById('deletePositionModal').classList.add('active');
+    }
+
+    function hideDeletePositionModal() {
+      document.getElementById('deletePositionModal').classList.remove('active');
+    }
+
+    function confirmDeletePosition() {
+      alert(`Position "${currentPosition.title}" has been deleted from the formation.`);
+      hideDeletePositionModal();
+      hideDetails();
+      // In real app: remove position card from DOM
     }
 
     function resetFormation() {

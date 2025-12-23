@@ -102,6 +102,35 @@
       background: rgba(255, 255, 255, 0.5);
     }
 
+    /* Remove player button on filled slots */
+    .slot-card .remove-player-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      background: #FEE2E2;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slot-card.filled:hover .remove-player-btn {
+      opacity: 1;
+    }
+
+    .slot-card .remove-player-btn:hover {
+      background: #ef4444;
+      color: white;
+    }
+
     .slot-role {
       font-size: 11px;
       font-weight: 600;
@@ -465,6 +494,32 @@
 
     .squad-card-dark:hover::before {
       opacity: 1;
+    }
+
+    /* Delete button on squad card */
+    .squad-card-dark .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      background: #FEE2E2;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      z-index: 10;
+    }
+
+    .squad-card-dark:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .squad-card-dark .delete-btn:hover {
+      background: #ef4444;
+      color: white;
     }
 
     .squad-card-dark .squad-name {
@@ -1033,6 +1088,8 @@
           <div class="slots-grid">
             <!-- Filled Slots -->
             <div class="slot-card filled" onclick="openDrawer('pm')">
+              <button class="remove-player-btn"
+                onclick="event.stopPropagation(); removePlayerFromSlot('pm', 'David Thompson')">×</button>
               <div class="slot-role">Product Manager</div>
               <div class="slot-avatar filled">DT</div>
               <div class="slot-name">David Thompson</div>
@@ -1041,6 +1098,8 @@
             </div>
 
             <div class="slot-card filled" onclick="openDrawer('be')">
+              <button class="remove-player-btn"
+                onclick="event.stopPropagation(); removePlayerFromSlot('be', 'Michael Kim')">×</button>
               <div class="slot-role">Backend Developer</div>
               <div class="slot-avatar filled">MK</div>
               <div class="slot-name">Michael Kim</div>
@@ -1049,6 +1108,8 @@
             </div>
 
             <div class="slot-card filled" onclick="openDrawer('fe')">
+              <button class="remove-player-btn"
+                onclick="event.stopPropagation(); removePlayerFromSlot('fe', 'Lisa Wang')">×</button>
               <div class="slot-role">Frontend Developer</div>
               <div class="slot-avatar filled">LW</div>
               <div class="slot-name">Lisa Wang</div>
@@ -1057,6 +1118,8 @@
             </div>
 
             <div class="slot-card filled" onclick="openDrawer('ux')">
+              <button class="remove-player-btn"
+                onclick="event.stopPropagation(); removePlayerFromSlot('ux', 'Emma Roberts')">×</button>
               <div class="slot-role">UX/UI Designer</div>
               <div class="slot-avatar filled">ER</div>
               <div class="slot-name">Emma Roberts</div>
@@ -1238,6 +1301,8 @@
 
         <!-- Squad Card 1: Project Phoenix (Dark Theme) -->
         <div class="squad-card-dark" onclick="hideDashboard()">
+          <button class="delete-btn"
+            onclick="event.stopPropagation(); showDeleteSquadModal('Project Phoenix')">🗑️</button>
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
             <div>
               <div class="squad-name">🛡️ Project Phoenix</div>
@@ -1304,6 +1369,8 @@
 
         <!-- Squad Card 2: Growth Squad (Dark Theme) -->
         <div class="squad-card-dark">
+          <button class="delete-btn"
+            onclick="event.stopPropagation(); showDeleteSquadModal('Growth Squad')">🗑️</button>
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
             <div>
               <div class="squad-name">⚔️ Growth Squad</div>
@@ -1360,6 +1427,8 @@
 
         <!-- Squad Card 3: Infrastructure (Dark Theme) -->
         <div class="squad-card-dark">
+          <button class="delete-btn"
+            onclick="event.stopPropagation(); showDeleteSquadModal('Infrastructure')">🗑️</button>
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
             <div>
               <div class="squad-name">🏗️ Infrastructure</div>
@@ -1544,6 +1613,36 @@
     </div>
   </div>
 
+  <!-- Delete Squad Confirmation Modal -->
+  <div class="modal-overlay" id="deleteSquadModal" style="display: none;">
+    <div class="modal modal-dark" style="max-width: 420px;">
+      <div class="modal-header"
+        style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-bottom: none;">
+        <h2 class="modal-title" style="color: white;">🗑️ Delete Squad</h2>
+        <button class="modal-close" style="color: white;" onclick="hideDeleteSquadModal()">×</button>
+      </div>
+      <div style="text-align: center; padding: 32px 24px;">
+        <div
+          style="width: 64px; height: 64px; background: #FEE2E2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px;">
+          ⚠️</div>
+        <h4 style="font-size: 18px; margin-bottom: 8px;">Delete "<span id="deleteSquadName">Project Phoenix</span>"?
+        </h4>
+        <p style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px;">
+          This will permanently remove the squad and all its configuration.
+        </p>
+        <div
+          style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 12px; font-size: 13px; color: #92400E; display: flex; align-items: center; gap: 8px;">
+          ⚠️ <span>Team members will be unassigned from this squad.</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center; gap: 12px;">
+        <button class="btn btn-secondary" onclick="hideDeleteSquadModal()">Cancel</button>
+        <button class="btn" style="background: #ef4444; color: white; border: none;" onclick="confirmDeleteSquad()">🗑️
+          Delete Squad</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function openDrawer(role) {
       const drawer = document.getElementById('drawer');
@@ -1569,6 +1668,22 @@
       alert('Player assigned! (Demo)');
       closeDrawer();
     }
+
+    // Remove player from squad slot
+    function removePlayerFromSlot(role, playerName) {
+      const roleNames = {
+        'pm': 'Product Manager',
+        'be': 'Backend Developer',
+        'fe': 'Frontend Developer',
+        'ux': 'UX/UI Designer',
+        'qa': 'QA Engineer',
+        'devops': 'DevOps Engineer'
+      };
+      if (confirm(`Remove ${playerName} from ${roleNames[role]} slot?`)) {
+        alert(`${playerName} has been removed from the squad.`);
+        // In real app: update slot to empty state
+      }
+    }
     function showDashboard() {
       document.getElementById('dashboard-overlay').style.display = 'block';
     }
@@ -1580,6 +1695,22 @@
     }
     function hideTemplateModal() {
       document.getElementById('templateModal').style.display = 'none';
+    }
+
+    // Delete Squad Modal
+    let deleteSquadName = null;
+    function showDeleteSquadModal(name) {
+      deleteSquadName = name;
+      document.getElementById('deleteSquadName').textContent = name;
+      document.getElementById('deleteSquadModal').style.display = 'flex';
+    }
+    function hideDeleteSquadModal() {
+      document.getElementById('deleteSquadModal').style.display = 'none';
+    }
+    function confirmDeleteSquad() {
+      alert(`Squad "${deleteSquadName}" has been deleted.`);
+      hideDeleteSquadModal();
+      // In real app: remove squad card from DOM
     }
 
     // Toggle between Template and Custom sections
