@@ -104,383 +104,6 @@
 5. Human verifies & merges
 ```
 
----
-
-# FLEXIBLE ROLE & HIERARCHY SYSTEM
-
-> **Key Change:** Instead of hardcoded Admin/Employee, build a scalable permission system that supports any organizational structure.
-
-## Database Schema
-
-### �️ Company (Football Club) Schema
-
-```sql
--- Companies (Multi-tenant clubs)
-companies (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(200) NOT NULL,           -- 'Manchester United FC'
-  slug: VARCHAR(100) UNIQUE,              -- 'manchester-united'
-  industry: VARCHAR(100),                 -- 'Technology', 'Finance', etc.
-  size: VARCHAR(50),                      -- 'startup', 'small', 'medium', 'enterprise'
-  logo_url: VARCHAR(500),
-  primary_color: VARCHAR(7),              -- '#DA291C'
-  secondary_color: VARCHAR(7),            -- '#FFE500'
-  
-  -- Club Settings
-  timezone: VARCHAR(50) DEFAULT 'Asia/Bangkok',
-  date_format: VARCHAR(20) DEFAULT 'DD/MM/YYYY',
-  formation_type: VARCHAR(50) DEFAULT '4-3-3',
-  
-  -- Status
-  status: VARCHAR(50) DEFAULT 'active',   -- 'trial', 'active', 'suspended'
-  trial_ends_at: TIMESTAMP,
-  
-  -- Onboarding
-  onboarding_completed: BOOLEAN DEFAULT false,
-  
-  created_by: UUID REFERENCES users(id),
-  created_at: TIMESTAMP,
-  updated_at: TIMESTAMP
-)
-
--- Add company_id to all tables for multi-tenancy
--- employees.company_id, users.company_id, departments.company_id, etc.
-```
-
-### 🎮 Squad Planner Schemas
-
-```sql
--- Attribute Definitions (Master list of all attributes)
-attribute_definitions (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL,           -- 'Coding', 'Leadership', 'Negotiation'
-  code: VARCHAR(50) NOT NULL UNIQUE,     -- 'coding', 'leadership', 'negotiation'
-  category: VARCHAR(20) NOT NULL,        -- 'core' or 'specialist'
-  zone: VARCHAR(20),                     -- 'attack', 'midfield', 'defense', 'support' (NULL for core)
-  icon: VARCHAR(50),                     -- emoji or icon name
-  description: TEXT,
-  is_active: BOOLEAN DEFAULT true,
-  display_order: INTEGER,
-  created_at: TIMESTAMP
-)
-
--- Role Templates (Pre-configured common roles)
-role_templates (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL,           -- 'Software Developer'
-  code: VARCHAR(50) NOT NULL UNIQUE,     -- 'software_developer'
-  zone: VARCHAR(20) NOT NULL,            -- 'midfield'
-  department_type: VARCHAR(50),          -- 'Engineering'
-  description: TEXT,
-  icon: VARCHAR(50),
-  color: VARCHAR(7),
-  attribute_config: JSONB NOT NULL,      -- Pre-configured attribute requirements
-  is_system: BOOLEAN DEFAULT false,      -- System templates can't be deleted
-  company_id: UUID,                      -- NULL for system templates
-  created_at: TIMESTAMP
-)
-
--- Role Attribute Requirements (Which attributes matter per position)
-role_attribute_requirements (
-  id: UUID PRIMARY KEY,
-  position_id: UUID REFERENCES positions(id),
-  attribute_id: UUID REFERENCES attribute_definitions(id),
-  importance: VARCHAR(20) NOT NULL,      -- 'critical', 'important', 'nice-to-have'
-  min_value: INTEGER CHECK (min_value BETWEEN 1 AND 20),
-  ideal_value: INTEGER CHECK (ideal_value BETWEEN 1 AND 20),
-  weight: DECIMAL(3,2) DEFAULT 1.00,     -- For fit score calculation
-  UNIQUE(position_id, attribute_id)
-)
-
--- Employee Attributes (FM-Style 1-20 ratings - Flexible JSONB)
-employee_attributes (
-  id: UUID PRIMARY KEY,
-  employee_id: UUID REFERENCES employees(id),
-  
-  -- Flexible attribute storage (allows any attributes)
-  core_attributes: JSONB NOT NULL,       -- {"leadership": 15, "teamwork": 12, "communication": 14, ...}
-  specialist_attributes: JSONB NOT NULL, -- {"coding": 18, "problem_solving": 16, ...}
-  
-  -- Calculated Ability Scores
-  current_ability: INTEGER CHECK (current_ability BETWEEN 1 AND 200),
-  potential_ability: INTEGER CHECK (potential_ability BETWEEN 1 AND 200),
-  
-  last_assessed_at: TIMESTAMP,
-  assessed_by: UUID REFERENCES users(id),
-  created_at: TIMESTAMP,
-  updated_at: TIMESTAMP
-)
-
--- Position Roles (Attack/Midfield/Defense mapping)
-position_roles (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(50) NOT NULL,            -- 'Striker', 'Midfielder', 'Defender'
-  zone: VARCHAR(20) NOT NULL,            -- 'attack', 'midfield', 'defense', 'support'
-  department_type: VARCHAR(50),          -- Maps to: 'Sales', 'Product', 'Operations'
-  template_id: UUID REFERENCES role_templates(id), -- Link to role template
-  color: VARCHAR(7),
-  pitch_position_x: INTEGER,             -- X coordinate (0-100)
-  pitch_position_y: INTEGER              -- Y coordinate (0-100)
-)
-
--- Formation Templates
-formations (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL,           -- '4-3-3', '4-4-2 Diamond'
-  layout_config: JSONB,
-  is_default: BOOLEAN DEFAULT false,
-  company_id: UUID,
-  created_at: TIMESTAMP
-)
-
--- Position Requirements (for Gap Analysis)
-position_requirements (
-  id: UUID PRIMARY KEY,
-  position_id: UUID REFERENCES positions(id),
-  min_headcount: INTEGER DEFAULT 1,
-  ideal_headcount: INTEGER DEFAULT 1,
-  critical_attributes: JSONB,            -- {"coding": 15, "leadership": 12}
-  created_at: TIMESTAMP
-)
-
--- Scouted Players (Lightweight ATS)
-scouted_players (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(200) NOT NULL,
-  email: VARCHAR(255),
-  linkedin_url: VARCHAR(500),
-  resume_url: VARCHAR(500),
-  photo_url: VARCHAR(500),
-  
-  target_position_id: UUID REFERENCES positions(id),
-  
-  -- Ability Ratings
-  current_ability: INTEGER CHECK (current_ability BETWEEN 1 AND 200),
-  potential_ability: INTEGER CHECK (potential_ability BETWEEN 1 AND 200),
-  attributes: JSONB,
-  
-  -- Pipeline  
-  status: VARCHAR(50) DEFAULT 'scouted', -- scouted, contacted, interviewing, offer, hired
-  source: VARCHAR(100),                  -- 'linkedin', 'referral'
-  scout_notes: TEXT,
-  scouted_by: UUID REFERENCES users(id),
-  created_at: TIMESTAMP
-)
-
--- Squad Templates (Define team structure)
-squad_templates (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL,           -- 'Scrum Team', 'Design Team'
-  description: TEXT,
-  icon: VARCHAR(50),
-  is_system: BOOLEAN DEFAULT false,      -- System templates can't be deleted
-  company_id: UUID,                      -- NULL for system templates
-  created_at: TIMESTAMP
-)
-
--- Squad Template Slots (Positions in a squad template)
-squad_template_slots (
-  id: UUID PRIMARY KEY,
-  template_id: UUID REFERENCES squad_templates(id),
-  position_id: UUID REFERENCES positions(id),
-  min_count: INTEGER DEFAULT 1,          -- Minimum players for this position
-  max_count: INTEGER DEFAULT 1,          -- Maximum players for this position
-  is_required: BOOLEAN DEFAULT true,     -- Required or optional slot
-  display_order: INTEGER                 -- Order in formation view
-)
-
--- Squads (Actual teams)
-squads (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL,           -- 'Alpha Team', 'Phoenix Squad'
-  template_id: UUID REFERENCES squad_templates(id),
-  company_id: UUID REFERENCES companies(id),
-  status: VARCHAR(20) DEFAULT 'active',  -- 'active', 'archived'
-  created_at: TIMESTAMP,
-  updated_at: TIMESTAMP
-)
-
--- Squad Members (Player assignments to squads)
-squad_members (
-  id: UUID PRIMARY KEY,
-  squad_id: UUID REFERENCES squads(id),
-  employee_id: UUID REFERENCES employees(id),
-  position_id: UUID REFERENCES positions(id),
-  assigned_at: TIMESTAMP,
-  assigned_by: UUID REFERENCES users(id),
-  UNIQUE(squad_id, employee_id)          -- Each player in one position per squad
-)
-```
-
-### Pre-seeded Attributes (Software House Focus)
-
-> 🏢 **Target Industry:** Software House / Digital Agency
-
-**Core Attributes (5)** - Apply to ALL roles:
-| Attribute | Code | Description |
-|-----------|------|-------------|
-| Leadership | `leadership` | Leading teams and projects |
-| Teamwork | `teamwork` | Agile collaboration |
-| Communication | `communication` | With team and clients |
-| Adaptability | `adaptability` | Tech changes fast |
-| Determination | `determination` | Meeting deadlines |
-
-**Specialist Attributes (15)** - Role-specific:
-| Category | Attributes | Description |
-|----------|------------|-------------|
-| **Engineering** | `coding` | Programming and development skills |
-| | `system_design` | Architecture and scalability thinking |
-| | `problem_solving` | Debugging and finding solutions |
-| | `code_quality` | Clean, maintainable, tested code |
-| | `technical_learning` | Staying current with new tech |
-| **Design** | `visual_design` | Aesthetics and UI skills |
-| | `ux_thinking` | User-centered design approach |
-| | `prototyping` | Wireframes and mockups |
-| **Business** | `client_relations` | Managing client expectations |
-| | `negotiation` | Contract and rate negotiation |
-| | `presentation` | Pitching and demos |
-| | `upselling` | Expanding existing accounts |
-| **Operations** | `process_management` | Workflows and SOPs |
-| | `documentation` | Record keeping and specs |
-| | `talent_acquisition` | Recruiting tech talent |
-
-### Pre-seeded Role Templates (10 - Software House)
-
-| # | Role | Zone | Department | Key Attributes (min/ideal) |
-|---|------|------|------------|---------------------------|
-| 1 | **Frontend Developer** | Midfield | Engineering | Coding 14/17, Visual Design 11/14, Problem Solving 13/16 |
-| 2 | **Backend Developer** | Midfield | Engineering | Coding 15/18, System Design 13/16, Problem Solving 14/17 |
-| 3 | **Full-stack Developer** | Midfield | Engineering | Coding 14/17, System Design 12/15, Technical Learning 13/16 |
-| 4 | **UX/UI Designer** | Midfield | Design | UX Thinking 15/18, Visual Design 14/17, Prototyping 13/16 |
-| 5 | **Product Manager** | Midfield | Product | Communication 15/17, Problem Solving 13/16, Leadership 12/15 |
-| 6 | **QA Engineer** | Midfield | Engineering | Code Quality 14/17, Problem Solving 13/16, Documentation 12/15 |
-| 7 | **DevOps Engineer** | Midfield | Engineering | System Design 14/17, Technical Learning 13/16, Process Management 12/15 |
-| 8 | **Tech Lead** | Midfield | Engineering | Leadership 14/17, Coding 13/16, Communication 13/16 |
-| 9 | **Account Manager** | Attack | Sales | Client Relations 15/18, Communication 14/16, Upselling 12/15 |
-| 10 | **HR / Recruiter** | Support | HR | Talent Acquisition 14/17, Communication 14/16, Process Management 11/14 |
-
-### Pre-seeded Squad Templates (4 - Software House)
-
-> 🏈 **Squad = Cross-functional team** (like a football squad with specific positions)
-
-| # | Squad Template | Positions | Min-Max | Description |
-|---|---------------|-----------|---------|-------------|
-| 1 | **Scrum Team** | Product Manager | 1 | Classic agile team |
-| | | UX/UI Designer | 1-2 | |
-| | | Developer (any) | 2-5 | |
-| | | QA Engineer | 1 | |
-| 2 | **Full-stack Team** | Tech Lead | 1 | Small delivery team |
-| | | Full-stack Developer | 2-4 | |
-| | | QA Engineer | 0-1 | Optional |
-| 3 | **Design Team** | Product Manager | 1 | Design-focused team |
-| | | UX/UI Designer | 2-4 | |
-| | | Frontend Developer | 1-2 | For prototypes |
-| 4 | **DevOps Team** | DevOps Engineer | 2-4 | Infrastructure team |
-| | | Backend Developer | 1-2 | |
-| | | QA Engineer | 0-1 | Optional |
-
-### Core System Schemas
-
-```sql
--- Roles (Dynamic, Admin-configurable)
-roles (
-  id: UUID PRIMARY KEY,
-  name: VARCHAR(100) NOT NULL UNIQUE,
-  level: INTEGER NOT NULL,  -- 0=highest (Super Admin), 99=lowest
-  description: TEXT,
-  is_system_role: BOOLEAN DEFAULT false,
-  is_active: BOOLEAN DEFAULT true,
-  created_at: TIMESTAMP
-)
-
--- Permissions (Granular actions)
-permissions (
-  id: UUID PRIMARY KEY,
-  resource: VARCHAR(50) NOT NULL,  -- 'employee', 'leave', 'announcement'
-  action: VARCHAR(50) NOT NULL,    -- 'create', 'read', 'update', 'delete', 'approve'
-  description: TEXT,
-  UNIQUE(resource, action)
-)
-
--- Role-Permission Mapping
-role_permissions (
-  id: UUID PRIMARY KEY,
-  role_id: UUID REFERENCES roles(id),
-  permission_id: UUID REFERENCES permissions(id),
-  UNIQUE(role_id, permission_id)
-)
-
--- User-Role Assignment (can have multiple roles)
-user_roles (
-  id: UUID PRIMARY KEY,
-  user_id: UUID REFERENCES users(id),
-  role_id: UUID REFERENCES roles(id),
-  assigned_at: TIMESTAMP,
-  assigned_by: UUID REFERENCES users(id),
-  UNIQUE(user_id, role_id)
-)
-
--- Employee Hierarchy (Reporting Structure)
-employee_hierarchy (
-  id: UUID PRIMARY KEY,
-  employee_id: UUID REFERENCES employees(id) UNIQUE,
-  reports_to_id: UUID REFERENCES employees(id),
-  effective_date: DATE NOT NULL,
-  created_at: TIMESTAMP
-)
-```
-
-## Pre-seeded System Roles
-
-| Role | Level | Permissions | Use Case |
-|------|-------|-------------|----------|
-| Super Admin | 0 | All permissions | System owner, IT |
-| HR Admin | 1 | All HR operations | HR department head |
-| HR Staff | 2 | Employee management, leave management | HR team members |
-| Department Head | 3 | View department, approve leaves | Directors, Heads |
-| Manager | 4 | View team, approve team leaves | Team managers |
-| Team Lead | 5 | View team members | Project leads |
-| Employee | 10 | Self-service only | All employees |
-
-## Pre-seeded Permissions
-
-| Resource | Actions |
-|----------|---------|
-| `employee` | create, read, read_all, update, update_all, delete, import |
-| `department` | create, read, update, delete |
-| `position` | create, read, update, delete |
-| `leave_type` | create, read, update, delete |
-| `leave_request` | create, read, read_all, approve, reject, cancel |
-| `leave_balance` | read, read_all, adjust |
-| `announcement` | create, read, update, delete, publish |
-| `report` | generate, export |
-| `role` | create, read, update, delete, assign |
-| `settings` | read, update |
-
-## Hierarchy-Aware Features
-
-### Leave Approval Flow
-```
-Employee submits leave
-    ↓
-System finds reports_to (Manager)
-    ↓
-Manager receives approval request
-    ↓
-If Manager unavailable → escalate to Manager's reports_to
-    ↓
-Approved/Rejected → notify Employee
-```
-
-### Data Visibility Rules
-- **Employee:** See only own data
-- **Manager:** See direct reports' data
-- **Department Head:** See department data
-- **HR Staff:** See all employee data
-- **Super Admin:** See everything including audit logs
-
----
-
 # PHASE 0 - CRITICAL (Revised)
 
 > **Total: 51 man-days (62 with buffer)**
@@ -651,14 +274,24 @@ Approved/Rejected → notify Employee
 
 **Subtotal: 1.5 days**
 
-### US-0.4.3: Employee Detail & Update
+### US-0.4.3: Employee Detail & Update (Update Attributes Wizard)
 | ID | Task | Est. |
 |----|------|------|
-| TASK-0.4.3.1 | Employee detail page | 0.5d |
-| TASK-0.4.3.2 | Edit employee form | 0.25d |
+| TASK-0.4.3.1 | Employee detail page with spider chart | 0.5d |
+| TASK-0.4.3.2 | Update Attributes 3-step wizard (trigger, adjust, preview) | 0.5d |
 | TASK-0.4.3.3 | Update API with audit logging | 0.25d |
 
-**Subtotal: 1 day**
+**Subtotal: 1.25 days**
+
+### US-0.4.3b: Change Position/Department (Transfer Wizard)
+| ID | Task | Est. |
+|----|------|------|
+| TASK-0.4.3b.1 | 4-step position change wizard UI | 0.5d |
+| TASK-0.4.3b.2 | Fit score comparison (current vs new role) | 0.25d |
+| TASK-0.4.3b.3 | Gap analysis & development recommendations | 0.25d |
+| TASK-0.4.3b.4 | Position change API with history | 0.25d |
+
+**Subtotal: 1.25 days**
 
 ### US-0.4.4: Employment Status Management
 | ID | Task | Est. |
@@ -752,8 +385,9 @@ Approved/Rejected → notify Employee
 | TASK-0.5.3.4 | Importance levels (Critical/Important/Nice-to-have) | 0.25d |
 | TASK-0.5.3.5 | Role card preview with configured attributes | 0.5d |
 | TASK-0.5.3.6 | Attribute definitions API | 0.25d |
+| TASK-0.5.3.7 | 🗑️ Delete attribute with confirmation modal | 0.25d |
 
-**Subtotal: 2 days**
+**Subtotal: 2.25 days**
 
 ### US-0.5.4: 📋 Role Templates Library (NEW)
 | ID | Task | Est. |
@@ -778,8 +412,9 @@ Approved/Rejected → notify Employee
 | TASK-0.5.5.7 | Export formation as image | 0.25d |
 | TASK-0.5.5.8 | Mobile-responsive pitch view | 0.5d |
 | TASK-0.5.5.9 | Formation data API | 0.5d |
+| TASK-0.5.5.10 | 🗑️ Delete position from formation | 0.25d |
 
-**Subtotal: 5.75 days**
+**Subtotal: 6 days**
 
 ### US-0.5.6: 🎮 Squad Builder (Enhanced)
 | ID | Task | Est. |
@@ -793,8 +428,10 @@ Approved/Rejected → notify Employee
 | TASK-0.5.6.7 | Best-fit player suggestions | 0.25d |
 | TASK-0.5.6.8 | Squad health overview (filled vs empty slots) | 0.25d |
 | TASK-0.5.6.9 | Squad CRUD APIs | 0.25d |
+| TASK-0.5.6.10 | 🗑️ Delete squad with confirmation modal | 0.25d |
+| TASK-0.5.6.11 | 🗑️ Remove player from squad slot | 0.25d |
 
-**Subtotal: 3 days**
+**Subtotal: 3.5 days**
 
 ---
 

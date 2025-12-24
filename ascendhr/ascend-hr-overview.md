@@ -1,5 +1,10 @@
 # FEATURE PRIORITY
 
+> [!IMPORTANT]
+> **⚠️ POST-MVP FEATURES**  
+> This document contains the extended HRIS feature roadmap (Leave Management, Announcements, etc.) which is **deferred to post-MVP**.  
+> The current MVP focuses on the **Squad Planner** concept. See `ascend-hr-mvp.md` for the active plan.
+
 ────────────────────────────────────────────
 
 ## PRODUCT VISION

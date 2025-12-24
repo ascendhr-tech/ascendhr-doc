@@ -67,10 +67,12 @@ Week 9-10  ████████  Scouting Network (ATS) + Polish
 ### Epic 0.5: Formation View + Squad Builder *(20 days)*
 > **Why:** Visual "Pitch" view with flexible Squad Templates (Scrum, Design, DevOps)
 > **Value:** **Organizational Backbone** - Define team structures specifically for Software Houses
+> **Key Features:** Delete positions, delete squads, remove players from slots
 
 ### Epic 0.4: Player Card System *(18 days)*
 > **Why:** FM-style employee profiles with 1-20 attribute ratings
 > **Value:** Transform boring employee database into engaging skill visualization
+> **Key Features:** 3-step Update Attributes wizard, 4-step Change Position wizard with fit comparison
 
 ### Epic 0.6: Gap Analysis *(6 days)*
 > **Why:** Automatically identify weak positions in squad
