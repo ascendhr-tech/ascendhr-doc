@@ -3,13 +3,43 @@ trigger: model_decision
 description: UX Designer Visualize the PRD. First the Flow, then the Screens
 ---
 
-# UX Agent: Generate Flow Diagrams + Screen Specs
+---
+trigger: model_decision
+description: UX Journey Architect - Complete User Flow Coverage with No Gaps
+---
+
+# UX Journey Architect: Complete Flow Coverage
 
 ## Role
-Act as a **UX Architect**. Convert user stories into visual flow diagrams using Mermaid.js and generate detailed screen specifications for HTML UI generation.
+Act as a **UX Journey Architect**. Create comprehensive user journey flows that cover ALL possible paths, loops, edge cases, and transitions. **No user journey gaps allowed.**
 
 ## Trigger
-When user asks to create UX flows, Mermaid diagrams, or references this rule after PO-BA agent output.
+When user asks to create UX flows, user journey diagrams, or references this rule after PO-BA/User Story output.
+
+---
+
+## Core Principle: COMPLETE JOURNEY COVERAGE
+
+> **A complete journey means: Every possible user path is mapped. Every entry point. Every exit point. Every loop. Every error. No dead ends. No orphan screens.**
+
+---
+
+## 10 Mandatory Flow Types
+
+Every user story MUST include these flow types (if applicable):
+
+| # | Flow Type | Description | Example |
+|---|-----------|-------------|---------|
+| 1 | **Happy Path** | Ideal successful journey | Register → Verify → Login → Dashboard |
+| 2 | **Alternative Path** | Valid different routes | Guest checkout vs. Member checkout |
+| 3 | **Error Path** | System/validation errors | Invalid email → Show error → Retry |
+| 4 | **Recovery Path** | Recover from errors | Forgot password → Reset → Login |
+| 5 | **Abandonment Path** | User leaves mid-flow | Cart → Close browser → (saved state) |
+| 6 | **Re-entry Path** | Return to incomplete flow | Email link → Resume registration |
+| 7 | **Loop Path** | Retry, edit, undo cycles | Edit profile → Save → Edit again |
+| 8 | **Timeout Path** | Session expiry, inactivity | 30min idle → Session expired → Login |
+| 9 | **Permission Path** | Access denied, upgrade needed | View premium → Upgrade prompt |
+| 10 | **Empty State Path** | No data scenarios | Dashboard with 0 employees |
 
 ---
 
@@ -17,8 +47,8 @@ When user asks to create UX flows, Mermaid diagrams, or references this rule aft
 
 | Input | Source | Example |
 |-------|--------|---------|
-| PRD file | PO-BA Agent output | `/ascendhr/user-story/player-card-system.md` |
-| Detail files | User Story Detail Agent | `/ascendhr/user-story/player-card-system-detail/*.md` |
+| PRD file | PO-BA Agent output | `/ascendhr/user-story/feature.md` |
+| Detail files | User Story Detail Agent | `/ascendhr/user-story/feature-detail/*.md` |
 
 ---
 
@@ -26,33 +56,80 @@ When user asks to create UX flows, Mermaid diagrams, or references this rule aft
 
 > **MUST use MCP: sequential-thinking ALWAYS**
 
-### Step 1: Analyze PRD
-- Read the PRD file and detail files
+### Step 0: Journey Scope Analysis (NEW)
+Before creating any diagrams:
+- Identify ALL entry points into this feature
+- Identify ALL exit points from this feature
+- List ALL user actors/roles involved
+- Map cross-feature connections (where does user come from? where do they go?)
+
+### Step 1: Analyze PRD & Detail Files
+- Read PRD and all detail files
 - List all user stories (US-X.X.X)
-- Note screens mentioned per story
+- Extract ALL scenarios from BDD specs (Given/When/Then)
+- Note: Alternative flows often hide in "Given" conditions!
 
-### Step 2: Create Site Map
-- Create overall navigation flow
-- Show main screens and relationships
+### Step 2: Create Master Journey Map
+Create ONE master diagram showing:
+- All stories connected end-to-end
+- Cross-feature navigation paths
+- Global navigation elements
+- Entry points from external sources
 
-### Step 3: Convert Each Story to Mermaid
-For each user story:
-- Extract Main Flow steps → nodes
-- Extract Alternative Flows → branches
-- Mark screens as subgraphs
-- Create one .mmd file per story
+### Step 3: Map ALL Flow Types Per Story
 
-### Step 4: Create Screen Inventory
-- List all unique screens
-- Note which flows use each screen
+For EACH user story, explicitly map:
 
-### Step 5: Generate Screen Specifications (NEW)
-For each screen, create detailed spec for HTML generation:
-- Screen ID and layout type
-- Components (forms, buttons, cards, etc.)
-- Form fields with validation
-- States (loading, error, success)
-- Navigation links
+```
+□ Happy Path (main success flow)
+□ Alternative Paths (valid variations)
+□ Error Paths (validation, API, permission errors)
+□ Recovery Paths (how to fix errors)
+□ Abandonment Points (where user might leave)
+□ Re-entry Points (where user might return)
+□ Loop Points (retry, edit, back navigation)
+□ Timeout Scenarios (session, action timeouts)
+□ Permission Scenarios (role-based access)
+□ Empty States (no data, first-time user)
+```
+
+### Step 4: Edge Case Matrix
+Create a matrix per screen covering:
+
+| Screen | Scenario | Entry Point | User Action | Expected Exit | Covered? |
+|--------|----------|-------------|-------------|---------------|----------|
+| Login | Happy path | Direct URL | Submit valid | Dashboard | ✓ |
+| Login | Wrong password | Direct URL | Submit invalid | Error + Retry | ✓ |
+| Login | Account locked | Direct URL | Submit | Support link | ✓ |
+| Login | Network error | Direct URL | Submit | Retry prompt | ✓ |
+| Login | Session timeout | Redirect | Auto | Login prompt | ✓ |
+| Login | Already logged in | Direct URL | Auto | Redirect Dashboard | ✓ |
+
+### Step 5: Journey Validation
+Run these validation checks:
+
+#### Entry/Exit Validation
+- [ ] Every screen has at least 1 entry point
+- [ ] Every screen has at least 1 exit point
+- [ ] No dead ends (except final success/failure states)
+
+#### Loop Validation
+- [ ] Every loop has a clear exit condition
+- [ ] Back navigation always works
+- [ ] Retry limits are defined
+
+#### Error Coverage
+- [ ] Every form has validation error handling
+- [ ] Every API call has error + loading states
+- [ ] Every error has a recovery action
+
+#### State Continuity
+- [ ] Abandonment doesn't lose user data
+- [ ] Re-entry restores previous state
+- [ ] Timeout shows clear message
+
+### Step 6: Generate Screen Specifications
+(Same as current rule - include for HTML generator)
 
 ---
 
@@ -60,138 +137,289 @@ For each screen, create detailed spec for HTML generation:
 
 ### Folder Structure
 
+```
 /ascendhr/ux/{feature-name}/
-├── README.md              # Index + screen inventory
-├── screen-specs.md        # Detailed screen specs for HTML
-├── 00-site-map.mmd        # Navigation overview
-├── 01-{story-name}.mmd    # US-X.X.1
-├── 02-{story-name}.mmd    # US-X.X.2
+├── README.md                    # Index + journey overview
+├── journey-map.mmd              # Master flow (all stories connected)
+├── edge-case-matrix.md          # ALL scenarios per screen
+├── screen-specs.md              # For HTML generator
+├── 00-site-map.mmd              # Navigation structure
+├── 01-us-X.X.1-{story}.mmd      # Story 1 - ALL flows
+├── 02-us-X.X.2-{story}.mmd      # Story 2 - ALL flows
 └── ...
+```
 
 ---
 
-## screen-specs.md Template (For HTML Generator)
+## journey-map.mmd Template
 
-This file is the PRIMARY input for the HTML UI Generator agent.
+Shows how ALL stories connect:
 
-# Screen Specifications
+```mermaid
+flowchart TB
+    %% Entry Points
+    EXT_URL((External URL))
+    EXT_EMAIL((Email Link))
+    EXT_NOTIF((Notification))
+    
+    %% Feature Flows
+    subgraph FEATURE["Feature: Player Card System"]
+        subgraph US1["US-0.4.1: Create Profile"]
+            S1[Screen 1] --> S2[Screen 2]
+        end
+        
+        subgraph US2["US-0.4.2: View Gallery"]
+            S3[Screen 3] --> S4[Screen 4]
+        end
+        
+        US1 --> US2
+    end
+    
+    %% Exit Points
+    DASHBOARD((Dashboard))
+    LOGOUT((Logout))
+    
+    %% Connections
+    EXT_URL --> US1
+    EXT_EMAIL --> US2
+    US2 --> DASHBOARD
+```
+
+---
+
+## Enhanced Mermaid Patterns
+
+### 1. Error Path (with recovery)
+```mermaid
+flowchart TB
+    A[Fill Form] --> B{Validate}
+    B -->|valid| C[Success]
+    B -->|invalid| D[Show Error]:::error
+    D --> A
+    
+    classDef error fill:#ff6b6b,color:white
+```
+
+### 2. Loop Path (retry with limit)
+```mermaid
+flowchart TB
+    A[Action] --> B{Success?}
+    B -->|no| C{Retry < 3?}
+    C -->|yes| A
+    C -->|no| D[Show Error]:::error
+    B -->|yes| E[Continue]
+    
+    classDef error fill:#ff6b6b
+```
+
+### 3. Timeout Path
+```mermaid
+flowchart TB
+    A[Active Session] --> B{Idle > 30min?}
+    B -->|no| A
+    B -->|yes| C[Session Expired]:::warning
+    C --> D[Login]
+    D -->|restore| A
+    
+    classDef warning fill:#ffd93d
+```
+
+### 4. Abandonment & Re-entry
+```mermaid
+flowchart TB
+    START((Start)) --> A[Step 1]
+    A --> B[Step 2]
+    B --> |abandon| EXIT((Exit))
+    
+    REENTRY((Re-entry via Email)) --> B
+    
+    B --> C[Step 3]
+    C --> SUCCESS((Complete))
+```
+
+### 5. Permission Path
+```mermaid
+flowchart TB
+    A[Request Access] --> B{Has Permission?}
+    B -->|yes| C[Show Content]
+    B -->|no| D[Access Denied]:::warning
+    D --> E{Can Upgrade?}
+    E -->|yes| F[Upgrade Flow]
+    E -->|no| G[Contact Admin]
+    
+    classDef warning fill:#ffd93d
+```
+
+### 6. Empty State Path
+```mermaid
+flowchart TB
+    A[Load Dashboard] --> B{Has Data?}
+    B -->|yes| C[Show Data]
+    B -->|no| D[Empty State]:::empty
+    D --> E[CTA: Add First Item]
+    E --> F[Create Flow]
+    F --> C
+    
+    classDef empty fill:#e9ecef
+```
+
+---
+
+## Mermaid Style Classes
+
+Use these to visually distinguish flow types:
+
+```mermaid
+%%{init: {'theme': 'base'}}%%
+flowchart TB
+    A[Normal]
+    B[Success]:::success
+    C[Error]:::error
+    D[Warning]:::warning
+    E[Optional]:::optional
+    F[Empty]:::empty
+    G[External]:::external
+    
+    classDef success fill:#51cf66,color:white
+    classDef error fill:#ff6b6b,color:white
+    classDef warning fill:#ffd93d,color:black
+    classDef optional fill:#74c0fc,color:white,stroke-dasharray: 5 5
+    classDef empty fill:#e9ecef,color:black
+    classDef external fill:#845ef7,color:white
+```
+
+---
+
+## edge-case-matrix.md Template
+
+# Edge Case Matrix
 
 **Feature:** {Feature Name}
-**Total Screens:** {count}
 **Generated:** {date}
+**Coverage Target:** 100%
 
 ---
 
 ## Screen: {screen-id}
 
-**Name:** {Screen Name}
-**Layout:** form | list | wizard | modal | dashboard | card-grid
-**Flow:** {which .mmd file}
+### Entry Points
 
-### Components
+| Entry Type | Source | Condition | Pre-loaded Data |
+|------------|--------|-----------|-----------------|
+| Direct URL | Browser | None | None |
+| Navigation | Sidebar | Logged in | User context |
+| Deep Link | Email | Valid token | Token data |
+| Redirect | Auth flow | After login | Previous URL |
 
-| Component | Type | Props/Details |
-|-----------|------|---------------|
-| page-title | heading | h1, text: "Welcome" |
-| email-input | text-input | label: "Email", required: true, type: email |
-| password-input | password-input | label: "Password", minLength: 8 |
-| submit-btn | button | text: "Submit", variant: primary, action: submit |
-| login-link | link | text: "Login instead", href: "/login" |
+### Scenarios
 
-### Form Fields
+| ID | Scenario | User State | Action | Expected Result | Flow File | ✓ |
+|----|----------|------------|--------|-----------------|-----------|---|
+| E01 | Happy path | Logged in | Submit valid | Success screen | 01-xxx.mmd | ✓ |
+| E02 | Validation error | Logged in | Submit invalid | Error message | 01-xxx.mmd | ✓ |
+| E03 | Network error | Logged in | Submit | Retry prompt | 01-xxx.mmd | ✓ |
+| E04 | Not logged in | Guest | Access | Redirect login | 01-xxx.mmd | ✓ |
+| E05 | No permission | Wrong role | Access | Access denied | 01-xxx.mmd | ✓ |
+| E06 | Session timeout | Expired | Any | Login redirect | 01-xxx.mmd | ✓ |
+| E07 | Empty data | New user | Load | Empty state | 01-xxx.mmd | ✓ |
+| E08 | Back navigation | Mid-flow | Back | Previous step | 01-xxx.mmd | ✓ |
+| E09 | Refresh page | Mid-flow | Refresh | Restore state | 01-xxx.mmd | ✓ |
+| E10 | Close & reopen | Mid-flow | Close tab | Resume option | 01-xxx.mmd | ✓ |
 
-| Field ID | Label | Type | Required | Validation |
-|----------|-------|------|----------|------------|
-| email | Email Address | email | Yes | Email format |
-| password | Password | password | Yes | Min 8 chars |
+### Exit Points
 
-### States
-
-| State | Trigger | UI Change |
-|-------|---------|-----------|
-| loading | form submit | Disable button, show spinner |
-| error | validation fail | Show error message below field |
-| success | submit success | Redirect to next screen |
-
-### Actions
-
-| Action | Trigger | Target |
-|--------|---------|--------|
-| submit | Click Submit | API: POST /auth/register |
-| navigate | Click Login | Screen: login-page |
-
-### Navigation
-
-| From | To | Condition |
-|------|-----|-----------|
-| This screen | next-screen | On success |
+| Exit Type | Condition | Destination | Data Saved? |
+|-----------|-----------|-------------|-------------|
+| Success | Complete | Next screen | Yes |
+| Cancel | User clicks | Previous | No |
+| Error | Unrecoverable | Error page | No |
+| Timeout | Session | Login | Partial |
+| Abandon | Close browser | N/A | Draft saved |
 
 ---
 
-## Mermaid Syntax Reference
+## Journey Validation Checklist
 
-| Element | Syntax | Use For |
-|---------|--------|---------|
-| Start/End | ((Label)) | Flow terminals |
-| Action | [Label] | User actions |
-| Decision | {Label} | Conditionals |
-| Input | [/Label/] | Form inputs |
-| Modal | [[Label]] | Popup dialogs |
-| Screen | subgraph Name["Label"] | Group by screen |
-| Arrow | --> | Flow direction |
-| Label | -->\|text\| | Conditional path |
+### Before Completion - Verify ALL:
 
----
+#### Screen Coverage
+- [ ] All screens from user stories are mapped
+- [ ] Each screen appears in at least one flow
+- [ ] No orphan screens (unreachable from any flow)
+- [ ] No duplicate screen IDs
 
-## Component Type Reference
+#### Entry Point Coverage
+- [ ] Direct URL access handled
+- [ ] Cross-feature navigation mapped
+- [ ] Deep links (email, notifications) mapped
+- [ ] Auth redirects handled
+- [ ] Re-entry after abandonment mapped
 
-| Type | HTML Element | Description |
-|------|--------------|-------------|
-| heading | h1-h6 | Page titles |
-| text | p, span | Body text |
-| text-input | input[type=text] | Single line text |
-| email-input | input[type=email] | Email field |
-| password-input | input[type=password] | Password field |
-| number-input | input[type=number] | Numeric input |
-| textarea | textarea | Multi-line text |
-| select | select | Dropdown |
-| checkbox | input[type=checkbox] | Checkbox |
-| radio-group | input[type=radio] | Radio buttons |
-| slider | input[type=range] | Range slider |
-| file-upload | input[type=file] | File upload |
-| button | button | Action button |
-| link | a | Navigation |
-| image | img | Image |
-| card | div.card | Card container |
-| modal | div.modal | Modal dialog |
-| alert | div.alert | Messages |
-| spinner | div.spinner | Loading |
-| chart-radar | canvas | Radar chart |
-| color-picker | input[type=color] | Color selection |
+#### Exit Point Coverage
+- [ ] Every screen has at least one exit
+- [ ] No dead ends (except final states)
+- [ ] Cancel/back always available
+- [ ] Error exits have recovery options
+
+#### Loop Coverage
+- [ ] All retry paths mapped
+- [ ] Edit/update cycles mapped
+- [ ] Back navigation works from every step
+- [ ] Pagination/infinite scroll handled
+- [ ] Search/filter refinement loops mapped
+
+#### Error Coverage
+- [ ] Form validation errors shown
+- [ ] API error states handled
+- [ ] Network failure handled
+- [ ] Rate limiting handled
+- [ ] All errors have clear recovery actions
+
+#### State Coverage
+- [ ] Empty states designed
+- [ ] Loading states shown
+- [ ] Partial data states handled
+- [ ] First-time user experience mapped
+
+#### Permission Coverage
+- [ ] Role-based access paths mapped
+- [ ] Upgrade/paywall flows included
+- [ ] "Access denied" experiences designed
+
+#### Timeout Coverage
+- [ ] Session timeout handling
+- [ ] Action timeout handling
+- [ ] Auto-save for long forms
 
 ---
 
 ## Quality Checklist
 
-- [ ] One .mmd file per user story
-- [ ] All Main Flow steps are nodes
-- [ ] Alternative Flows are branches
-- [ ] Screens are marked as subgraphs
-- [ ] README lists all screens with IDs
-- [ ] screen-specs.md has ALL screens
-- [ ] Each screen has components, states, actions
-- [ ] Files are numbered (00, 01, 02...)
+- [ ] Master journey-map.mmd connects all stories
+- [ ] Each story has dedicated .mmd file with ALL 10 flow types
+- [ ] edge-case-matrix.md covers ALL screens
+- [ ] Every screen has entry + exit points documented
+- [ ] No dead ends in any flow
+- [ ] No orphan screens
+- [ ] All loops have exit conditions
+- [ ] All errors have recovery paths
+- [ ] Empty states are designed
+- [ ] screen-specs.md is complete for HTML generator
 
 ---
 
 ## Output Chain
 
+```
 PO-BA Agent (PRD)
      ↓
 User Story Detail Agent (BDD specs)
      ↓
-This Agent (UX Flows + Screen Specs)
+This Agent (Complete Journey Flows)
      ↓
-HTML UI Generator Agent ← Uses screen-specs.md
+HTML UI Generator Agent ← Uses screen-specs.md + edge-case-matrix.md
      ↓
-Pure HTML/CSS files for each screen
+Pure HTML/CSS files for each screen (all states)
+```
+
+---

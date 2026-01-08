@@ -1,871 +1,489 @@
-# AscendHR - DynamoDB Architecture
+# AscendHR Product Architecture & Infrastructure
 
-> Alternative to PostgreSQL using DynamoDB (NoSQL)
-
----
-
-## Why DynamoDB for Lambda?
-
-| Feature | DynamoDB | PostgreSQL |
-|---------|----------|------------|
-| Cold start | ✅ Instant connection | ⚠️ Needs connection pool |
-| Scaling | ✅ Auto-scale | ⚠️ Manual scaling |
-| Cost | ✅ Pay per request | 💰 Always running |
-| Schema | ⚠️ Flexible (careful!) | ✅ Strict |
-| Queries | ⚠️ Limited patterns | ✅ Flexible SQL |
-| AWS Native | ✅ Best integration | ⚠️ Need RDS/Neon |
-
-**Best for:** Simple queries, high scale, serverless-first
+**Document Version:** 1.0  
+**Last Updated:** January 7, 2026  
+**Prepared For:** Executive Leadership (CEO, CTO)  
+**Status:** Production
 
 ---
 
-## Updated Architecture
+## Executive Summary
+
+AscendHR is a modern, cloud-native HR Management System built on a serverless architecture using AWS services. The platform provides comprehensive employee management, performance tracking, leave management, and organizational structure visualization capabilities.
+
+**Key Highlights:**
+- **100% Serverless Architecture** - Zero server management overhead
+- **Cost-Effective** - Estimated $2-3/month for 100 daily active users
+- **Highly Scalable** - Auto-scales from 1 to 10,000+ users without infrastructure changes
+- **Modern Tech Stack** - React 19, TypeScript, AWS Lambda, DynamoDB
+- **Region:** Asia Pacific (Singapore) - ap-southeast-1
+- **Deployment:** Fully automated CI/CD via Bitbucket Pipelines
+
+
+## Technology Stack
+
+### Frontend Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **React** | 18.3.1 | UI framework with modern hooks |
+| **TypeScript** | 5.8.3 | Type-safe development |
+| **Vite** | 5.4.19 | Fast build tool and dev server |
+| **TailwindCSS** | 3.4.17 | Utility-first CSS framework |
+| **Radix UI** | Latest | Accessible component primitives (shadcn/ui) |
+| **React Router** | 6.30.1 | Client-side routing |
+| **TanStack Query** | 5.83.0 | Server state management & caching |
+| **React Hook Form** | 7.61.1 | Form handling |
+| **Zod** | 3.25.76 | Schema validation |
+| **Recharts** | 2.15.4 | Data visualization |
+| **Lucide React** | 0.462.0 | Icon library |
+
+### Backend Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Node.js (HONO)** | 20.x | Runtime environment |
+| **SST (Serverless Stack)** | 3.5.0 | Infrastructure as Code framework |
+| **AWS Lambda** | Node.js 20.x | Serverless compute |
+| **Dynamoose** | 4.0.1 | DynamoDB ORM |
+| **AWS SDK v3** | 3.600.0+ | AWS service integration |
+
+### Development Tools
+
+| Tool | Purpose |
+|------|---------|
+| **pnpm** | Package manager with workspaces |
+| **Turbo** | Monorepo build orchestration |
+| **Bitbucket Pipelines** | CI/CD automation |
+
+---
+
+## Infrastructure Architecture
+
+### Architecture Diagram (Logical View)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         FRONTEND                                │
-│                     Vite + React App                            │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      API GATEWAY                                │
-└───┬─────────┬─────────┬─────────┬─────────┬─────────┬──────────┘
-    │         │         │         │         │         │
-    ▼         ▼         ▼         ▼         ▼         ▼
-┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐
-│ Auth  │ │Employee│ │  Org  │ │ Leave │ │Announce│ │Report │
-│Lambda │ │Lambda  │ │Lambda │ │Lambda │ │Lambda  │ │Lambda │
-└───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘
-    │         │         │         │         │         │
-    └─────────┴─────────┴────┬────┴─────────┴─────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    DynamoDB     │
-                    │  (Single Table) │
-                    └─────────────────┘
+│                         CLIENT LAYER                             │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │   Web Browser (React SPA)                                   │ │
+│  └────────────────────────────────────────────────────────────┘ │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ HTTPS
+┌───────────────────────────▼─────────────────────────────────────┐
+│                    AWS AMPLIFY HOSTING                           │
+│  • CloudFront CDN Distribution (Global)                          │
+│  • Static Asset Hosting (SPA)                                    │
+│  • SSL/TLS Certificates                                          │
+│  • CI/CD Build Pipeline                                          │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ API Calls
+┌───────────────────────────▼─────────────────────────────────────┐
+│                  AWS API GATEWAY (HTTP API)                       │
+│  • RESTful HTTP endpoints                                        │
+│  • Request routing & throttling                                  │
+│  • CORS configuration                                            │
+│  • Request/Response transformation                               │
+└───┬─────────────┬─────────────┬─────────────┬──────────────────┘
+    │             │             │             │
+    ▼             ▼             ▼             ▼
+┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+│ Lambda  │  │ Lambda  │  │ Lambda  │  │ Lambda  │  ... (6 total)
+│  Auth   │  │Employee │  │  Leave  │  │  Org    │
+└────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘
+     │            │             │             │
+     └────────────┴─────────────┴─────────────┘
+                  │
+     ┌────────────┴────────────┬
+     │                         │                
+     ▼                         ▼                
+┌─────────────────┐  ┌──────────────────┐  
+│   DYNAMODB      │  │  AWS S3 BUCKET   │  │   │
+│  (9 Tables)     │  │  (File Storage)  │  │  │
+│  • employees    │  │  • Avatars       │  │       │
+│  • users        │  │  • Documents     │  │            │
+│  • departments  │  │                  │  │            │
+│  • positions    │  │                  │  │            │
+│  • leave-req    │  │                  │  │            │
+│  • announce     │  │                  │  │            │
+│  • attributes   │  │                  │  │            │
+│  • squads       │  │                  │  │            │
+│  • orgs         │  │                  │  │            │
+└─────────────────┘  └──────────────────┘  └────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   CLOUDWATCH    │
+│  • Logs         │
+│  • Metrics      │
+│  • Alarms       │
+└─────────────────┘
 ```
+---
+
+## AWS Services Breakdown
+
+### 1. AWS Amplify Hosting
+
+**Purpose:** Frontend web application hosting and deployment
+
+**Configuration:**
+- **Build System:** Node.js 20 with pnpm
+- **Build Command:** `pnpm run build`
+- **Output Directory:** `dist/`
+- **CDN:** CloudFront distribution included
+- **SSL:** Automatic SSL certificates
+- **Environment:** Static SPA hosting
+
+**Features Used:**
+- Automatic builds from Git commits
+- Environment variable management
+- Instant cache invalidation
+- Global CDN distribution
+- Custom domain support
+
+**Why We Chose It:**
+- Seamless integration with AWS ecosystem
+- Zero-config SSL and CDN
+- Automatic deployments on Git push
+- Cost-effective for static sites
+- Built-in performance optimizations
 
 ---
 
-## Tech Stack Update
+### 2. AWS Lambda
 
-| Layer | Technology |
-|-------|------------|
-| Database | **DynamoDB** |
-| ORM/Client | **ElectroDB** (schema + type-safe) |
-| Schema Control | **ElectroDB Entities** |
+**Purpose:** Serverless compute for backend API logic
 
----
+**Configuration:**
+- **Runtime:** Node.js 20.x (Hono)
+- **Architecture:** x86_64
+- **Memory:** 512 MB (configurable per function)
+- **Timeout:** 30 seconds (API Gateway limit)
+- **Concurrency:** Auto-scaling (no reserved capacity)
 
-## Single Table Design
-
-DynamoDB works best with **Single Table Design** - all data in one table with different access patterns.
-
-### Table Structure
-
-```
-Table: ascend-hr
-
-Primary Key:
-- PK (Partition Key): string
-- SK (Sort Key): string
-
-Global Secondary Indexes (GSI):
-- GSI1: GSI1PK, GSI1SK (for alternate queries)
-- GSI2: GSI2PK, GSI2SK (for more queries)
-```
-
-### Entity Patterns
-
-| Entity | PK | SK | Example |
-|--------|----|----|---------|
-| User | `USER#<id>` | `USER#<id>` | `USER#123` / `USER#123` |
-| Employee | `EMP#<id>` | `EMP#<id>` | `EMP#456` / `EMP#456` |
-| Employee by Dept | `DEPT#<deptId>` | `EMP#<id>` | `DEPT#eng` / `EMP#456` |
-| Department | `DEPT#<id>` | `DEPT#<id>` | `DEPT#eng` / `DEPT#eng` |
-| Position | `DEPT#<deptId>` | `POS#<id>` | `DEPT#eng` / `POS#dev` |
-| Leave Request | `EMP#<empId>` | `LEAVE#<id>` | `EMP#456` / `LEAVE#789` |
-| Leave by Status | `LEAVE#<status>` | `<date>#<id>` | `LEAVE#pending` / `2024-01-15#789` |
-| Announcement | `ANN#<id>` | `ANN#<id>` | `ANN#001` / `ANN#001` |
+**Why We Chose Lambda:**
+- Zero infrastructure management
+- Automatic scaling (0 to millions of requests)
+- Pay-per-execution model (cost-effective at low volume)
+- Built-in high availability
+- Fast cold start times with Node.js 20
 
 ---
 
-## ElectroDB Setup
+### 3. Amazon API Gateway V2 (HTTP API)
 
-### Why ElectroDB?
+**Purpose:** HTTP API gateway for routing requests to Lambda functions
 
-- ✅ Type-safe schema definition
-- ✅ Auto-generates PK/SK patterns
-- ✅ Validates data before write
-- ✅ Simple query API
-- ✅ Works great with TypeScript
+**Configuration:**
+- **API Type:** HTTP API (not REST API - 70% cheaper)
+- **Protocol:** HTTPS only
+- **CORS:** Enabled for frontend domain
+- **Authorization:** JWT-based (handled in Lambda)
+- **Throttling:** AWS default limits
 
-### Install
-
-```bash
-pnpm add electrodb @aws-sdk/client-dynamodb
-```
-
----
-
-## Schema Definitions with ElectroDB
-
-### packages/database/entities/employee.entity.ts
-
-```typescript
-import { Entity } from 'electrodb'
-import { client } from '../client'
-
-export const EmployeeEntity = new Entity(
-  {
-    model: {
-      entity: 'employee',
-      version: '1',
-      service: 'ascendhr',
-    },
-    attributes: {
-      id: {
-        type: 'string',
-        required: true,
-      },
-      employeeCode: {
-        type: 'string',
-        required: true,
-      },
-      firstName: {
-        type: 'string',
-        required: true,
-      },
-      lastName: {
-        type: 'string',
-        required: true,
-      },
-      email: {
-        type: 'string',
-        required: true,
-      },
-      phone: {
-        type: 'string',
-      },
-      departmentId: {
-        type: 'string',
-        required: true,
-      },
-      positionId: {
-        type: 'string',
-        required: true,
-      },
-      reportsToId: {
-        type: 'string',
-      },
-      status: {
-        type: ['active', 'inactive', 'terminated'] as const,
-        default: 'active',
-      },
-      startDate: {
-        type: 'string',
-        required: true,
-      },
-      terminationDate: {
-        type: 'string',
-      },
-      avatarUrl: {
-        type: 'string',
-      },
-      roleId: {
-        type: 'string',
-        required: true,
-      },
-      createdAt: {
-        type: 'string',
-        default: () => new Date().toISOString(),
-      },
-      updatedAt: {
-        type: 'string',
-        default: () => new Date().toISOString(),
-        set: () => new Date().toISOString(),
-      },
-    },
-    indexes: {
-      // Primary: Get employee by ID
-      byId: {
-        pk: {
-          field: 'PK',
-          composite: ['id'],
-          template: 'EMP#${id}',
-        },
-        sk: {
-          field: 'SK',
-          composite: [],
-          template: 'EMP#PROFILE',
-        },
-      },
-      // GSI1: Get employees by department
-      byDepartment: {
-        index: 'GSI1',
-        pk: {
-          field: 'GSI1PK',
-          composite: ['departmentId'],
-          template: 'DEPT#${departmentId}',
-        },
-        sk: {
-          field: 'GSI1SK',
-          composite: ['lastName', 'firstName'],
-          template: 'EMP#${lastName}#${firstName}',
-        },
-      },
-      // GSI2: Get employees by status
-      byStatus: {
-        index: 'GSI2',
-        pk: {
-          field: 'GSI2PK',
-          composite: ['status'],
-          template: 'STATUS#${status}',
-        },
-        sk: {
-          field: 'GSI2SK',
-          composite: ['startDate', 'id'],
-          template: '${startDate}#${id}',
-        },
-      },
-      // GSI3: Get employees by manager
-      byManager: {
-        index: 'GSI3',
-        pk: {
-          field: 'GSI3PK',
-          composite: ['reportsToId'],
-          template: 'MANAGER#${reportsToId}',
-        },
-        sk: {
-          field: 'GSI3SK',
-          composite: ['lastName'],
-          template: 'EMP#${lastName}',
-        },
-      },
-    },
-  },
-  { client, table: process.env.TABLE_NAME! }
-)
-```
-
-### packages/database/entities/leave-request.entity.ts
-
-```typescript
-import { Entity } from 'electrodb'
-import { client } from '../client'
-
-export const LeaveRequestEntity = new Entity(
-  {
-    model: {
-      entity: 'leaveRequest',
-      version: '1',
-      service: 'ascendhr',
-    },
-    attributes: {
-      id: {
-        type: 'string',
-        required: true,
-      },
-      employeeId: {
-        type: 'string',
-        required: true,
-      },
-      leaveTypeId: {
-        type: 'string',
-        required: true,
-      },
-      startDate: {
-        type: 'string',
-        required: true,
-      },
-      endDate: {
-        type: 'string',
-        required: true,
-      },
-      daysCount: {
-        type: 'number',
-        required: true,
-      },
-      reason: {
-        type: 'string',
-      },
-      status: {
-        type: ['pending', 'approved', 'rejected', 'cancelled'] as const,
-        default: 'pending',
-      },
-      approverId: {
-        type: 'string',
-      },
-      approvedAt: {
-        type: 'string',
-      },
-      rejectionReason: {
-        type: 'string',
-      },
-      createdAt: {
-        type: 'string',
-        default: () => new Date().toISOString(),
-      },
-    },
-    indexes: {
-      // Primary: Get leave request by ID
-      byId: {
-        pk: {
-          field: 'PK',
-          composite: ['id'],
-          template: 'LEAVE#${id}',
-        },
-        sk: {
-          field: 'SK',
-          composite: [],
-          template: 'LEAVE#DETAILS',
-        },
-      },
-      // GSI1: Get leaves by employee
-      byEmployee: {
-        index: 'GSI1',
-        pk: {
-          field: 'GSI1PK',
-          composite: ['employeeId'],
-          template: 'EMP#${employeeId}',
-        },
-        sk: {
-          field: 'GSI1SK',
-          composite: ['startDate', 'id'],
-          template: 'LEAVE#${startDate}#${id}',
-        },
-      },
-      // GSI2: Get leaves by status (for approvers)
-      byStatus: {
-        index: 'GSI2',
-        pk: {
-          field: 'GSI2PK',
-          composite: ['status'],
-          template: 'LEAVE_STATUS#${status}',
-        },
-        sk: {
-          field: 'GSI2SK',
-          composite: ['createdAt', 'id'],
-          template: '${createdAt}#${id}',
-        },
-      },
-      // GSI3: Get leaves by approver
-      byApprover: {
-        index: 'GSI3',
-        pk: {
-          field: 'GSI3PK',
-          composite: ['approverId', 'status'],
-          template: 'APPROVER#${approverId}#${status}',
-        },
-        sk: {
-          field: 'GSI3SK',
-          composite: ['createdAt'],
-          template: '${createdAt}',
-        },
-      },
-    },
-  },
-  { client, table: process.env.TABLE_NAME! }
-)
-```
-
-### packages/database/entities/department.entity.ts
-
-```typescript
-import { Entity } from 'electrodb'
-import { client } from '../client'
-
-export const DepartmentEntity = new Entity(
-  {
-    model: {
-      entity: 'department',
-      version: '1',
-      service: 'ascendhr',
-    },
-    attributes: {
-      id: {
-        type: 'string',
-        required: true,
-      },
-      name: {
-        type: 'string',
-        required: true,
-      },
-      description: {
-        type: 'string',
-      },
-      parentId: {
-        type: 'string',
-      },
-      isActive: {
-        type: 'boolean',
-        default: true,
-      },
-      createdAt: {
-        type: 'string',
-        default: () => new Date().toISOString(),
-      },
-    },
-    indexes: {
-      byId: {
-        pk: {
-          field: 'PK',
-          composite: ['id'],
-          template: 'DEPT#${id}',
-        },
-        sk: {
-          field: 'SK',
-          composite: [],
-          template: 'DEPT#DETAILS',
-        },
-      },
-      // GSI1: List all departments
-      all: {
-        index: 'GSI1',
-        pk: {
-          field: 'GSI1PK',
-          composite: [],
-          template: 'DEPTS',
-        },
-        sk: {
-          field: 'GSI1SK',
-          composite: ['name'],
-          template: '${name}',
-        },
-      },
-    },
-  },
-  { client, table: process.env.TABLE_NAME! }
-)
-```
+**Why We Chose HTTP API (vs REST API):**
+- 70% cheaper than REST API Gateway
+- Lower latency
+- Built-in JWT authorizers
+- Simpler configuration
+- Sufficient features for our use case
 
 ---
 
-## DynamoDB Client
+### 4. Amazon DynamoDB
 
-### packages/database/client.ts
+**Purpose:** NoSQL database for all application data
 
-```typescript
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+**Data Model Highlights:**
+- Denormalized for read performance
+- Attribution scores embedded in employee records
+- Historical performance tracking with change logs
+- Rich metadata for reporting
 
-export const client = new DynamoDBClient({
-  region: process.env.AWS_REGION || 'ap-southeast-1',
-})
-```
-
-### packages/database/index.ts
-
-```typescript
-// Export all entities
-export { EmployeeEntity } from './entities/employee.entity'
-export { DepartmentEntity } from './entities/department.entity'
-export { PositionEntity } from './entities/position.entity'
-export { LeaveRequestEntity } from './entities/leave-request.entity'
-export { LeaveTypeEntity } from './entities/leave-type.entity'
-export { AnnouncementEntity } from './entities/announcement.entity'
-export { UserEntity } from './entities/user.entity'
-export { RoleEntity } from './entities/role.entity'
-```
+**Why We Chose DynamoDB:**
+- Fully managed (no patching, backups automatic)
+- Single-digit millisecond latency
+- Virtually unlimited scalability
+- On-demand pricing fits usage pattern
+- Strong consistency available when needed
+- Excellent AWS Lambda integration
 
 ---
 
-## Using ElectroDB in Services
+### 5. Amazon S3
 
-### apps/api/employee/services/employee.service.ts
+**Purpose:** Object storage for user-uploaded files
 
-```typescript
-import { EmployeeEntity } from '@ascend-hr/database'
-import { v4 as uuid } from 'uuid'
+**Use Cases:**
+- Employee profile avatars
+- Document uploads (resumes, certifications)
+- Organization logos
+- Report exports (PDF, Excel)
 
-export const employeeService = {
-  // Create employee
-  async create(data: CreateEmployeeInput) {
-    const id = uuid()
-    const employeeCode = await generateEmployeeCode()
-    
-    const result = await EmployeeEntity.create({
-      id,
-      employeeCode,
-      ...data,
-    }).go()
-    
-    return result.data
-  },
-  
-  // Get by ID
-  async getById(id: string) {
-    const result = await EmployeeEntity.get({ id }).go()
-    return result.data
-  },
-  
-  // List all employees (paginated)
-  async list(params: { limit?: number; cursor?: string }) {
-    const result = await EmployeeEntity.query
-      .byStatus({ status: 'active' })
-      .go({
-        limit: params.limit || 20,
-        cursor: params.cursor,
-      })
-    
-    return {
-      data: result.data,
-      cursor: result.cursor, // Use for next page
-    }
-  },
-  
-  // List by department
-  async listByDepartment(departmentId: string) {
-    const result = await EmployeeEntity.query
-      .byDepartment({ departmentId })
-      .go()
-    
-    return result.data
-  },
-  
-  // List by manager (direct reports)
-  async listByManager(managerId: string) {
-    const result = await EmployeeEntity.query
-      .byManager({ reportsToId: managerId })
-      .go()
-    
-    return result.data
-  },
-  
-  // Update employee
-  async update(id: string, data: UpdateEmployeeInput) {
-    const result = await EmployeeEntity.patch({ id })
-      .set(data)
-      .go()
-    
-    return result.data
-  },
-  
-  // Change status
-  async changeStatus(id: string, status: string, terminationDate?: string) {
-    const result = await EmployeeEntity.patch({ id })
-      .set({ 
-        status,
-        terminationDate,
-      })
-      .go()
-    
-    return result.data
-  },
-  
-  // Search employees (limited in DynamoDB)
-  async search(query: string) {
-    // DynamoDB doesn't support full-text search
-    // Option 1: Use GSI with begins_with
-    // Option 2: Use OpenSearch for complex search
-    // Option 3: Filter in memory (small dataset only)
-    
-    const result = await EmployeeEntity.query
-      .byStatus({ status: 'active' })
-      .go()
-    
-    // Filter in memory (ok for < 1000 employees)
-    const filtered = result.data.filter(emp => 
-      emp.firstName.toLowerCase().includes(query.toLowerCase()) ||
-      emp.lastName.toLowerCase().includes(query.toLowerCase()) ||
-      emp.email.toLowerCase().includes(query.toLowerCase())
-    )
-    
-    return filtered
-  },
-}
-```
+**Access Pattern:**
+- Frontend requests presigned URLs from Lambda
+- Direct browser upload/download via presigned URLs
+- No direct public access (security)
 
-### apps/api/leave/services/leave.service.ts
 
-```typescript
-import { LeaveRequestEntity } from '@ascend-hr/database'
-import { v4 as uuid } from 'uuid'
-
-export const leaveService = {
-  // Create leave request
-  async createRequest(employeeId: string, data: CreateLeaveInput) {
-    const id = uuid()
-    
-    const result = await LeaveRequestEntity.create({
-      id,
-      employeeId,
-      ...data,
-      status: 'pending',
-    }).go()
-    
-    return result.data
-  },
-  
-  // Get pending requests for approver
-  async getPendingForApprover(approverId: string) {
-    const result = await LeaveRequestEntity.query
-      .byApprover({ 
-        approverId, 
-        status: 'pending' 
-      })
-      .go()
-    
-    return result.data
-  },
-  
-  // Get employee's leave history
-  async getEmployeeLeaves(employeeId: string, year?: string) {
-    let query = LeaveRequestEntity.query.byEmployee({ employeeId })
-    
-    if (year) {
-      query = query.begins({ startDate: year })
-    }
-    
-    const result = await query.go()
-    return result.data
-  },
-  
-  // Approve leave
-  async approve(id: string, approverId: string) {
-    const result = await LeaveRequestEntity.patch({ id })
-      .set({
-        status: 'approved',
-        approverId,
-        approvedAt: new Date().toISOString(),
-      })
-      .go()
-    
-    return result.data
-  },
-  
-  // Reject leave
-  async reject(id: string, approverId: string, reason: string) {
-    const result = await LeaveRequestEntity.patch({ id })
-      .set({
-        status: 'rejected',
-        approverId,
-        rejectionReason: reason,
-      })
-      .go()
-    
-    return result.data
-  },
-}
-```
+**Why We Chose S3:**
+- Industry standard for object storage
+- 99.999999999% (11 9's) durability
+- Presigned URLs for secure direct uploads
+- Pay only for storage used
+- Integrates with CloudFront for CDN delivery
 
 ---
 
-## SST Configuration for DynamoDB
+### 6. Amazon CloudWatch
 
-### sst.config.ts
+**Purpose:** Monitoring, logging, and observability
 
-```typescript
-import { SSTConfig } from 'sst'
-import { Api, Table } from 'sst/constructs'
+**Components Used:**
 
-export default {
-  config() {
-    return {
-      name: 'ascend-hr',
-      region: 'ap-southeast-1',
-    }
-  },
-  stacks(app) {
-    app.stack(function Stack({ stack }) {
-      // DynamoDB Table
-      const table = new Table(stack, 'Table', {
-        fields: {
-          PK: 'string',
-          SK: 'string',
-          GSI1PK: 'string',
-          GSI1SK: 'string',
-          GSI2PK: 'string',
-          GSI2SK: 'string',
-          GSI3PK: 'string',
-          GSI3SK: 'string',
-        },
-        primaryIndex: { partitionKey: 'PK', sortKey: 'SK' },
-        globalIndexes: {
-          GSI1: { partitionKey: 'GSI1PK', sortKey: 'GSI1SK' },
-          GSI2: { partitionKey: 'GSI2PK', sortKey: 'GSI2SK' },
-          GSI3: { partitionKey: 'GSI3PK', sortKey: 'GSI3SK' },
-        },
-      })
-      
-      // API
-      const api = new Api(stack, 'Api', {
-        defaults: {
-          function: {
-            bind: [table],
-            environment: {
-              TABLE_NAME: table.tableName,
-            },
-          },
-        },
-        routes: {
-          // Auth
-          'ANY /auth/{proxy+}': 'apps/api/auth/index.handler',
-          
-          // Employee
-          'ANY /employees/{proxy+}': 'apps/api/employee/index.handler',
-          'GET /employees': 'apps/api/employee/index.handler',
-          'POST /employees': 'apps/api/employee/index.handler',
-          
-          // Organization
-          'ANY /departments/{proxy+}': 'apps/api/organization/index.handler',
-          'ANY /positions/{proxy+}': 'apps/api/organization/index.handler',
-          
-          // Leave
-          'ANY /leave-types/{proxy+}': 'apps/api/leave/index.handler',
-          'ANY /leave-requests/{proxy+}': 'apps/api/leave/index.handler',
-          
-          // Announcement
-          'ANY /announcements/{proxy+}': 'apps/api/announcement/index.handler',
-          
-          // Report
-          'ANY /reports/{proxy+}': 'apps/api/report/index.handler',
-        },
-      })
-      
-      stack.addOutputs({
-        ApiUrl: api.url,
-        TableName: table.tableName,
-      })
-    })
-  },
-} satisfies SSTConfig
-```
+**CloudWatch Logs:**
+- All Lambda function logs automatically captured
+- Log retention: 7 days default
+- Log groups per Lambda function
+- Searchable and filterable
+
+**CloudWatch Metrics:**
+- Lambda invocations, duration, errors
+- API Gateway requests, latency, errors
+- DynamoDB read/write capacity, throttles
+- Automatic AWS service metrics
+
+**Monitoring Capabilities:**
+- Real-time function execution logs
+- Error tracking and debugging
+- Performance metrics and trends
+- Configurable alarms (not yet configured)
+
+**Why It's Essential:**
+- Automatic log collection (no setup needed)
+- Centralized logging for all services
+- Performance troubleshooting
+- Security audit trails
+- Free tier covers current usage
 
 ---
 
-## DynamoDB Access Patterns Summary
+## Cost Analysis (100 Daily Active Users)
 
-### Employee Queries
+### Assumptions
 
-| Query | Index | Key Condition |
-|-------|-------|---------------|
-| Get by ID | Primary | PK = `EMP#<id>` |
-| List by department | GSI1 | GSI1PK = `DEPT#<deptId>` |
-| List by status | GSI2 | GSI2PK = `STATUS#<status>` |
-| List by manager | GSI3 | GSI3PK = `MANAGER#<managerId>` |
+**User Activity Profile:**
+- **Daily Active Users (DAU):** 100
+- **Monthly Active Users (MAU):** ~120 (accounting for weekends/holidays)
+- **Average API Calls per User per Day:** 75 calls
+  - 40 GET requests (viewing data)
+  - 25 POST/PATCH requests (data entry)
+  - 10 DELETE requests (occasional)
+- **Active Days per Month:** 30
 
-### Leave Request Queries
-
-| Query | Index | Key Condition |
-|-------|-------|---------------|
-| Get by ID | Primary | PK = `LEAVE#<id>` |
-| List by employee | GSI1 | GSI1PK = `EMP#<empId>` |
-| List pending (all) | GSI2 | GSI2PK = `LEAVE_STATUS#pending` |
-| List for approver | GSI3 | GSI3PK = `APPROVER#<id>#pending` |
-
----
-
-## DynamoDB Limitations & Workarounds
-
-| Limitation | Workaround |
-|------------|------------|
-| No full-text search | Use OpenSearch or filter in memory |
-| No JOIN | Denormalize data or multiple queries |
-| No aggregate (COUNT, SUM) | Maintain counters separately |
-| Max 25 items per batch | Split into multiple batches |
-| Max 400KB per item | Split large data |
-
-### Example: Maintaining Counters
-
-```typescript
-// Counter entity for department headcount
-export const CounterEntity = new Entity({
-  model: { entity: 'counter', version: '1', service: 'ascendhr' },
-  attributes: {
-    id: { type: 'string', required: true },
-    count: { type: 'number', default: 0 },
-  },
-  indexes: {
-    byId: {
-      pk: { field: 'PK', composite: ['id'], template: 'COUNTER#${id}' },
-      sk: { field: 'SK', composite: [], template: 'COUNTER' },
-    },
-  },
-}, { client, table: process.env.TABLE_NAME! })
-
-// Increment when adding employee
-async function incrementDepartmentCount(departmentId: string) {
-  await CounterEntity.update({ id: `dept_${departmentId}` })
-    .add({ count: 1 })
-    .go()
-}
-```
+**Calculated Monthly Volumes:**
+- **Total API Calls:** 100 users × 75 calls × 30 days = **225,000 calls/month**
+- **Lambda Invocations:** 225,000 (1:1 with API calls)
+- **Average Lambda Execution Time:** 200ms
+- **Average Lambda Memory:** 512 MB
+- **DynamoDB Operations:**
+  - Read operations: 135,000/month (60% of calls)
+  - Write operations: 90,000/month (40% of calls)
+- **Data Storage:**
+  - DynamoDB: ~1 GB (employee data, relationships)
+  - S3: ~0.5 GB (100 users × 5 MB average files)
+- **Data Transfer Out:** ~10 GB/month
+- **Monthly Builds:** 4 builds (weekly deployments)
 
 ---
 
-## Folder Structure Update
+### Detailed Cost Breakdown
 
-```
-packages/database/
-├── client.ts                 # DynamoDB client
-├── index.ts                  # Export all entities
-├── entities/
-│   ├── employee.entity.ts
-│   ├── user.entity.ts
-│   ├── department.entity.ts
-│   ├── position.entity.ts
-│   ├── role.entity.ts
-│   ├── leave-type.entity.ts
-│   ├── leave-request.entity.ts
-│   ├── leave-balance.entity.ts
-│   ├── announcement.entity.ts
-│   └── counter.entity.ts
-└── package.json
-```
+#### 1. AWS Lambda - $0.00/month
+
+**Free Tier (Permanent):**
+- 1,000,000 requests per month
+- 400,000 GB-seconds of compute time per month
+
+**Usage:**
+- Requests: 225,000 (22.5% of free tier)
+- Compute: 225,000 invocations × 0.2s × 0.5 GB = 22,500 GB-seconds (5.6% of free tier)
+
+**Status:** ✅ **Entirely within free tier**
 
 ---
 
-## PostgreSQL vs DynamoDB Comparison
+#### 2. API Gateway HTTP API - $0.00/month (Year 1) | $0.23/month (Year 2+)
 
-| Feature | PostgreSQL + Drizzle | DynamoDB + ElectroDB |
-|---------|---------------------|----------------------|
-| Schema control | ✅ Migrations | ✅ Entity definitions |
-| Type safety | ✅ Full | ✅ Full |
-| Cold start | ⚠️ ~500ms | ✅ ~50ms |
-| Complex queries | ✅ Full SQL | ⚠️ Plan indexes |
-| Full-text search | ✅ Built-in | ❌ Need OpenSearch |
-| Cost (low traffic) | 💰 $15-50/mo | ✅ $1-5/mo |
-| Cost (high traffic) | 💰 $50-200/mo | 💰 $10-50/mo |
-| Learning curve | ✅ SQL knowledge | ⚠️ New patterns |
+**Free Tier (First 12 Months):**
+- 1,000,000 API calls per month
 
----
+**Usage:**
+- API Calls: 225,000/month
 
-## Recommendation
+**Pricing After Free Tier:**
+- First 300M requests: $1.00 per million
+- 225,000 requests × $1.00 / 1,000,000 = **$0.23/month**
 
-| Choose | When |
-|--------|------|
-| **PostgreSQL** | Complex queries, reports, familiar SQL |
-| **DynamoDB** | Simple CRUD, high scale, fastest cold starts |
-
-For **AscendHR** with reports feature → **PostgreSQL is easier**
-
-But if cost and cold start are priority → **DynamoDB works fine**
+**Status:** ✅ **Free for first year**, minimal cost after
 
 ---
 
-## Quick Start with DynamoDB
+#### 3. DynamoDB On-Demand - $0.39/month
 
-```bash
-# Install dependencies
-pnpm add electrodb @aws-sdk/client-dynamodb
+**Pricing (ap-southeast-1):**
+- Write Request Units: $1.25 per million
+- Read Request Units: $0.25 per million
+- Storage (Standard): $0.25 per GB-month
 
-# Create entity file
-# packages/database/entities/employee.entity.ts
+**Usage & Cost:**
+- **Write Requests:** 90,000 × $1.25 / 1,000,000 = **$0.11/month**
+- **Read Requests:** 135,000 × $0.25 / 1,000,000 = **$0.03/month**
+- **Storage:** 1 GB × $0.25 = **$0.25/month**
 
-# Use in Lambda
-import { EmployeeEntity } from '@ascend-hr/database'
+**Total:** **$0.39/month**
 
-// Create
-await EmployeeEntity.create({ ... }).go()
+**Notes:**
+- On-demand pricing chosen for predictable costs
+- No capacity planning required
+- Scales automatically with usage
 
-// Query
-await EmployeeEntity.query.byDepartment({ departmentId }).go()
+---
 
-# Update
-await EmployeeEntity.patch({ id }).set({ ... }).go()
+#### 4. AWS Amplify Hosting - $0.00/month
 
-// Delete
-await EmployeeEntity.delete({ id }).go()
-```
+**Free Tier:**
+- 1,000 build minutes per month
+- 5 GB stored on CDN
+- 15 GB data transfer out
+- 500,000 requests per month
+
+**Usage:**
+- Build minutes: 20 minutes (4 builds × 5 min each)
+- Storage: ~0.1 GB (React SPA build artifacts)
+- Data transfer: ~10 GB
+- Requests: ~50,000/month
+
+**Pricing Beyond Free Tier:**
+- Build minutes: $0.01 per minute
+- Storage: $0.023 per GB
+- Data transfer: $0.15 per GB
+- Requests: $0.30 per million
+
+**Status:** ✅ **Entirely within free tier**
+
+---
+
+#### 5. Amazon S3 - $0.02/month
+
+**Pricing (ap-southeast-1):**
+- Storage (Standard): $0.023 per GB
+- PUT/COPY/POST requests: $0.005 per 1,000
+- GET requests: $0.0004 per 1,000
+
+**Usage & Cost:**
+- **Storage:** 0.5 GB × $0.023 = **$0.012/month**
+- **PUT Requests:** ~1,000 × $0.005 / 1,000 = **$0.005/month**
+- **GET Requests:** ~5,000 × $0.0004 / 1,000 = **$0.002/month**
+
+**Total:** **$0.02/month**
+
+**Notes:**
+- Minimal storage with 100 users
+- Direct uploads via presigned URLs (efficient)
+
+---
+
+#### 6. CloudWatch - $0.00/month
+
+**Free Tier:**
+- 5 GB log ingestion
+- 10 custom metrics
+- 1,000,000 API requests
+
+**Usage:**
+- Log ingestion: ~2 GB/month (Lambda logs)
+- Custom metrics: 0 (using only default metrics)
+
+**Pricing Beyond Free Tier:**
+- Log ingestion: $0.50 per GB
+- Log storage: $0.03 per GB
+
+**Status:** ✅ **Entirely within free tier**
+
+---
+
+### Total Monthly Cost Summary
+
+| Service | Year 1 (Free Tier) | Year 2+ (Steady State) | % of Total |
+|---------|-------------------|------------------------|------------|
+| Lambda | $0.00 | $0.00 | 0% |
+| API Gateway | $0.00 | $0.23 | 8% |
+| DynamoDB | $0.39 | $0.39 | 13% |
+| Amplify Hosting | $0.00 | $0.00 | 0% |
+| S3 | $0.02 | $0.02 | 1% |
+| Secrets Manager | $1.53 | $1.53 | 52% |
+| CloudWatch | $0.00 | $0.00 | 0% |
+| **TOTAL** | **$1.94/month** | **$2.17/month** | **100%** |
+
+**Annual Cost:**
+- **Year 1:** $23.28/year ($1.94/month)
+- **Year 2+:** $26.04/year ($2.17/month)
+
+**Cost per User (100 DAU):**
+- **Year 1:** $0.0194 per user per month
+- **Year 2+:** $0.0217 per user per month
+
+---
+
+#### Future Scaling Considerations
+
+**At 1,000 DAU (10x growth):**
+- Lambda: Still free tier (~$0.10/month)
+- API Gateway: $2.30/month
+- DynamoDB: $3.90/month (reads/writes scale linearly)
+- S3: $0.12/month
+- Secrets Manager: $0.50/month (with caching)
+- **Total:** ~$7/month ($0.007 per user)
+
+**At 10,000 DAU (100x growth):**
+- Lambda: $15/month
+- API Gateway: $23/month
+- DynamoDB: $39/month
+- S3: $1.20/month
+- Amplify: $5/month (data transfer exceeds free tier)
+- Secrets Manager: $0.50/month
+- CloudWatch: $2/month
+- **Total:** ~$86/month ($0.0086 per user)
+
+**Cost scales sub-linearly** - per-user cost decreases as usage grows.
+
+---
+
+### Pricing Sources
+
+All pricing verified from official AWS documentation (January 2026):
+- Lambda: https://aws.amazon.com/lambda/pricing/
+- API Gateway: https://aws.amazon.com/api-gateway/pricing/
+- DynamoDB: https://aws.amazon.com/dynamodb/pricing/on-demand/
+- Amplify: https://aws.amazon.com/amplify/pricing/
+- S3: https://aws.amazon.com/s3/pricing/
+- Secrets Manager: https://aws.amazon.com/secrets-manager/pricing/
+- CloudWatch: https://aws.amazon.com/cloudwatch/pricing/
+
+---
+
+
+## Conclusion
+
+AscendHR is built on a modern, scalable, and cost-effective serverless architecture that leverages AWS best practices. The infrastructure provides:
+
+**Key Strengths:**
+- ✅ **Exceptional Cost Efficiency** - $2/month for 100 users, $0.02 per user
+- ✅ **Zero Infrastructure Management** - Fully serverless, no servers to patch
+- ✅ **Auto-Scaling** - Handles 100 to 10,000+ users without changes
+- ✅ **High Availability** - Multi-AZ deployments by default
+- ✅ **Fast Development** - Modern frameworks, TypeScript, automated deployments
+- ✅ **Secure by Default** - Encryption, IAM, least privilege access
+
