@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruitment Pipeline | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+    
+    .filters-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    
+    .kanban-container {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 16px;
+    }
+    
+    .kanban-column {
+      min-width: 320px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .column-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .column-count {
+      background: var(--muted);
+      color: var(--muted-foreground);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .candidate-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 200px;
+    }
+    
+    .candidate-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      cursor: grab;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .candidate-card:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    
+    .candidate-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .card-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .card-name {
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .card-position {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .fit-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .fit-score.high {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    
+    .fit-score.medium {
+      background: var(--warning-light);
+      color: #713F12;
+    }
+    
+    .fit-score.low {
+      background: var(--destructive-light);
+      color: var(--destructive);
+    }
+    
+    .card-source {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      padding: 2px 6px;
+      background: var(--muted);
+      border-radius: var(--radius-sm);
+    }
+    
+    .card-actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: none;
+      gap: 4px;
+    }
+    
+    .candidate-card:hover .card-actions {
+      display: flex;
+    }
+    
+    .action-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--background);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .action-icon:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted-foreground);
+      font-size: 14px;
+    }
+    
+    /* Modal Overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-overlay.visible {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow-strong);
+    }
+    
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+    }
+    
+    .modal-close:hover {
+      background: var(--muted);
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Kanban Board - Recruitment Pipeline
+    User Story: US-4.4, US-4.5
+    
+    INTERACTIVE: 
+    - Click candidate cards to view details
+    - Drag & drop to move between stages (simulated)
+    - Click action icons for quick actions
+    - Filter by fit score and source
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="../football-club-setup/03-invite-team.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">🎯</span> Recruitment
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item">
+            <span class="icon">📝</span> Positions
+          </a>
+          <a href="04-candidate-form.html" class="sidebar-item">
+            <span class="icon">👤</span> Candidates
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item active">
+            <span class="icon">📋</span> Pipeline
+          </a>
+          <a href="05-interview-schedule.html" class="sidebar-item">
+            <span class="icon">📅</span> Interviews
+          </a>
+          <a href="06-offer-creation.html" class="sidebar-item">
+            <span class="icon">💼</span> Offers
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Recruitment Pipeline</h1>
+          <p style="color: var(--muted-foreground); margin-top: 4px;">
+            <select class="form-select" style="display: inline-block; width: auto; padding: 6px 12px; font-size: 14px;" onchange="switchPosition(this.value)">
+              <option value="backend">Senior Backend Developer (13 candidates)</option>
+              <option value="frontend">Frontend Developer (8 candidates)</option>
+              <option value="designer">UI/UX Designer (5 candidates)</option>
+            </select>
+          </p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-outline" onclick="showFilters()">🔽 Filter</button>
+          <button class="btn btn-primary" onclick="window.location.href='04-candidate-form.html'">➕ Add Candidate</button>
+        </div>
+      </header>
+
+      <!-- Filters Bar -->
+      <div class="filters-bar">
+        <div class="form-group" style="margin: 0; flex: 1;">
+          <input type="text" class="form-input" placeholder="🔍 Search candidates..." style="margin: 0;">
+        </div>
+        <select class="form-select" style="width: 180px;">
+          <option>All Fit Scores</option>
+          <option>High (≥90%)</option>
+          <option>Medium (70-89%)</option>
+          <option>Low (<70%)</option>
+        </select>
+        <select class="form-select" style="width: 150px;">
+          <option>All Sources</option>
+          <option>LinkedIn</option>
+          <option>Referral</option>
+          <option>Direct</option>
+        </select>
+        <button class="btn btn-outline btn-sm">Reset</button>
+      </div>
+
+      <!-- Kanban Board -->
+      <div class="kanban-container">
+        <!-- Column: New -->
+        <div class="kanban-column" id="column-new">
+          <div class="column-header">
+            <span class="column-title">🆕 New</span>
+            <span class="column-count">5</span>
+          </div>
+          <div class="candidate-cards" id="cards-new">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="1">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(1)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(1)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar">AC</div>
+                <div class="card-info">
+                  <div class="card-name">Alex Chen</div>
+                  <div class="card-position">Senior Backend Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 95%</span>
+                <span class="card-source">LinkedIn</span>
+              </div>
+            </div>
+            
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="2">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(2)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(2)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--accent);">TL</div>
+                <div class="card-info">
+                  <div class="card-name">Tom Lee</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 88%</span>
+                <span class="card-source">Referral</span>
+              </div>
+            </div>
+            
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="3">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(3)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(3)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--zone-support);">MP</div>
+                <div class="card-info">
+                  <div class="card-name">Maria Perez</div>
+                  <div class="card-position">Full-Stack Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score medium">🎯 76%</span>
+                <span class="card-source">Direct</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Screening -->
+        <div class="kanban-column" id="column-screening">
+          <div class="column-header">
+            <span class="column-title">🔍 Screening</span>
+            <span class="column-count">3</span>
+          </div>
+          <div class="candidate-cards" id="cards-screening" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="4">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(4)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(4)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--warning);">SM</div>
+                <div class="card-info">
+                  <div class="card-name">Sarah Miller</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score medium">🎯 78%</span>
+                <span class="card-source">LinkedIn</span>
+              </div>
+            </div>
+            
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="5">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(5)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(5)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--destructive);">RK</div>
+                <div class="card-info">
+                  <div class="card-name">Robert Kim</div>
+                  <div class="card-position">Senior Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 91%</span>
+                <span class="card-source">Referral</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Interview -->
+        <div class="kanban-column" id="column-interview">
+          <div class="column-header">
+            <span class="column-title">🗣️ Interview</span>
+            <span class="column-count">2</span>
+          </div>
+          <div class="candidate-cards" id="cards-interview" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="6">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(6)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(6)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--zone-support);">JD</div>
+                <div class="card-info">
+                  <div class="card-name">John Davis</div>
+                  <div class="card-position">Senior Architect</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 92%</span>
+                <span class="card-source">LinkedIn</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--primary);">
+                📅 Interview: Mar 20, 2:00 PM
+              </div>
+            </div>
+            
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="7">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(7)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(7)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar">LB</div>
+                <div class="card-info">
+                  <div class="card-name">Lisa Brown</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 87%</span>
+                <span class="card-source">Direct</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--accent);">
+                ✅ Feedback submitted
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Offer -->
+        <div class="kanban-column" id="column-offer">
+          <div class="column-header">
+            <span class="column-title">💼 Offer</span>
+            <span class="column-count">1</span>
+          </div>
+          <div class="candidate-cards" id="cards-offer" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="8">
+              <div class="card-actions">
+                <div class="action-icon" onclick="viewCandidate(8)" title="View Profile">👁️</div>
+                <div class="action-icon" onclick="moveCard(8)" title="Move Stage">➡️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--warning);">EW</div>
+                <div class="card-info">
+                  <div class="card-name">Emma Wilson</div>
+                  <div class="card-position">Senior Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 88%</span>
+                <span class="card-source">Referral</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--warning);">
+                ⏳ Expires in 6 days
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Hired -->
+        <div class="kanban-column" id="column-hired">
+          <div class="column-header">
+            <span class="column-title">✅ Hired</span>
+            <span class="column-count">0</span>
+          </div>
+          <div class="candidate-cards" id="cards-hired" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="empty-state">
+              🎉 No hires yet<br>Keep the pipeline moving!
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Rejected -->
+        <div class="kanban-column" id="column-rejected" style="opacity: 0.6;">
+          <div class="column-header">
+            <span class="column-title">❌ Rejected</span>
+            <span class="column-count">2</span>
+          </div>
+          <div class="candidate-cards" id="cards-rejected" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" style="opacity: 0.7;">
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--muted-foreground);">DT</div>
+                <div class="card-info">
+                  <div class="card-name">David Taylor</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-top: 8px;">
+                Insufficient experience
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Move Stage Modal -->
+  <div class="modal-overlay" id="moveModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Move to Stage</h2>
+        <button class="modal-close" onclick="hideModal('moveModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--muted-foreground); margin-bottom: 16px;">Select the new stage for this candidate:</p>
+        <select class="form-select" id="targetStage">
+          <option value="screening">🔍 Screening</option>
+          <option value="interview">🗣️ Interview</option>
+          <option value="offer">💼 Offer</option>
+          <option value="hired">✅ Hired</option>
+          <option value="rejected">❌ Rejected</option>
+        </select>
+        <div class="form-group">
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-textarea" rows="3" placeholder="Add any notes about this move..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideModal('moveModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmMove()">Move Candidate</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let draggedElement = null;
+    let currentCandidateId = null;
+
+    // Drag and Drop Functions
+    function allowDrop(ev) {
+      ev.preventDefault();
+      ev.currentTarget.style.background = 'rgba(59, 130, 246, 0.05)';
+    }
+
+    function drag(ev) {
+      draggedElement = ev.target;
+      ev.target.classList.add('dragging');
+      ev.dataTransfer.effectAllowed = 'move';
+      ev.dataTransfer.setData('text/html', ev.target.innerHTML);
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      ev.currentTarget.style.background = '';
+      
+      if (draggedElement && ev.currentTarget.classList.contains('candidate-cards')) {
+        ev.currentTarget.appendChild(draggedElement);
+        draggedElement.classList.remove('dragging');
+        
+        // Show success message
+        showToast('Candidate moved successfully! ✓');
+        
+        // Update column counts
+        updateColumnCounts();
+        
+        draggedElement = null;
+      }
+    }
+
+    // Remove highlight when dragging out
+    document.querySelectorAll('.candidate-cards').forEach(cards => {
+      cards.addEventListener('dragleave', (e) => {
+        e.currentTarget.style.background = '';
+      });
+    });
+
+    // Modal Functions
+    function showModal(id) {
+      document.getElementById(id).classList.add('visible');
+    }
+
+    function hideModal(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    // Click outside modal to close
+    document.getElementById('moveModal').addEventListener('click', (e) => {
+      if (e.target.id === 'moveModal') {
+        hideModal('moveModal');
+      }
+    });
+
+    // Quick Action Functions
+    function viewCandidate(id) {
+      alert(`Viewing candidate profile #${id}\n\nIn a real app, this would navigate to the candidate detail page.`);
+    }
+
+    function moveCard(id) {
+      currentCandidateId = id;
+      showModal('moveModal');
+    }
+
+    function confirmMove() {
+      const stage = document.getElementById('targetStage').value;
+      hideModal('moveModal');
+      showToast(`Candidate moved to ${stage} stage! ✓`);
+    }
+
+    function showFilters() {
+      alert('Filter panel expanded\n\nIn a real app, this would show additional filter options.');
+    }
+
+    function switchPosition(value) {
+      showToast(`Switched to ${value} position`);
+    }
+
+    // Update column counts
+    function updateColumnCounts() {
+      const columns = ['new', 'screening', 'interview', 'offer', 'hired', 'rejected'];
+      columns.forEach(col => {
+        const cards = document.querySelectorAll(`#cards-${col} .candidate-card`).length;
+        const countEl = document.querySelector(`#column-${col} .column-count`);
+        if (countEl) {
+          countEl.textContent = cards;
+        }
+      });
+    }
+
+    // Toast notification
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'alert alert-success';
+      toast.style.position = 'fixed';
+      toast.style.top = '24px';
+      toast.style.right = '24px';
+      toast.style.zIndex = '9999';
+      toast.style.boxShadow = 'var(--shadow-strong)';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Initialize
+    console.log('Kanban Board loaded - Ready for drag & drop');
+  </script>
+</body>
+</html>

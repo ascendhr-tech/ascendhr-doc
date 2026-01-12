@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruitment Pipeline | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 0;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    /* Position Header Bar */
+    .position-header {
+      background: white;
+      border-bottom: 2px solid var(--border);
+      padding: 20px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .position-info {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+    
+    .position-selector {
+      flex: 1;
+      max-width: 400px;
+    }
+    
+    .position-current {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .position-current:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-1px);
+    }
+    
+    .position-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .position-meta {
+      font-size: 13px;
+      opacity: 0.95;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .position-metric {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .metrics-row {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .metric-card {
+      background: var(--background);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+    
+    .board-container {
+      padding: 24px 32px;
+      overflow-x: auto;
+    }
+    
+    /* Enhanced Filters */
+    .filters-section {
+      padding: 16px 32px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .filters-top {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted-foreground);
+      font-size: 16px;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 10px 12px 10px 40px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .filter-select {
+      padding: 8px 32px 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-select:hover {
+      border-color: var(--primary);
+    }
+    
+    .active-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-height: 24px;
+    }
+    
+    .filter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .filter-badge-remove {
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    
+    .filter-badge-remove:hover {
+      opacity: 1;
+    }
+    
+    .kanban-board {
+      display: flex;
+      gap: 20px;
+      min-height: calc(100vh - 280px);
+    }
+    
+    .kanban-column {
+      min-width: 340px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 300px);
+    }
+    
+    .column-header {
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 10;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    
+    .column-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .column-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .column-count {
+      background: var(--muted);
+      color: var(--muted-foreground);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    
+    .column-stats {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .candidate-cards {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .candidate-card {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .candidate-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    
+    .candidate-card.dragging {
+      opacity: 0.5;
+    }
+    
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .card-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .card-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .card-role {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 6px;
+    }
+    
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .fit-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    
+    .fit-score.high {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+    }
+    
+    .fit-score.medium {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+    }
+    
+    .fit-score.low {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      color: white;
+    }
+    
+    .card-source {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      padding: 3px 8px;
+      background: var(--muted);
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .card-duration {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .card-status {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .card-actions {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: none;
+      gap: 4px;
+      background: white;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .candidate-card:hover .card-actions {
+      display: flex;
+    }
+    
+    .action-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--background);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .action-icon:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted-foreground);
+    }
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.3;
+    }
+    
+    .empty-text {
+      font-size: 13px;
+    }
+    
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    
+    .fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+    }
+    
+    /* Modal Overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .modal-overlay.visible {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      width: 90%;
+      max-width: 700px;
+      box-shadow: var(--shadow-strong);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalAppear 0.3s;
+    }
+    
+    @keyframes modalAppear {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .modal.large {
+      max-width: 900px;
+    }
+    
+    .modal-header {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 10;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    
+    .modal-close {
+      background: var(--muted);
+      border: none;
+      font-size: 20px;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      transition: all 0.2s;
+    }
+    
+    .modal-close:hover {
+      background: var(--destructive);
+      color: white;
+    }
+    
+    .modal-body {
+      padding: 28px;
+    }
+    
+    .modal-footer {
+      padding: 20px 28px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      position: sticky;
+      bottom: 0;
+      background: var(--card);
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    }
+    
+    .position-context {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .context-info {
+      flex: 1;
+    }
+    
+    .context-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+    
+    .context-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    
+    .context-meta {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+    
+    .change-position-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .change-position-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      color: var(--muted-foreground);
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Attribute Sliders */
+    .attributes-grid {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .attribute-item {
+      display: grid;
+      grid-template-columns: 160px 1fr 60px;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .attribute-label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--border);
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      border: none;
+    }
+    
+    .attribute-value {
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .attribute-value.high { color: var(--accent); }
+    .attribute-value.medium { color: #B45309; }
+    .attribute-value.low { color: var(--destructive); }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Kanban Board - MAIN HUB
+    All CRUD operations happen on this page via modals
+    No navigation to separate pages
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item active">
+            <span class="icon">🎯</span> Recruitment Pipeline
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item">
+            <span class="icon">➕</span> Create Position
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Position Header -->
+      <div class="position-header">
+        <div class="position-info">
+          <div class="position-selector">
+            <div class="position-current" onclick="alert('Position Switcher\n\nSwitch between:\n• Senior Backend Developer (current)\n• Frontend Developer\n• UI/UX Designer')">
+              <div class="position-name">
+                Senior Backend Developer
+                <span style="font-size: 14px; opacity: 0.8;">▾</span>
+              </div>
+              <div class="position-meta">
+                <span class="position-metric">
+                  <strong>1/2</strong> filled
+                </span>
+                <span class="position-metric">
+                  <strong>13</strong> candidates
+                </span>
+                <span class="position-metric">
+                  <strong>45</strong> days open
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="position-actions" style="display: flex; gap: 12px;">
+            <button class="btn btn-outline" onclick="window.location.href='03-position-wizard.html'">
+              ➕ New Position
+            </button>
+          </div>
+        </div>
+        
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-label">Pipeline</div>
+            <div class="metric-value">13</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Avg. Stage Time</div>
+            <div class="metric-value">8d</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Interview Rate</div>
+            <div class="metric-value">62%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Offer Rate</div>
+            <div class="metric-value">33%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="filters-top">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search candidates by name, email, or skills...">
+          </div>
+          
+          <div class="filter-group">
+            <select class="filter-select">
+              <option value="">All Fit Scores</option>
+              <option value="high">High (≥90%)</option>
+              <option value="medium">Medium (70-89%)</option>
+              <option value="low">Low (<70%)</option>
+            </select>
+            
+            <select class="filter-select">
+              <option value="">All Sources</option>
+              <option value="linkedin">LinkedIn (5)</option>
+              <option value="referral">Referral (4)</option>
+              <option value="direct">Direct (3)</option>
+              <option value="jobboard">Job Board (1)</option>
+            </select>
+            
+            <button class="btn btn-outline btn-sm">Clear All</button>
+          </div>
+        </div>
+        
+        <div class="active-filters" id="activeFilters">
+          <!-- Dynamic filter badges appear here -->
+        </div>
+      </div>
+
+      <!-- Kanban Board -->
+      <div class="board-container">
+        <div class="kanban-board">
+          <!-- Column: New -->
+          <div class="kanban-column">
+            <div class="column-header">
+              <div class="column-title-row">
+                <span class="column-title">
+                  🆕 New
+                  <span class="column-count">3</span>
+                </span>
+              </div>
+              <div class="column-stats">
+                ⏱️ Avg: 2 days in stage
+              </div>
+            </div>
+            <div class="candidate-cards" ondrop="drop(event)" ondragover="allowDrop(event)" data-stage="new">
+              <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="1" onclick="openViewModal(1)">
+                <div class="card-actions" onclick="event.stopPropagation()">
+                  <div class="action-icon" onclick="openViewModal(1)" title="View">👁️</div>
+                  <div class="action-icon" onclick="openEditModal(1)" title="Edit">✏️</div>
+                  <div class="action-icon" onclick="openScheduleModal(1)" title="Schedule">�</div>
+                </div>
+                <div class="card-top">
+                  <div class="card-avatar">AC</div>
+                  <div class="card-info">
+                    <div class="card-name">Alex Chen</div>
+                    <div class="card-role">Senior Backend Developer</div>
+                    <div class="card-meta-row">
+                      <span class="fit-score high">🎯 95%</span>
+                      <span class="card-source">💼 LinkedIn</span>
+                      <span class="card-duration">⏱️ 2d</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <span class="column-count">2</span>
+          </div>
+          <div class="candidate-cards" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="4" onclick="openViewModal(4)">
+              <div class="card-actions" onclick="event.stopPropagation()">
+                <div class="action-icon" onclick="openEditModal(4)" title="Edit">✏️</div>
+                <div class="action-icon" onclick="openScheduleModal(4)" title="Schedule Interview">📅</div>
+                <div class="action-icon" onclick="deleteCandidate(4)" title="Delete">🗑️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--warning);">SM</div>
+                <div class="card-info">
+                  <div class="card-name">Sarah Miller</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score medium">🎯 78%</span>
+                <span class="card-source">LinkedIn</span>
+              </div>
+            </div>
+            
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="5" onclick="openViewModal(5)">
+              <div class="card-actions" onclick="event.stopPropagation()">
+                <div class="action-icon" onclick="openEditModal(5)" title="Edit">✏️</div>
+                <div class="action-icon" onclick="openScheduleModal(5)" title="Schedule Interview">📅</div>
+                <div class="action-icon" onclick="deleteCandidate(5)" title="Delete">🗑️</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--destructive);">RK</div>
+                <div class="card-info">
+                  <div class="card-name">Robert Kim</div>
+                  <div class="card-position">Senior Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 91%</span>
+                <span class="card-source">Referral</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Interview -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title">🗣️ Interview</span>
+            <span class="column-count">2</span>
+          </div>
+          <div class="candidate-cards" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="6" onclick="openViewModal(6)">
+              <div class="card-actions" onclick="event.stopPropagation()">
+                <div class="action-icon" onclick="openEditModal(6)" title="Edit">✏️</div>
+                <div class="action-icon" onclick="openFeedbackModal(6)" title="Add Feedback">📝</div>
+                <div class="action-icon" onclick="openOfferModal(6)" title="Create Offer">💼</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--zone-support);">JD</div>
+                <div class="card-info">
+                  <div class="card-name">John Davis</div>
+                  <div class="card-position">Senior Architect</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 92%</span>
+                <span class="card-source">LinkedIn</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--primary);">
+                📅 Interview: Mar 20, 2:00 PM
+              </div>
+            </div>
+            
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="7" onclick="openViewModal(7)">
+              <div class="card-actions" onclick="event.stopPropagation()">
+                <div class="action-icon" onclick="openEditModal(7)" title="Edit">✏️</div>
+                <div class="action-icon" onclick="openFeedbackModal(7)" title="Add Feedback">📝</div>
+                <div class="action-icon" onclick="openOfferModal(7)" title="Create Offer">💼</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar">LB</div>
+                <div class="card-info">
+                  <div class="card-name">Lisa Brown</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 87%</span>
+                <span class="card-source">Direct</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--accent);">
+                ✅ Feedback submitted
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Offer -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title">💼 Offer</span>
+            <span class="column-count">1</span>
+          </div>
+          <div class="candidate-cards" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" draggable="true" ondragstart="drag(event)" data-id="8" onclick="openViewModal(8)">
+              <div class="card-actions" onclick="event.stopPropagation()">
+                <div class="action-icon" onclick="openEditModal(8)" title="Edit">✏️</div>
+                <div class="action-icon" onclick="openOfferModal(8)" title="Edit Offer">💼</div>
+                <div class="action-icon" onclick="openConversionWizard(8)" title="Convert to Employee">⭐</div>
+              </div>
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--warning);">EW</div>
+                <div class="card-info">
+                  <div class="card-name">Emma Wilson</div>
+                  <div class="card-position">Senior Developer</div>
+                </div>
+              </div>
+              <div class="card-meta">
+                <span class="fit-score high">🎯 88%</span>
+                <span class="card-source">Referral</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--warning);">
+                ⏳ Offer expires in 6 days
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Hired -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title">✅ Hired</span>
+            <span class="column-count">0</span>
+          </div>
+          <div class="candidate-cards" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="empty-state">
+              🎉 No hires yet<br>Keep the pipeline moving!
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Rejected -->
+        <div class="kanban-column" style="opacity: 0.6;">
+          <div class="column-header">
+            <span class="column-title">❌ Rejected</span>
+            <span class="column-count">1</span>
+          </div>
+          <div class="candidate-cards" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="candidate-card" style="opacity: 0.7;" onclick="openViewModal(9)">
+              <div class="card-header">
+                <div class="card-avatar" style="background: var(--muted-foreground);">DT</div>
+                <div class="card-info">
+                  <div class="card-name">David Taylor</div>
+                  <div class="card-position">Backend Developer</div>
+                </div>
+              </div>
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-top: 8px;">
+                Insufficient experience
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button class="fab" onclick="openAddCandidateModal()" title="Add Candidate">
+    ➕
+  </button>
+
+  <!-- ADD CANDIDATE MODAL -->
+  <div class="modal-overlay" id="addCandidateModal">
+    <div class="modal large">
+      <div class="modal-header">
+        <h2 class="modal-title">➕ Add Candidate</h2>
+        <button class="modal-close" onclick="closeModal('addCandidateModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Position Context -->
+        <div class="position-context">
+          <div class="context-info">
+            <div class="context-label">Adding candidate to:</div>
+            <div class="context-value">Senior Backend Developer</div>
+            <div class="context-meta">1 of 2 positions filled • 13 candidates in pipeline</div>
+          </div>
+          <button class="change-position-btn" onclick="alert('Switch to different position')">Change Position</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-input" placeholder="Enter full name">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" placeholder="candidate@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-input" placeholder="+66 XX XXX XXXX">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Current Position</label>
+            <input type="text" class="form-input" placeholder="Current role">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Source *</label>
+            <select class="form-select">
+              <option>LinkedIn</option>
+              <option>Referral</option>
+              <option>Job Board</option>
+              <option>Direct Application</option>
+            </select>
+          </div>
+        </div>
+        
+        <h3 style="font-size: 16px; font-weight: 600; margin: 24px 0 16px;">Attribute Rating (1-20)</h3>
+        
+        <div class="attributes-grid">
+          <div class="attribute-item">
+            <div class="attribute-label">Backend Development</div>
+            <input type="range" min="1" max="20" value="15" class="slider" oninput="updateSliderValue(this, 'attr1')">
+            <div class="attribute-value high" id="attr1">15</div>
+          </div>
+          <div class="attribute-item">
+            <div class="attribute-label">Database Design</div>
+            <input type="range" min="1" max="20" value="14" class="slider" oninput="updateSliderValue(this, 'attr2')">
+            <div class="attribute-value medium" id="attr2">14</div>
+          </div>
+          <div class="attribute-item">
+            <div class="attribute-label">Problem Solving</div>
+            <input type="range" min="1" max="20" value="16" class="slider" oninput="updateSliderValue(this, 'attr3')">
+            <div class="attribute-value high" id="attr3">16</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('addCandidateModal')">Cancel</button>
+        <button class="btn btn-outline" onclick="alert('LinkedIn import coming soon!')">📎 Import from LinkedIn</button>
+        <button class="btn btn-primary" onclick="saveNewCandidate()">Add to Pipeline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW/EDIT CANDIDATE MODAL -->
+  <div class="modal-overlay" id="viewCandidateModal">
+    <div class="modal large">
+      <div class="modal-header">
+        <h2 class="modal-title">👤 Candidate Details</h2>
+        <button class="modal-close" onclick="closeModal('viewCandidateModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('tab-info')">Basic Info</button>
+          <button class="tab" onclick="switchTab('tab-attributes')">Attributes & Fit</button>
+          <button class="tab" onclick="switchTab('tab-activity')">Activity Log</button>
+        </div>
+        
+        <div class="tab-content active" id="tab-info">
+          <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--gradient-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700;">AC</div>
+            <div>
+              <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Alex Chen</h3>
+              <p style="color: var(--muted-foreground); margin-bottom: 8px;">Senior Backend Developer</p>
+              <div style="display: flex; gap: 8px;">
+                <span class="badge badge-success">95% Fit</span>
+                <span class="badge badge-primary">New Stage</span>
+              </div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">EMAIL</div>
+              <div style="font-weight: 600;">alex.chen@email.com</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">PHONE</div>
+              <div style="font-weight: 600;">+66 81 234 5678</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">SOURCE</div>
+              <div style="font-weight: 600;">LinkedIn</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">EXPERIENCE</div>
+              <div style="font-weight: 600;">8 years</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="tab-attributes">
+          <div style="background: var(--gradient-primary); color: white; padding: 24px; border-radius: var(--radius-lg); text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 48px; font-weight: 700; margin-bottom: 8px;">95%</div>
+            <div style="font-size: 16px;">Fit Score for Senior Backend Developer</div>
+          </div>
+          
+          <div class="attributes-grid">
+            <div class="attribute-item">
+              <div class="attribute-label">Backend Development</div>
+              <div style="flex: 1; background: var(--accent-light); height: 8px; border-radius: 999px;"><div style="width: 90%; background: var(--accent); height: 100%; border-radius: 999px;"></div></div>
+              <div class="attribute-value high">18</div>
+            </div>
+            <div class="attribute-item">
+              <div class="attribute-label">Database Design</div>
+              <div style="flex: 1; background: var(--accent-light); height: 8px; border-radius: 999px;"><div style="width: 85%; background: var(--accent); height: 100%; border-radius: 999px;"></div></div>
+              <div class="attribute-value high">17</div>
+            </div>
+            <div class="attribute-item">
+              <div class="attribute-label">System Architecture</div>
+              <div style="flex: 1; background: var(--accent-light); height: 8px; border-radius: 999px;"><div style="width: 80%; background: var(--accent); height: 100%; border-radius: 999px;"></div></div>
+              <div class="attribute-value high">16</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="tab-activity">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="padding: 16px; background: var(--background); border-radius: var(--radius-md);">
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">2 hours ago</div>
+              <div><strong>Alex Chen</strong> was added to the pipeline</div>
+            </div>
+            <div style="padding: 16px; background: var(--background); border-radius: var(--radius-md);">
+              <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">1 day ago</div>
+              <div>Fit score calculated: <strong>95%</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('viewCandidateModal')">Close</button>
+        <button class="btn btn-outline" onclick="closeModal('viewCandidateModal'); openEditModal(1)">Edit</button>
+        <button class="btn btn-primary" onclick="closeModal('viewCandidateModal'); openScheduleModal(1)">Schedule Interview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE INTERVIEW MODAL -->
+  <div class="modal-overlay" id="scheduleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">📅 Schedule Interview</h2>
+        <button class="modal-close" onclick="closeModal('scheduleModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+          <strong>Candidate:</strong> Alex Chen - Senior Backend Developer
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Interview Type *</label>
+          <select class="form-select">
+            <option>Technical Interview</option>
+            <option>Phone Screen</option>
+            <option>Cultural Fit</option>
+            <option>Managerial Interview</option>
+          </select>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" class="form-input" value="2026-03-20">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time *</label>
+            <input type="time" class="form-input" value="14:00">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Duration</label>
+          <select class="form-select">
+            <option>30 minutes</option>
+            <option>45 minutes</option>
+            <option selected>60 minutes</option>
+            <option>90 minutes</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Interviewers (≥1 required)</label>
+          <input type="text" class="form-input" placeholder="Search employees...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('scheduleModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="scheduleInterview()">Schedule Interview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK MODAL -->
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">📝 Submit Interview Feedback</h2>
+        <button class="modal-close" onclick="closeModal('feedbackModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+          <strong>Candidate:</strong> John Davis - Interview on Mar 20, 2:00 PM
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Overall Rating (1-5) *</label>
+          <div style="display: flex; gap: 12px; font-size: 32px;">
+            <span style="cursor: pointer;" onclick="setRating(1)">⭐</span>
+            <span style="cursor: pointer;" onclick="setRating(2)">⭐</span>
+            <span style="cursor: pointer;" onclick="setRating(3)">⭐</span>
+            <span style="cursor: pointer;" onclick="setRating(4)">⭐</span>
+            <span style="cursor: pointer;" onclick="setRating(5)">⭐</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Comments (min 50 characters) *</label>
+          <textarea class="form-textarea" rows="6" placeholder="Provide detailed feedback about the interview..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Recommendation *</label>
+          <select class="form-select">
+            <option>Strong Hire</option>
+            <option>Hire</option>
+            <option>Maybe</option>
+            <option>No Hire</option>
+            <option>Strong No Hire</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('feedbackModal')">Cancel</button>
+        <button class="btn btn-outline">Save Draft</button>
+        <button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFER MODAL -->
+  <div class="modal-overlay" id="offerModal">
+    <div class="modal large">
+      <div class="modal-header">
+        <h2 class="modal-title">💼 Create Job Offer</h2>
+        <button class="modal-close" onclick="closeModal('offerModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+          <strong>Candidate:</strong> John Davis - Senior Architect
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Monthly Salary (THB) *</label>
+            <div style="display: flex; gap: 8px;">
+              <span style="padding: 12px 16px; background: var(--muted); border-radius: var(--radius-md); font-weight: 600;">฿</span>
+              <input type="number" class="form-input" value="90000" min="60000" max="100000" style="flex: 1;">
+            </div>
+            <span class="form-hint">Range: ฿60,000 - ฿100,000</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Start Date *</label>
+            <input type="date" class="form-input" value="2026-04-15">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Employment Type *</label>
+          <select class="form-select">
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Contract</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Benefits Package</label>
+          <textarea class="form-textarea" rows="4">• Health insurance
+• Annual bonus (up to 3 months)
+• Flexible working hours
+• Remote work options</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('offerModal')">Cancel</button>
+        <button class="btn btn-outline">Preview PDF</button>
+        <button class="btn btn-primary" onclick="sendOffer()">Send Offer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let draggedElement = null;
+    
+    // Drag and Drop
+    function allowDrop(ev) {
+      ev.preventDefault();
+      ev.currentTarget.style.background = 'rgba(59, 130, 246, 0.05)';
+    }
+
+    function drag(ev) {
+      draggedElement = ev.target;
+      ev.target.classList.add('dragging');
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      ev.currentTarget.style.background = '';
+      
+      if (draggedElement && ev.currentTarget.classList.contains('candidate-cards')) {
+        ev.currentTarget.appendChild(draggedElement);
+        draggedElement.classList.remove('dragging');
+        showToast('Candidate moved successfully! ✓');
+        draggedElement = null;
+      }
+    }
+
+    document.querySelectorAll('.candidate-cards').forEach(cards => {
+      cards.addEventListener('dragleave', (e) => {
+        e.currentTarget.style.background = '';
+      });
+    });
+
+    // Modal Functions
+    function openAddCandidateModal() {
+      document.getElementById('addCandidateModal').classList.add('visible');
+    }
+
+    function openViewModal(id) {
+      document.getElementById('viewCandidateModal').classList.add('visible');
+      switchTab('tab-info');
+    }
+
+    function openEditModal(id) {
+      closeAllModals();
+      // In real app, this would open an edit modal with pre-filled data
+      alert('Edit Candidate #' + id + '\n\nIn real app, this would open an edit form with current data.');
+    }
+
+    function openScheduleModal(id) {
+      closeAllModals();
+      document.getElementById('scheduleModal').classList.add('visible');
+    }
+
+    function openFeedbackModal(id) {
+      closeAllModals();
+      document.getElementById('feedbackModal').classList.add('visible');
+    }
+
+    function openOfferModal(id) {
+      closeAllModals();
+      document.getElementById('offerModal').classList.add('visible');
+    }
+
+    function openConversionWizard(id) {
+      if (confirm('Convert Emma Wilson to Employee?\n\nThis will open the employee conversion wizard.')) {
+        window.location.href = '07-conversion-wizard.html';
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.remove('visible');
+      });
+    }
+
+    // Click outside modal to close
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeAllModals();
+        }
+      });
+    });
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // CRUD Operations
+    function saveNewCandidate() {
+      closeModal('addCandidateModal');
+      showToast('✅ Candidate added successfully!');
+      // In real app, would add card to New column
+    }
+
+    function scheduleInterview() {
+      closeModal('scheduleModal');
+      showToast('📅 Interview scheduled successfully!');
+    }
+
+    function submitFeedback() {
+      closeModal('feedbackModal');
+      showToast('✅ Feedback submitted successfully!');
+    }
+
+    function sendOffer() {
+      closeModal('offerModal');
+      showToast('💼 Job offer sent successfully!');
+    }
+
+    function deleteCandidate(id) {
+      if (confirm('Delete this candidate?\n\nThis action cannot be undone.')) {
+        showToast('🗑️ Candidate deleted');
+      }
+    }
+
+    // Helper Functions
+    function updateSliderValue(slider, id) {
+      const value = parseInt(slider.value);
+      const element = document.getElementById(id);
+      element.textContent = value;
+      
+      element.className = 'attribute-value';
+      if (value >= 15) element.classList.add('high');
+      else if (value >= 10) element.classList.add('medium');
+      else element.classList.add('low');
+    }
+
+    function setRating(rating) {
+      console.log('Rating set to:', rating);
+    }
+
+    function showFilters() {
+      alert('Advanced filters expanded\n\nIn real app, this would show additional filter options.');
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'alert alert-success';
+      toast.style.position = 'fixed';
+      toast.style.top = '24px';
+      toast.style.right = '24px';
+      toast.style.zIndex = '9999';
+      toast.style.boxShadow = 'var(--shadow-strong)';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    console.log('Kanban Board (MAIN HUB) loaded - All CRUD operations available inline');
+  </script>
+</body>
+</html>

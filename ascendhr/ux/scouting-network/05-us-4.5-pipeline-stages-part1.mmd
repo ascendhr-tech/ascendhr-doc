@@ -1,0 +1,300 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_KANBAN[("Kanban Board<br/>Drag Card")]
+    ENTRY_CARD[("Candidate Card<br/>Quick Action")]
+    ENTRY_BULK[("Bulk Select<br/>Multiple Candidates")]
+    ENTRY_MENU[("Context Menu<br/>Right-Click")]
+    
+    %% 1. HAPPY PATH: Single Drag & Drop
+    subgraph HAPPY["1️⃣ HAPPY PATH: Drag & Drop Move"]
+        H1[Candidate in 'New' Column]
+        H2[User Drags Card]
+        H3[Card Semi-Transparent]
+        H4[Target Columns Highlight]
+        H5[Hover 'Screening' Column]
+        H6[Column Glows Blue]
+        H7[Drop Card]
+        H8{Validation: BR-006}
+        H9[Valid Transition ✓]
+        H10[Show Confirmation Dialog]
+        H11[Add Notes Optional]
+        H12[Confirm Move]
+        H13[Update Database]
+        H14[Card Animates to New Column]
+        H15[Status Updated: Screening]
+        H16[Show Toast: 'Moved to Screening']
+        H17[Activity Log Created]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+        H16 --> H17
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Bulk Move
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Bulk Move Multiple"]
+        A1[Kanban Board View]
+        A2[Click 'Bulk Actions']
+        A3[Bulk Mode Enabled]
+        A4[Checkboxes Appear on Cards]
+        A5[Select 5 Candidates]
+        A6[Selection Count: '5 selected']
+        A7[Click 'Move Selected']
+        A8[Stage Selector Opens]
+        A9[Select Target: 'Interview']
+        A10[Confirmation Modal]
+        A11[List 5 Candidates]
+        A12[Confirm Bulk Move]
+        A13[Process Each in Sequence]
+        A14[Progress: '3 of 5 moved...']
+        A15[All 5 Moved Successfully ✓]
+        A16[Show Summary: '5 moved to Interview']
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 --> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+        A11 --> A12
+        A12 --> A13
+        A13 --> A14
+        A14 --> A15
+        A15 --> A16
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Context Menu Move
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Context Menu"]
+        B1[Candidate Card Displayed]
+        B2[Right-Click on Card]
+        B3[Context Menu Opens]
+        B4[Options Listed]
+        B5[Move to Screening]
+        B6[Move to Interview]
+        B7[Move to Offer]
+        B8[Reject Candidate]
+        B9[User Selects 'Move to Interview']
+        B10[Confirmation Dialog]
+        B11[Confirm]
+        B12[Candidate Moved ✓]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B4 --> B6
+        B4 --> B7
+        B4 --> B8
+        B5 --> B9
+        B6 --> B9
+        B7 --> B9
+        B9 --> B10
+        B10 --> B11
+        B11 --> B12
+    end
+    
+    %% 3. ERROR PATH: Invalid Stage Transition
+    subgraph ERROR["3️⃣ ERROR PATH: Invalid Transition"]
+        E1[Candidate in 'New']
+        E2[User Drags to 'Offer']
+        E3[Drop on Offer Column]
+        E4{Validation: BR-006}
+        E5[Invalid: Skipped Stages ❌]
+        E6[Card Snaps Back]
+        E7[Show Error Toast]
+        E8[Message: 'Cannot skip stages.<br/>Move to Screening first']
+        E9[Suggest Valid Next Steps]
+        E10[Show: 'Valid: Screening or Rejected']
+        E11[User Corrects]
+        E12[Drags to Screening]
+        
+        E1 --> E2
+        E2 --> E3
+        E3 --> E4
+        E4 --> E5
+        E5 --> E6
+        E6 --> E7
+        E7 --> E8
+        E8 --> E9
+        E9 --> E10
+        E10 --> E11
+        E11 --> E12
+    end
+    
+    %% 4. BUSINESS RULE ERROR: BR-014 Offer Without Interview
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: BR-014 Violation"]
+        BR1[Attempt Move to Offer]
+        BR2{BR-014 Check}
+        BR3[No Interview Conducted ❌]
+        BR4[Error Modal]
+        BR5[Title: 'Interview Required']
+        BR6[Message: 'Candidate must complete<br/>interview before receiving offer']
+        BR7[Options Presented]
+        BR8A[Schedule Interview]
+        BR8B[Cancel Move]
+        BR9[User Selects: Schedule Interview]
+        BR10[Open Interview Form]
+        BR11[Schedule & Return]
+        
+        BR1 --> BR2
+        BR2 --> BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8A
+        BR7 --> BR8B
+        BR8A --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+    end
+    
+    %% 5. RECOVERY PATH: Undo Recent Move
+    subgraph RECOVERY["5️⃣ RECOVERY: Undo Move"]
+        R1[Candidate Moved: New → Screening]
+        R2[Toast Shows: 'Moved to Screening']
+        R3[Undo Button in Toast]
+        R4[User Clicks 'Undo' (5 sec window)]
+        R5[Reverse Transaction]
+        R6[Card Animates Back]
+        R7[Status Reverted: New]
+        R8[Activity Log: 'Move undone']
+        R9[Show: 'Move cancelled']
+        R10[After 5 Seconds]
+        R11[Toast Disappears]
+        R12[Undo No Longer Available]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R2 --> R10
+        R10 --> R11
+        R11 --> R12
+    end
+    
+    %% 6. PERMISSION PATH: Hiring Manager Approval
+    subgraph PERMISSION["6️⃣ PERMISSION: Approval Required"]
+        P1[Recruiter Moves to Offer]
+        P2{Check Permission}
+        P3[Requires Manager Approval]
+        P4[Stage: 'Pending Approval']
+        P5[Notify Hiring Manager]
+        P6[Manager Receives Notification]
+        P7{Manager Decision}
+        P8A[Approve Move]
+        P8B[Reject Move]
+        P9[Move Completes to Offer ✓]
+        P10[Return to Interview]
+        P11[Add Rejection Reason]
+        
+        P1 --> P2
+        P2 --> P3
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P6 --> P7
+        P7 --> P8A
+        P7 --> P8B
+        P8A --> P9
+        P8B --> P10
+        P10 --> P11
+    end
+    
+    %% EXIT POINTS
+    EXIT_KANBAN[("Kanban Board<br/>Updated View")]
+    EXIT_PROF[("Candidate Profile<br/>View Details")]
+    EXIT_INT[("Schedule Interview<br/>Next Step")]
+    
+    %% Main Flow Connections
+    ENTRY_KANBAN ==> H1
+    ENTRY_CARD ==> B1
+    ENTRY_BULK ==> A1
+    ENTRY_MENU ==> B2
+    
+    H8 -->|Invalid| E4
+    H17 ==> EXIT_KANBAN
+    
+    A16 ==> EXIT_KANBAN
+    B12 ==> EXIT_KANBAN
+    
+    E12 --> H2
+    
+    BR2 -->|Valid| H9
+    BR11 ==> EXIT_INT
+    BR8B ==> EXIT_KANBAN
+    
+    R9 ==> EXIT_KANBAN
+    R12 --> H17
+    
+    P9 ==> EXIT_KANBAN
+    P11 ==> EXIT_KANBAN
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    
+    class ENTRY_KANBAN,ENTRY_CARD,ENTRY_BULK,ENTRY_MENU entry
+    class EXIT_KANBAN,EXIT_PROF,EXIT_INT exit
+    class H9,H17,A15,B12,R9,P9 success
+    class E5,E8,BR3,BR4 error
+    class R3,P4,E10 warning
+```
+
+---
+
+## US-4.5: Move Candidate Through Pipeline Stages (Part 1)
+
+### Flow Type Coverage (Part 1): 6 of 10 Types
+
+1. **Happy Path** ✅ - Drag & drop with validation and confirmation
+2. **Alternative Paths** ✅ - Bulk move, context menu move
+3. **Error Paths** ✅ - Invalid stage transitions, skipped stages
+4. **Business Rule Errors** ✅ - BR-014 (interview required before offer)
+5. **Recovery Paths** ✅ - Undo move within 5-second window
+6. **Permission Paths** ✅ - Hiring manager approval for offers
+
+### Valid Stage Transitions (BR-006)
+
+| From Stage | Valid Next Stages |
+|------------|-------------------|
+| New | Screening, Rejected |
+| Screening | Interview, Rejected |
+| Interview | Offer, Rejected |
+| Offer | Hired, Rejected |
+| Hired | (Final state) |
+| Rejected | (Final state) |
+
+### Key Business Rules
+
+- **BR-006:** Stage transitions must follow pipeline sequence (no skipping)
+- **BR-014:** Interview feedback required before moving to Offer
+- **BR-007:** Application status syncs with pipeline stage
+- **BR-015:** Rejection requires reason (mandatory field)
+
+**Continued in Part 2...**

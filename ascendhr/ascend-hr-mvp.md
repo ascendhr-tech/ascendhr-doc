@@ -21,7 +21,7 @@
 | Epic 0.7 | Scouting Network | 8 | 10 |
 | **TOTAL** | | **58.5** | **71 man-days** |
 
-> **AI Productivity Boost:** ~40-50% faster than traditional development
+> **AI Productivity Boost:** ~40-60% faster than traditional development
 
 ---
 

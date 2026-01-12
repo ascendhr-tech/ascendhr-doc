@@ -1,0 +1,418 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '13px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_DASH[("Dashboard<br/>'New Position'")]
+    ENTRY_FORM[("Formation View<br/>'Add Position'")]
+    ENTRY_LIST[("Position List<br/>'Create'")]
+    ENTRY_URL[("Direct URL<br/>/positions/new")]
+    ENTRY_DRAFT[("Email Reminder<br/>'Resume Draft'")]
+    
+    %% 1. HAPPY PATH
+    subgraph HAPPY["1️⃣ HAPPY PATH: Create Position Successfully"]
+        H1[Position List]
+        H2[Click 'New Position']
+        H3[Position Form<br/>Step 1: Basic Info]
+        H4[Enter Title, Dept, Headcount]
+        H5[Step 2: Requirements Grid]
+        H6[Add Attribute Requirements]
+        H7[Set Min/Max values 1-20]
+        H8[Mark Mandatory fields]
+        H9{Validation Check}
+        H10[Step 3: Link to Formation]
+        H11[Select Team Position]
+        H12[Preview Position]
+        H13[Submit]
+        H14[Position Created ✓]
+        H15[View Position Detail]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 -->|Valid| H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Save as Draft
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Save Draft & Resume Later"]
+        A1[Mid-form: Step 1 or 2]
+        A2[Click 'Save as Draft']
+        A3[Show Save Confirmation]
+        A4[Draft Saved in List]
+        A5[Close Form]
+        A6[Later: Return to List]
+        A7[See Draft Badge]
+        A8[Click 'Resume Draft']
+        A9[Form Restores State]
+        A10[Continue Editing]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 -.-> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Bulk Requirements Import
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Import Template for Requirements"]
+        B1[Requirements Grid Empty]
+        B2[Click 'Use Template']
+        B3[Select Position Type]
+        B4[Backend Developer Template]
+        B5[Template Loads 8 Attributes]
+        B6[Customize Values]
+        B7[Continue to Next Step]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 --> B6
+        B6 --> B7
+    end
+    
+    %% 3. ERROR PATH: Validation Errors
+    subgraph ERROR["3️⃣ ERROR PATH: Validation Failures"]
+        E1[Submit Form]
+        E2{Validation}
+        E3[Title Empty ❌]
+        E4[Show Inline Error]
+        E5[Headcount = 0 ❌]
+        E6[Show 'Must be ≥ 1']
+        E7[No Requirements ❌]
+        E8[Show 'Add ≥ 1 Requirement']
+        E9[Fix Errors]
+        E10[Resubmit]
+        
+        E1 --> E2
+        E2 -->|Title Missing| E3
+        E2 -->|Invalid Headcount| E5
+        E2 -->|No Requirements| E7
+        E3 --> E4
+        E5 --> E6
+        E7 --> E8
+        E4 --> E9
+        E6 --> E9
+        E8 --> E9
+        E9 --> E10
+    end
+    
+    %% 4. BUSINESS RULE ERROR: BR-001 Violation
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE ERROR: BR-001 Violation"]
+        BR1[Attempt to Publish]
+        BR2{BR-001 Check}
+        BR3[Requirements Count = 0]
+        BR4[Error: 'Position must have<br/>≥1 requirement before publishing']
+        BR5[Option 1: Add Requirements]
+        BR6[Option 2: Save as Draft]
+        
+        BR1 --> BR2
+        BR2 -->|No Requirements| BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR4 --> BR6
+    end
+    
+    %% 5. RECOVERY PATH: Unsaved Changes Warning
+    subgraph RECOVERY["5️⃣ RECOVERY PATH: Prevent Data Loss"]
+        R1[User Editing Form]
+        R2[Click Back/Close]
+        R3{Has Unsaved Changes?}
+        R4[Show Warning Modal]
+        R5[3 Options Presented]
+        R6A[Save as Draft]
+        R6B[Discard Changes]
+        R6C[Cancel - Keep Editing]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 -->|Yes| R4
+        R3 -->|No| R6B
+        R4 --> R5
+        R5 --> R6A
+        R5 --> R6B
+        R5 --> R6C
+    end
+    
+    %% 6. PERMISSION PATH: Access Control
+    subgraph PERMISSION["6️⃣ PERMISSION: Role-Based Access"]
+        P1[User Requests Create Position]
+        P2{Check Role}
+        P3[Role = Interviewer]
+        P4[Access Denied ⛔]
+        P5[Show Message:<br/>'Only Recruiters can create positions']
+        P6[Suggest: Contact HR]
+        P7[Role = Recruiter ✓]
+        P8[Access Granted]
+        
+        P1 --> P2
+        P2 -->|Not Recruiter| P3
+        P2 -->|Recruiter| P7
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P7 --> P8
+    end
+    
+    %% 7. LOOP PATH: Edit After Creation
+    subgraph LOOP["7️⃣ LOOP: Edit & Update Cycle"]
+        L1[Position Created]
+        L2[View Position Detail]
+        L3[Click 'Edit Position']
+        L4[Form Opens with Data]
+        L5[Modify Requirements]
+        L6[Update Min/Max Values]
+        L7[Save Changes]
+        L8[Show 'Position Updated' ✓]
+        L9{Continue?}
+        L10[Edit Again]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 -->|Edit More| L10
+        L10 --> L3
+        L9 -->|Done| L2
+    end
+    
+    %% 8. TIMEOUT PATH: Session Expiry
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Session Management"]
+        T1[Form Open 45 Minutes]
+        T2[User Idle]
+        T3[Session Expires]
+        T4[Show Warning: 'Session expiring in 2 min']
+        T5{User Action}
+        T6[Auto-save Draft]
+        T7[Redirect to Login]
+        T8[After Login]
+        T9[Show: 'Draft saved - Resume?']
+        T10[Click Resume]
+        T11[Form Restored]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 -->|No Response| T6
+        T5 -->|User Active| T1
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+    end
+    
+    %% 9. EMPTY STATE: First Position
+    subgraph EMPTY["9️⃣ EMPTY STATE: First-Time User"]
+        EM1[Navigate to Positions]
+        EM2[Load Position List]
+        EM3{Has Positions?}
+        EM4[Empty State Display]
+        EM5[Illustration: Empty Office]
+        EM6[Message: 'No positions yet']
+        EM7[CTA: 'Create First Position']
+        EM8[Tips: Quick Start Guide]
+        EM9[Click CTA]
+        EM10[Open Create Form]
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 -->|No| EM4
+        EM4 --> EM5
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+    end
+    
+    %% 10. CONCURRENT MODIFICATION: Conflict Handling
+    subgraph CONCURRENT["🔟 CONCURRENT: Multi-User Editing"]
+        C1[User A Editing Position]
+        C2[User B Opens Same Position]
+        C3[Both Modify Requirements]
+        C4[User A Saves First]
+        C5[User B Attempts Save]
+        C6{Conflict Detection}
+        C7[Show Conflict Warning]
+        C8[Display Changes:<br/>Your vs. Current]
+        C9[Options Presented]
+        C10A[Overwrite Their Changes]
+        C10B[Reload & Lose Yours]
+        C10C[Merge Manually]
+        
+        C1 --> C2
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+        C5 --> C6
+        C6 -->|Conflict| C7
+        C7 --> C8
+        C8 --> C9
+        C9 --> C10A
+        C9 --> C10B
+        C9 --> C10C
+    end
+    
+    %% INTEGRATION: Formation View Link
+    subgraph INTEGRATION["🔗 INTEGRATION: Formation View"]
+        I1[Step 3: Link to Formation]
+        I2[Call Formation View API]
+        I3{API Response}
+        I4[Load Available Team Positions]
+        I5[Show Position Selector]
+        I6[User Selects Position]
+        I7[Link Established ✓]
+        I8[API Error]
+        I9[Show: 'Formation View unavailable']
+        I10[Option: Skip Linking]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 -->|Success| I4
+        I3 -->|Error| I8
+        I4 --> I5
+        I5 --> I6
+        I6 --> I7
+        I8 --> I9
+        I9 --> I10
+    end
+    
+    %% EXIT POINTS
+    EXIT_LIST[("Position List<br/>View All")]
+    EXIT_DETAIL[("Position Detail<br/>View Created")]
+    EXIT_DASH[("Dashboard<br/>Return Home")]
+    EXIT_CAND[("Add Candidates<br/>Next Step")]
+    
+    %% Main Flow Connections
+    ENTRY_DASH ==> H1
+    ENTRY_FORM ==> H3
+    ENTRY_LIST ==> H2
+    ENTRY_URL ==> H3
+    ENTRY_DRAFT ==> A9
+    
+    H9 -->|Invalid| E2
+    H10 --> I1
+    I7 --> H12
+    H15 ==> EXIT_DETAIL
+    H15 ==> EXIT_CAND
+    
+    A10 --> H5
+    B7 --> H8
+    E10 --> H9
+    BR5 --> H6
+    BR6 --> A2
+    
+    R6A --> A3
+    R6B ==> EXIT_LIST
+    R6C --> R1
+    
+    P8 --> H1
+    P6 ==> EXIT_DASH
+    
+    L8 ==> EXIT_DETAIL
+    T11 --> A10
+    EM10 --> H3
+    
+    C10A --> C4
+    C10B --> L4
+    C10C --> L5
+    
+    I10 --> H12
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef draft fill:#74c0fc,color:white,stroke:#339af0
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class ENTRY_DASH,ENTRY_FORM,ENTRY_LIST,ENTRY_URL,ENTRY_DRAFT entry
+    class EXIT_LIST,EXIT_DETAIL,EXIT_DASH,EXIT_CAND exit
+    class H14,L8,I7 success
+    class E3,E5,E7,BR4,P4,C7 error
+    class T4,R4,EM4,I9 warning
+    class A3,A4,T6 draft
+    class I1,I2,I4 integration
+```
+
+---
+
+## US-4.1: Create Position with Requirements
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Complete form submission with all validations passing
+2. **Alternative Paths** ✅ - Draft saving, template import, Formation View linking
+3. **Error Paths** ✅ - Validation errors, missing fields, invalid values
+4. **Business Rule Errors** ✅ - BR-001 violation (no requirements)
+5. **Recovery Paths** ✅ - Unsaved changes warning, data preservation
+6. **Permission Paths** ✅ - Role-based access control
+7. **Loop Paths** ✅ - Edit-save-edit cycle
+8. **Timeout Paths** ✅ - Session expiry with auto-save
+9. **Empty States** ✅ - First position creation
+10. **Concurrent Modification** ✅ - Multi-user conflict resolution
+
+### Key Screens
+
+| Screen ID | Name | Purpose |
+|-----------|------|---------|
+| `position-list` | Position List | Browse all positions, entry point |
+| `position-form-step1` | Basic Info Form | Title, department, headcount |
+| `position-form-step2` | Requirements Grid | Attribute requirements (min/max 1-20) |
+| `position-form-step3` | Formation Link | Link to team structure |
+| `position-preview` | Preview & Confirm | Review before submission |
+| `position-detail` | Position Detail | View created position |
+| `position-draft-list` | Draft List | Resume incomplete positions |
+
+### Validation Rules
+
+| Field | Rule | Error Message |
+|-------|------|---------------|
+| Title | Required, max 100 chars | "Position title is required" |
+| Department | Required | "Select department" |
+| Headcount | ≥ 1 | "Headcount must be at least 1" |
+| Requirements | ≥ 1 before publish (BR-001) | "Add at least 1 requirement before publishing" |
+| Min Score | 1-20 range | "Min score must be 1-20" |
+| Max Score | ≥ Min, ≤ 20 | "Max must be ≥ Min and ≤ 20" |
+
+### Integration Points
+
+- **Formation View API** - Link position to team structure
+  - Endpoint: `GET /api/formation/positions`
+  - Endpoint: `POST /api/formation/positions/{id}/link`
+  - Error handling: Optional skip if unavailable
+
+### State Persistence
+
+- **Auto-save Draft** - Every 30 seconds while editing
+- **Session Recovery** - Restore after timeout/crash
+- **Conflict Detection** - Last-write-wins with warning
+
+### Success Criteria
+
+- ✅ User can create position in <2 minutes (happy path)
+- ✅ Zero data loss on session timeout
+- ✅ Clear error messages for all validation failures
+- ✅ Draft resume works 100% of time
+- ✅ Multi-user conflict detected and resolved

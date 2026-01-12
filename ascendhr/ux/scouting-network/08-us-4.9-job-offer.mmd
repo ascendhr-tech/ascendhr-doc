@@ -1,0 +1,623 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_FEEDBACK[("Interview Feedback<br/>All Positive")]
+    ENTRY_KANBAN[("Kanban Board<br/>Offer Stage")]
+    ENTRY_PROF[("Candidate Profile<br/>'Create Offer'")]
+    ENTRY_LIST[("Offer List<br/>'New Offer'")]
+    
+    %% 1. HAPPY PATH
+    subgraph HAPPY["1️⃣ HAPPY PATH: Create and Send Offer"]
+        H1[Interview Feedback Positive]
+        H2[All Interviewers: Hire/Strong Hire]
+        H3[Click 'Create Offer']
+        H4[Offer Form Opens]
+        H5[Pre-filled: Candidate, Position Info]
+        H6[Enter Salary Amount]
+        H7[Amount: ฿90,000/month]
+        H8{Validate: BR-008}
+        H9[Within Position Range ✓]
+        H10[₿60k-₿100k range]
+        H11[Select Employment Type]
+        H12[Full-time Selected]
+        H13[Set Start Date]
+        H14[Start: 2026-04-15]
+        H15[Set Expiration Date]
+        H16[Expires: 2026-04-07 7 days]
+        H17[Add Benefits & Terms]
+        H18[Health insurance, 15 days leave]
+        H19{Approval Required: BR-009}
+        H20[Hiring Manager Approval Needed]
+        H21[Generate Offer Letter PDF]
+        H22[Preview PDF]
+        H23[Send for Approval]
+        H24[Manager Receives Notification]
+        H25{Manager Decision}
+        H26[Approved ✓]
+        H27[Send to Candidate]
+        H28[Offer Status: Sent]
+        H29[Candidate Receives Email]
+        H30[Track Offer Status]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+        H16 --> H17
+        H17 --> H18
+        H18 --> H19
+        H19 --> H20
+        H20 --> H21
+        H21 --> H22
+        H22 --> H23
+        H23 --> H24
+        H24 --> H25
+        H25 --> H26
+        H26 --> H27
+        H27 --> H28
+        H28 --> H29
+        H29 --> H30
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Candidate Accepts
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Offer Accepted"]
+        A1[Offer Sent to Candidate]
+        A2[Candidate Reviews Offer]
+        A3[Terms Acceptable]
+        A4[Click 'Accept Offer' Link]
+        A5[Acceptance Form Opens]
+        A6[Review Terms Again]
+        A7[E-signature Required]
+        A8[Sign Digitally]
+        A9[Confirm Acceptance]
+        A10[Offer Status: Accepted ✓]
+        A11[Notify All Stakeholders]
+        A12[Recruiter Notified]
+        A13[Hiring Manager Notified]
+        A14[HR Team Notified]
+        A15[Trigger Employee Conversion]
+        A16[Move to Hired Stage]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 --> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+        A11 --> A12
+        A12 --> A13
+        A13 --> A14
+        A14 --> A15
+        A15 --> A16
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Candidate Rejects/Negotiates
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Offer Rejected/Negotiate"]
+        B1[Candidate Reviews Offer]
+        B2[Salary Too Low]
+        B3[Click 'Decline' or 'Negotiate']
+        B4{Action Chosen}
+        B5[Decline Offer]
+        B6[Reason Required]
+        B7[Select: 'Compensation too low']
+        B8[Offer Status: Rejected]
+        B9[Notify Recruiter]
+        B10[Move to Rejected Stage]
+        B11[Negotiate Terms]
+        B12[Counter Offer Form]
+        B13[Candidate: Requests ฿95k]
+        B14[Reason: Market rate higher]
+        B15[Submit Counter]
+        B16[Status: Negotiating]
+        B17[Recruiter Reviews]
+        B18{Decision}
+        B19[Accept Counter → Revise Offer]
+        B20[Decline Counter → Reject]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 -->|Decline| B5
+        B4 -->|Negotiate| B11
+        B5 --> B6
+        B6 --> B7
+        B7 --> B8
+        B8 --> B9
+        B9 --> B10
+        B11 --> B12
+        B12 --> B13
+        B13 --> B14
+        B14 --> B15
+        B15 --> B16
+        B16 --> B17
+        B17 --> B18
+        B18 --> B19
+        B18 --> B20
+    end
+    
+    %% 3. ERROR PATH: Validation Failures
+    subgraph ERROR["3️⃣ ERROR PATH: Offer Form Validation"]
+        E1[Submit Offer Form]
+        E2{Validation}
+        E3[Salary Empty ❌]
+        E4[Show: 'Salary amount required']
+        E5[Salary Out of Range ❌]
+        E6[Show: 'Must be ฿60k-฿100k']
+        E7[Start Date in Past ❌]
+        E8[Show: 'Start date must be future']
+        E9[Expiration < 3 Days ❌]
+        E10[Show: 'Minimum 3 days to respond']
+        E11[Fix Errors]
+        E12[Resubmit]
+        
+        E1 --> E2
+        E2 -->|No Salary| E3
+        E2 -->|Out of Range| E5
+        E2 -->|Past Date| E7
+        E2 -->|Too Short| E9
+        E3 --> E4
+        E5 --> E6
+        E7 --> E8
+        E9 --> E10
+        E4 --> E11
+        E6 --> E11
+        E8 --> E11
+        E10 --> E11
+        E11 --> E12
+    end
+    
+    %% 4. BUSINESS RULE ERROR: BR-008 & BR-009
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: BR-008 & BR-009"]
+        BR1[Create Offer]
+        BR2{BR-008: Salary Check}
+        BR3[Salary: ฿110,000]
+        BR4[Position Range: ฿60k-฿100k]
+        BR5[Exceeds Max ❌]
+        BR6[Error: 'Salary must be within<br/>position range (BR-008)']
+        BR7[Options]
+        BR8A[Adjust to ฿100k]
+        BR8B[Request Range Increase]
+        BR9{BR-009: Approval Check}
+        BR10[Offer ≥ ฿80k]
+        BR11[Requires Manager Approval]
+        BR12[Cannot Send Without Approval]
+        BR13[Wait for Manager]
+        
+        BR1 --> BR2
+        BR2 --> BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8A
+        BR7 --> BR8B
+        BR8A --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+        BR11 --> BR12
+        BR12 --> BR13
+    end
+    
+    %% 5. RECOVERY PATH: Revise Offer
+    subgraph RECOVERY["5️⃣ RECOVERY: Revise Rejected Offer"]
+        R1[Offer Rejected by Candidate]
+        R2[Reason: Salary too low]
+        R3[Recruiter Reviews]
+        R4[Click 'Revise Offer']
+        R5[Form Opens with Current Data]
+        R6[Increase Salary: ฿90k → ฿95k]
+        R7[Add Signing Bonus: ฿50k]
+        R8[Update Terms]
+        R9{New Approval Needed?}
+        R10[Yes: Salary Increased]
+        R11[Send for Re-approval]
+        R12[Manager Approves]
+        R13[Resend to Candidate]
+        R14[Offer Version 2 Sent]
+        R15[Track: 'Revised offer sent']
+        
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R9 --> R10
+        R10 --> R11
+        R11 --> R12
+        R12 --> R13
+        R13 --> R14
+        R14 --> R15
+    end
+    
+    %% 6. PERMISSION PATH: Approval Workflow
+    subgraph PERMISSION["6️⃣ PERMISSION: Manager Approval"]
+        P1[Recruiter Creates Offer]
+        P2{Check Approval Rules}
+        P3[Offer ≥ ฿80k or Senior Role]
+        P4[Approval Required (BR-009)]
+        P5[Send to Hiring Manager]
+        P6[Manager Receives Notification]
+        P7{Manager Action}
+        P8[Approve Offer]
+        P9[Reject Offer]
+        P10[Request Changes]
+        P11[Offer Approved: Send to Candidate]
+        P12[Offer Rejected: Return to Recruiter]
+        P13[Revision Requested]
+        P14[Recruiter Adjusts]
+        
+        P1 --> P2
+        P2 --> P3
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P6 --> P7
+        P7 --> P8
+        P7 --> P9
+        P7 --> P10
+        P8 --> P11
+        P9 --> P12
+        P10 --> P13
+        P13 --> P14
+    end
+    
+    %% 7. LOOP PATH: Offer Expiration & Extension
+    subgraph LOOP["7️⃣ LOOP: Expiration & Extension"]
+        L1[Offer Sent: 7 Day Expiration]
+        L2[Day 6: No Response]
+        L3[Auto-reminder Sent]
+        L4[Day 7: Offer Expires]
+        L5[Status: Expired]
+        L6[Notify Recruiter]
+        L7{Recruiter Decision}
+        L8[Extend Expiration]
+        L9[Add 7 More Days]
+        L10[Resend Offer]
+        L11[Status: Active Again]
+        L12[Let Expire]
+        L13[Move to Rejected]
+        L14[Position Reopened]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L7 --> L12
+        L8 --> L9
+        L9 --> L10
+        L10 --> L11
+        L11 -.-> L2
+        L12 --> L13
+        L13 --> L14
+    end
+    
+    %% 8. TIMEOUT PATH: Session During Creation
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Session Expiry"]
+        T1[Creating Offer Form]
+        T2[Filled 70% of Form]
+        T3[Phone Call 40 Minutes]
+        T4[Session Expires]
+        T5[Show Warning Before Expiry]
+        T6[Auto-save Draft]
+        T7[Redirect to Login]
+        T8[After Re-login]
+        T9[Show: 'Resume offer draft?']
+        T10[Click 'Resume']
+        T11[Form Restores All Data]
+        T12[Salary: ฿90k ✓]
+        T13[Benefits: Saved ✓]
+        T14[Continue Editing]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 --> T6
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+        T11 --> T12
+        T12 --> T13
+        T13 --> T14
+    end
+    
+    %% 9. EMPTY STATE: No Offers Yet
+    subgraph EMPTY["9️⃣ EMPTY: No Offers for Position"]
+        EM1[Navigate to Offers]
+        EM2[Select Position]
+        EM3{Has Offers?}
+        EM4[Empty State Display]
+        EM5[Message: 'No offers yet']
+        EM6[Illustration: Empty Mailbox]
+        EM7[CTA: 'Create First Offer']
+        EM8[Tips: 'Complete interviews<br/>before creating offers']
+        EM9[Click CTA]
+        EM10[Check Interview Feedback]
+        EM11{Feedback Complete?}
+        EM12[Yes: Open Offer Form]
+        EM13[No: Warning 'Complete interviews first']
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 -->|No| EM4
+        EM3 -->|Yes| H30
+        EM4 --> EM5
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+        EM10 --> EM11
+        EM11 -->|Yes| EM12
+        EM11 -->|No| EM13
+    end
+    
+    %% 10. CONCURRENT: Multiple Offers Same Candidate
+    subgraph CONCURRENT["🔟 CONCURRENT: Duplicate Offer Prevention"]
+        C1[Candidate Applied to 2 Positions]
+        C2[Position A: Backend Dev]
+        C3[Position B: Full-Stack Dev]
+        C4[Recruiter A Creates Offer for Pos A]
+        C5[Recruiter B Creates Offer for Pos B]
+        C6[Both Submit Within Minutes]
+        C7{System Check}
+        C8[Detect: Same Candidate, Multiple Offers]
+        C9[Warning to Both Recruiters]
+        C10[Message: 'Candidate has pending<br/>offer for another position']
+        C11[Options]
+        C12A[Proceed Anyway Separate offers]
+        C12B[Cancel This Offer]
+        C12C[Coordinate with Other Recruiter]
+        C13[Candidate Chooses Between Offers]
+        
+        C1 --> C2
+        C1 --> C3
+        C2 --> C4
+        C3 --> C5
+        C4 --> C6
+        C5 --> C6
+        C6 --> C7
+        C7 --> C8
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11
+        C11 --> C12A
+        C11 --> C12B
+        C11 --> C12C
+        C12A --> C13
+    end
+    
+    %% INTEGRATION: PDF Generation
+    subgraph INTEGRATION["🔗 INTEGRATION: Offer Letter PDF"]
+        I1[Offer Approved]
+        I2[Generate PDF Letter]
+        I3[Load Template]
+        I4[Company Letterhead]
+        I5[Merge Offer Data]
+        I6[Candidate: Alex Chen]
+        I7[Position: Senior Backend Dev]
+        I8[Salary: ฿90,000/month]
+        I9[Start Date: April 15, 2026]
+        I10[Benefits: Listed]
+        I11[Generate PDF File]
+        I12[PDF Created: offer-2026-050.pdf]
+        I13[Attach to Email]
+        I14[Store in Document Storage]
+        I15[Link in Offer Record]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 --> I5
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 --> I9
+        I9 --> I10
+        I10 --> I11
+        I11 --> I12
+        I12 --> I13
+        I13 --> I14
+        I14 --> I15
+    end
+    
+    %% EXIT POINTS
+    EXIT_TRACK[("Offer Tracking<br/>Monitor Status")]
+    EXIT_CONV[("Employee Conversion<br/>US-4.10")]
+    EXIT_KANBAN[("Kanban Board<br/>Updated")]
+    EXIT_DETAIL[("Offer Detail<br/>View/Edit")]
+    
+    %% Main Flow Connections
+    ENTRY_FEEDBACK ==> H1
+    ENTRY_KANBAN ==> H3
+    ENTRY_PROF ==> H3
+    ENTRY_LIST ==> H4
+    
+    H8 -->|Invalid| E2
+    H19 -->|No Approval| H27
+    H22 --> I1
+    H25 -->|Rejected| P9
+    H30 ==> EXIT_TRACK
+    
+    A16 ==> EXIT_CONV
+    
+    B10 ==> EXIT_KANBAN
+    B19 --> R4
+    B20 --> B10
+    
+    E2 -->|Valid| H9
+    E12 --> H8
+    
+    BR2 -->|Valid| H11
+    BR8A --> H11
+    BR8B --> P5
+    BR13 --> H25
+    
+    R15 ==> EXIT_TRACK
+    
+    P11 --> H27
+    P12 --> EXIT_DETAIL
+    P14 --> H5
+    
+    L11 ==> EXIT_TRACK
+    L14 ==> EXIT_KANBAN
+    
+    T14 --> H19
+    
+    EM12 --> H4
+    EM13 --> EXIT_KANBAN
+    
+    C13 ==> EXIT_TRACK
+    
+    I15 ==> EXIT_DETAIL
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class ENTRY_FEEDBACK,ENTRY_KANBAN,ENTRY_PROF,ENTRY_LIST entry
+    class EXIT_TRACK,EXIT_CONV,EXIT_KANBAN,EXIT_DETAIL exit
+    class H26,A10,I12,R15 success
+    class E3,E5,E7,BR5,BR6 error
+    class L5,T5,EM5,C10 warning
+    class I1,I2,I11 integration
+```
+
+---
+
+## US-4.9: Create and Manage Job Offer
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Create offer, get approval, send to candidate
+2. **Alternative Paths** ✅ - Candidate accepts, rejects, negotiates
+3. **Error Paths** ✅ - Validation failures (salary, dates, terms)
+4. **Business Rule Errors** ✅ - BR-008 (salary range), BR-009 (approval required)
+5. **Recovery Paths** ✅ - Revise rejected offer with updated terms
+6. **Permission Paths** ✅ - Manager approval workflow for senior/high-salary offers
+7. **Loop Paths** ✅ - Offer expiration and extension cycle
+8. **Timeout Paths** ✅ - Session expiry with draft auto-save
+9. **Empty States** ✅ - No offers yet, must complete interviews first
+10. **Concurrent Paths** ✅ - Multiple offers to same candidate (conflict detection)
+
+### Offer Components
+
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| Candidate | Auto-filled | ✅ | From interview |
+| Position | Auto-filled | ✅ | From application |
+| Salary | Number | ✅ | Within position range (BR-008) |
+| Employment Type | Dropdown | ✅ | Full-time, Part-time, Contract |
+| Start Date | Date | ✅ | Future date |
+| Expiration Date | Date | ✅ | ≥ 3 days from send |
+| Benefits | Text | Optional | Health, Leave, Bonus |
+| Special Terms | Text | Optional | Relocation, Remote, etc. |
+
+### Business Rules
+
+**BR-008: Salary Range Validation**
+- Offer salary must be within position's min-max range
+- If exceeds: Show error, suggest adjustment or range increase
+
+**BR-009: Approval Requirements**
+- Offers ≥ ฿80,000/month require manager approval
+- Senior positions always require approval
+- Cannot send without approval
+
+**BR-014: Auto-Expiration (Implied)**
+- Default: 7 days to respond
+- Can be extended by recruiter
+- Auto-expire if no response
+
+### Offer Lifecycle States
+
+```
+Draft → Pending Approval → Approved → Sent → 
+  → Accepted (→ Hired) ✅
+  → Rejected ❌
+  → Expired ⏰
+  → Negotiating 🔄
+  → Revised (→ Sent again)
+```
+
+### Offer Letter PDF Structure
+
+```
+[Company Letterhead]
+
+Date: March 15, 2026
+
+Dear Alex Chen,
+
+We are pleased to offer you the position of Senior Backend Developer
+at AscendHR.
+
+Position Details:
+- Title: Senior Backend Developer
+- Department: Engineering
+- Employment Type: Full-time
+- Start Date: April 15, 2026
+- Salary: ฿90,000/month
+- Benefits:
+  • Health Insurance (Employee + Family)
+  • 15 Days Annual Leave
+  • Performance Bonus (up to 3 months)
+  • Remote Work (2 days/week)
+
+This offer expires on: April 7, 2026
+
+To accept: [Accept Offer Link]
+To decline: [Decline Link]
+
+Questions? Contact: recruiter@ascendhr.com
+
+Best regards,
+[Hiring Manager Name]
+[Company Seal]
+```
+
+### Negotiation Flow
+
+1. **Candidate counters:** Requests higher salary/better terms
+2. **System captures:** Counter amount + reason
+3. **Recruiter reviews:** Accept/Decline/Revise
+4. **If accepted:** Create revised offer (new version)
+5. **If declined:** Move to rejected, can offer to another candidate
+
+### Success Criteria
+
+- ✅ Offer creation <5 minutes (happy path)
+- ✅ PDF generation <10 seconds
+- ✅ 100% compliance with BR-008 salary range
+- ✅ Manager approval enforced for BR-009 cases
+- ✅ Expiration tracking 100% accurate
+- ✅ Candidate can accept with e-signature
+- ✅ Negotiation history fully tracked

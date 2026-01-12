@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convert to Employee | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    .wizard-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--muted-foreground);
+    }
+    
+    .critical-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      color: white;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    
+    /* State Management */
+    .wizard-state {
+      display: none;
+    }
+    
+    .wizard-state.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Candidate Review Card */
+    .candidate-review {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      margin-bottom: 32px;
+    }
+    
+    .candidate-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .candidate-avatar-large {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 36px;
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .candidate-details {
+      flex: 1;
+    }
+    
+    .candidate-name-large {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .candidate-position {
+      font-size: 18px;
+      color: var(--muted-foreground);
+      margin-bottom: 12px;
+    }
+    
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    
+    .data-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .data-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    
+    .data-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    
+    /* Progress Overlay */
+    .progress-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .progress-overlay.visible {
+      display: flex;
+    }
+    
+    .progress-modal {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: var(--shadow-strong);
+    }
+    
+    .progress-title {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    
+    .progress-subtitle {
+      text-align: center;
+      color: var(--muted-foreground);
+      margin-bottom: 32px;
+    }
+    
+    .progress-bar-container {
+      background: var(--background);
+      border-radius: var(--radius-full);
+      height: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-full);
+      transition: width 0.3s;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+    
+    .progress-text {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 24px;
+    }
+    
+    .step-list {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 16px;
+      background: var(--background);
+      border-radius: var(--radius-md);
+    }
+    
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+    
+    .step-item.completed {
+      color: var(--accent);
+    }
+    
+    .step-item.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .step-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+    
+    /* Success State */
+    .success-card {
+      background: var(--card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      text-align: center;
+    }
+    
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+    }
+    
+    .success-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    
+    .success-message {
+      font-size: 18px;
+      color: var(--muted-foreground);
+      margin-bottom: 32px;
+    }
+    
+    .employee-id-display {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+    }
+    
+    .employee-id-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    
+    .employee-id-value {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: monospace;
+    }
+    
+    .checklist {
+      text-align: left;
+      background: var(--background);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+    }
+    
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+    
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+    
+    .checklist-icon {
+      color: var(--accent);
+      font-size: 20px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    /* Form Card */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Employee Conversion Wizard
+    User Story: US-4.10 (CRITICAL)
+    
+    INTERACTIVE: 
+    - 30-step conversion process (BR-010)
+    - Progress tracking with visual feedback
+    - Integration with Player Card System (Step 13)
+    - Integration with Formation View (Step 23)
+    - Success/error state handling
+    - Rollback on failure
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item">
+            <span class="icon">🎯</span> Recruitment Pipeline
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item">
+            <span class="icon">➕</span> Create Position
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="wizard-container">
+        
+        <!-- STATE 1: Review Candidate -->
+        <div class="wizard-state active" id="state-review">
+          <div class="page-header">
+            <h1 class="page-title">Convert to Employee</h1>
+            <p class="page-subtitle">Complete the hiring process by converting the candidate to an employee</p>
+            <span class="critical-badge">⭐ CRITICAL PROCESS</span>
+          </div>
+
+          <div class="candidate-review">
+            <div class="candidate-header">
+              <div class="candidate-avatar-large">EW</div>
+              <div class="candidate-details">
+                <div class="candidate-name-large">Emma Wilson</div>
+                <div class="candidate-position">Senior Backend Developer</div>
+                <div style="display: flex; gap: 8px;">
+                  <span class="badge badge-success">Offer Accepted</span>
+                  <span class="badge badge-primary">Ready for Conversion</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="data-grid">
+              <div class="data-item">
+                <div class="data-label">Department</div>
+                <div class="data-value">Engineering</div>
+              </div>
+              <div class="data-item">
+                <div class="data-label">Monthly Salary</div>
+                <div class="data-value">฿88,000</div>
+              </div>
+              <div class="data-item">
+                <div class="data-label">Start Date</div>
+                <div class="data-value">April 15, 2026</div>
+              </div>
+              <div class="data-item">
+                <div class="data-label">Employment Type</div>
+                <div class="data-value">Full-time</div>
+              </div>
+              <div class="data-item">
+                <div class="data-label">Email</div>
+                <div class="data-value">emma.wilson@email.com</div>
+              </div>
+              <div class="data-item">
+                <div class="data-label">Phone</div>
+                <div class="data-value">+66 81 234 5678</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info" style="margin-bottom: 24px;">
+            <strong>ℹ️ 30-Step Conversion Process (BR-010)</strong><br>
+            This process will create an employee record, integrate with the Player Card System and Formation View, and complete all necessary steps. The operation is atomic - all 30 steps must succeed or the entire process will be rolled back.
+          </div>
+
+          <div class="form-card">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Pre-Conversion Checklist</h3>
+            
+            <div class="checklist">
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div>Offer accepted by candidate</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div>All interview feedback submitted</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div>Background check completed</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div>Manager approval received</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div>Start date confirmed</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='02-kanban-board.html'">Cancel</button>
+            <button class="btn btn-primary btn-lg" onclick="startConversion()">🚀 Start Conversion Process</button>
+          </div>
+        </div>
+
+        <!-- STATE 2: Processing (30 Steps) -->
+        <div class="wizard-state" id="state-processing">
+          <!-- This is shown as overlay -->
+        </div>
+
+        <!-- STATE 3: Success -->
+        <div class="wizard-state" id="state-success">
+          <div class="success-card">
+            <div class="success-icon">🎉</div>
+            <h2 class="success-title">Employee Conversion Successful!</h2>
+            <p class="success-message">Emma Wilson has been successfully converted to an employee</p>
+            
+            <div class="employee-id-display">
+              <div class="employee-id-label">Employee ID</div>
+              <div class="employee-id-value">EMP-2026-050</div>
+            </div>
+            
+            <div class="checklist">
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>Employee profile created</strong> - Full record in HR system</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>Player Card System updated</strong> - Employee card active</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>Formation View updated</strong> - Position assigned in team</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>Gap Analysis recalculated</strong> - Team strength updated</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>Welcome email sent</strong> - Onboarding information delivered</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>Position filled (2/2 hired)</strong> - Position closed</div>
+              </div>
+              <div class="checklist-item">
+                <div class="checklist-icon">✅</div>
+                <div><strong>12 other applications rejected</strong> - Pipeline cleaned</div>
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button class="btn btn-outline btn-lg" onclick="window.location.href='../player-card-system/01-employee-list.html'">👥 View Employee Profile</button>
+              <button class="btn btn-outline btn-lg" onclick="window.location.href='../formation-view/05-formation-pitch.html'">🏟️ View Formation View</button>
+              <button class="btn btn-primary btn-lg" onclick="window.location.href='01-recruitment-dashboard.html'">📊 Return to Dashboard</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Progress Overlay (30-Step Process) -->
+  <div class="progress-overlay" id="progressOverlay">
+    <div class="progress-modal">
+      <h2 class="progress-title">Creating Employee...</h2>
+      <p class="progress-subtitle">Please wait while we complete all 30 steps</p>
+      
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+      </div>
+      
+      <div class="progress-text" id="progressText">Step 0/30: Initializing...</div>
+      
+      <div class="step-list" id="stepList">
+        <!-- Steps will be dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 30-Step Conversion Process (BR-010)
+    const steps = [
+      { id: 1, name: 'Validate application status = offer_accepted' },
+      { id: 2, name: 'Lock candidate record (prevent concurrent changes)' },
+      { id: 3, name: 'Create employee record in database' },
+      { id: 4, name: 'Set employee name' },
+      { id: 5, name: 'Set employee email' },
+      { id: 6, name: 'Set employee phone' },
+      { id: 7, name: 'Set department assignment' },
+      { id: 8, name: 'Set position title' },
+      { id: 9, name: 'Set start date' },
+      { id: 10, name: 'Set employment type' },
+      { id: 11, name: 'Set monthly salary' },
+      { id: 12, name: 'Set employee status = Active' },
+      { id: 13, name: '🔴 CRITICAL: Call Player Card API - Create employee', critical: true },
+      { id: 14, name: 'Receive employee_id from Player Card (EMP-2026-050)' },
+      { id: 15, name: 'Update candidate.employee_id link' },
+      { id: 16, name: 'Update candidate.status = Hired' },
+      { id: 17, name: 'Set candidate.hired_date timestamp' },
+      { id: 18, name: 'Update application.status = Hired' },
+      { id: 19, name: 'Count total hired applications for position' },
+      { id: 20, name: 'Check position capacity (BR-011)' },
+      { id: 21, name: 'Close position (status = Filled, 2/2 hired)' },
+      { id: 22, name: 'Bulk reject 12 remaining active applications' },
+      { id: 23, name: '🔴 CRITICAL: Call Formation View API - Assign position', critical: true },
+      { id: 24, name: 'Update Formation View position slot' },
+      { id: 25, name: 'Trigger Gap Analysis recalculation' },
+      { id: 26, name: 'Gap Analysis: Update team strength scores' },
+      { id: 27, name: 'Update department headcount' },
+      { id: 28, name: 'Send welcome email to new employee' },
+      { id: 29, name: 'Notify hiring manager of completion' },
+      { id: 30, name: 'Update recruitment analytics (time-to-hire, source metrics)' }
+    ];
+    
+    let currentStep = 0;
+    
+    // Start conversion process
+    function startConversion() {
+      // Confirm action
+      if (!confirm('🚀 Start Employee Conversion?\n\nThis will execute a 30-step process to convert Emma Wilson to an employee.\n\nThe process cannot be interrupted once started.\n\nContinue?')) {
+        return;
+      }
+      
+      // Hide review state
+      document.getElementById('state-review').classList.remove('active');
+      
+      // Show progress overlay
+      document.getElementById('progressOverlay').classList.add('visible');
+      
+      // Populate step list
+      const stepList = document.getElementById('stepList');
+      stepList.innerHTML = '';
+      steps.forEach(step => {
+        const stepItem = document.createElement('div');
+        stepItem.className = 'step-item';
+        stepItem.id = `step-${step.id}`;
+        stepItem.innerHTML = `
+          <span class="step-icon">⚪</span>
+          <span>${step.id}. ${step.name}</span>
+        `;
+        stepList.appendChild(stepItem);
+      });
+      
+      // Start processing
+      processNextStep();
+    }
+    
+    // Process steps sequentially
+    function processNextStep() {
+      if (currentStep >= steps.length) {
+        // All steps complete
+        completeConversion();
+        return;
+      }
+      
+      currentStep++;
+      const step = steps[currentStep - 1];
+      
+      // Update progress bar
+      const progress = (currentStep / steps.length) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('progressText').textContent = `Step ${currentStep}/30: ${step.name}`;
+      
+      // Update step list
+      const stepElement = document.getElementById(`step-${step.id}`);
+      if (stepElement) {
+        // Mark as active
+        stepElement.classList.add('active');
+        stepElement.querySelector('.step-icon').textContent = '⏳';
+        
+        // Scroll to current step
+        stepElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      
+      // Simulate processing time (faster for demo)
+      const delay = step.critical ? 1000 : 300; // Critical steps take longer
+      
+      setTimeout(() => {
+        // Mark as completed
+        if (stepElement) {
+          stepElement.classList.remove('active');
+          stepElement.classList.add('completed');
+          stepElement.querySelector('.step-icon').textContent = '✅';
+        }
+        
+        // Continue to next step
+        setTimeout(processNextStep, 100);
+      }, delay);
+    }
+    
+    // Complete conversion
+    function completeConversion() {
+      // Update progress to 100%
+      document.getElementById('progressBar').style.width = '100%';
+      document.getElementById('progressText').textContent = 'Conversion Complete! ✅';
+      
+      // Wait a moment, then show success
+      setTimeout(() => {
+        document.getElementById('progressOverlay').classList.remove('visible');
+        document.getElementById('state-success').classList.add('active');
+        
+        // Confetti effect (simple)
+        createConfetti();
+      }, 1500);
+    }
+    
+    // Simple confetti effect
+    function createConfetti() {
+      const emojis = ['🎉', '🎊', '✨', '⭐', '🌟'];
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          confetti.style.position = 'fixed';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.top = '-50px';
+          confetti.style.fontSize = '24px';
+          confetti.style.zIndex = '10000';
+          confetti.style.animation = 'fall 3s linear';
+          document.body.appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 3000);
+        }, i * 100);
+      }
+    }
+    
+    // Add fall animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fall {
+        to {
+          transform: translateY(100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    console.log('Employee Conversion Wizard loaded - Ready for 30-step process (BR-010)');
+  </script>
+</body>
+</html>

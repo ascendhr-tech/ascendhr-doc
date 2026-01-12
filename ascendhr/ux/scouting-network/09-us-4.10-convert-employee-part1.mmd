@@ -1,0 +1,313 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '11px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_OFFER[("Offer Accepted<br/>Auto-trigger")]
+    ENTRY_HIRED[("Hired Stage<br/>'Complete Hire'")]
+    ENTRY_BULK[("Bulk Hire<br/>Multiple Candidates")]
+    
+    %% 1. HAPPY PATH: Single Candidate Conversion (30 Steps)
+    subgraph HAPPY["1️⃣ HAPPY PATH: Convert to Employee (BR-010 30 Steps)"]
+        H1[Offer Accepted Detected]
+        H2[Application Status: offer_accepted]
+        H3[Trigger: 'Complete Hire' Button]
+        H4[Conversion Wizard Opens]
+        H5[Step 1: Verify Candidate Data]
+        H6[Name, Email, Phone ✓]
+        H7[Step 2: Review Offer Details]
+        H8[Salary, Start Date, Type ✓]
+        H9[Step 3: Map to Employee Fields]
+        H10[Auto-map Candidate → Employee]
+        H11[Candidate Attributes → Employee Skills]
+        H12[Step 4: Set Department]
+        H13[Select: Engineering Dept]
+        H14[Step 5: Assign Employee ID]
+        H15[Generate: EMP-2026-050]
+        H16[Step 6: Set Employment Details]
+        H17[Type: Full-time]
+        H18[Status: Active]
+        H19[Start Date: 2026-04-15]
+        H20[Step 7: Preview Employee Profile]
+        H21[Show Complete Profile]
+        H22{Final Confirmation}
+        H23[Confirm: 'Create Employee']
+        H24[BEGIN 30-STEP TRANSACTION]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+        H16 --> H17
+        H17 --> H18
+        H18 --> H19
+        H19 --> H20
+        H20 --> H21
+        H21 --> H22
+        H22 --> H23
+        H23 --> H24
+    end
+    
+    %% BR-010: 30-Step Process
+    subgraph BR010["🔴 CRITICAL: BR-010 30-Step Employee Conversion"]
+        STEP1[1. Validate Application Status]
+        STEP2[2. Lock Candidate Record]
+        STEP3[3. Create Employee Record]
+        STEP4[4. Set employee.full_name]
+        STEP5[5. Set employee.email]
+        STEP6[6. Set employee.phone]
+        STEP7[7. Set employee.department_id]
+        STEP8[8. Set employee.position_id]
+        STEP9[9. Set employee.start_date]
+        STEP10[10. Set employee.employment_type]
+        STEP11[11. Set employee.salary]
+        STEP12[12. Set employee.status = Active]
+        STEP13[13. Player Card: Create Employee]
+        STEP14[14. Player Card: Returns employee_id]
+        STEP15[15. Update candidate.status = Hired]
+        STEP16[16. Link candidate.employee_id]
+        STEP17[17. Set candidate.hired_at timestamp]
+        STEP18[18. Update application.status = Hired]
+        STEP19[19. Count hired for position]
+        STEP20[20. Check position.headcount]
+        
+        STEP1 --> STEP2
+        STEP2 --> STEP3
+        STEP3 --> STEP4
+        STEP4 --> STEP5
+        STEP5 --> STEP6
+        STEP6 --> STEP7
+        STEP7 --> STEP8
+        STEP8 --> STEP9
+        STEP9 --> STEP10
+        STEP10 --> STEP11
+        STEP11 --> STEP12
+        STEP12 --> STEP13
+        STEP13 --> STEP14
+        STEP14 --> STEP15
+        STEP15 --> STEP16
+        STEP16 --> STEP17
+        STEP17 --> STEP18
+        STEP18 --> STEP19
+        STEP19 --> STEP20
+    end
+    
+    subgraph BR010B["BR-010 Continued: Steps 21-30"]
+        STEP21[21. If filled: position.status = Filled]
+        STEP22[22. Bulk Reject Other Applications]
+        STEP23[23. Notify Formation View]
+        STEP24[24. Formation: Update Position Slot]
+        STEP25[25. Trigger Gap Analysis Recalc]
+        STEP26[26. Gap Analysis: Update Team]
+        STEP27[27. Update Club Dept Headcount]
+        STEP28[28. Send Welcome Email]
+        STEP29[29. Notify Hiring Manager]
+        STEP30[30. Update Recruitment Analytics]
+        SUCCESS[✅ CONVERSION COMPLETE]
+        
+        STEP21 --> STEP22
+        STEP22 --> STEP23
+        STEP23 --> STEP24
+        STEP24 --> STEP25
+        STEP25 --> STEP26
+        STEP26 --> STEP27
+        STEP27 --> STEP28
+        STEP28 --> STEP29
+        STEP29 --> STEP30
+        STEP30 --> SUCCESS
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Bulk Conversion
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Bulk Hire Multiple Candidates"]
+        A1[5 Candidates with Accepted Offers]
+        A2[Click 'Bulk Complete Hire']
+        A3[Select All 5 Candidates]
+        A4[Bulk Wizard Opens]
+        A5[Review All Data]
+        A6[Confirm Bulk Conversion]
+        A7[Process Sequentially]
+        A8[Progress: 1/5 converting...]
+        A9[Candidate 1: Complete ✓]
+        A10[Progress: 2/5 converting...]
+        A11[Candidate 2: Complete ✓]
+        A12[Progress: 3/5 converting...]
+        A13[Candidate 3: ERROR ❌]
+        A14[Continue with Remaining]
+        A15[Candidate 4: Complete ✓]
+        A16[Candidate 5: Complete ✓]
+        A17[Summary: 4 Success, 1 Failed]
+        A18[Show Error Details for #3]
+        A19[Option: Retry Failed]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 --> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+        A11 --> A12
+        A12 --> A13
+        A13 --> A14
+        A14 --> A15
+        A15 --> A16
+        A16 --> A17
+        A17 --> A18
+        A18 --> A19
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Re-hire Former Employee
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Re-hire Returning Employee"]
+        B1[Candidate Profile]
+        B2[System Detects: Former Employee]
+        B3[Show Warning: 'Previously worked here']
+        B4[Display: EMP-2024-010 Terminated 2025-12-15]
+        B5{Conversion Options}
+        B6A[Reactivate Old Record]
+        B7A[Restore employee.status = Active]
+        B8A[Update start_date = new date]
+        B9A[Keep Employee History]
+        B6B[Create New Employee Record]
+        B7B[New ID: EMP-2026-050]
+        B8B[Link to Old Record]
+        B9B[Note: 'Re-hire, prev EMP-2024-010']
+        B10[User Selects Option]
+        B11[Continue Conversion]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 --> B6A
+        B5 --> B6B
+        B6A --> B7A
+        B7A --> B8A
+        B8A --> B9A
+        B9A --> B10
+        B6B --> B7B
+        B7B --> B8B
+        B8B --> B9B
+        B9B --> B10
+        B10 --> B11
+    end
+    
+    %% 3. ERROR PATH: Validation Before Conversion
+    subgraph ERROR["3️⃣ ERROR PATH: Pre-Conversion Validation"]
+        E1[Attempt Conversion]
+        E2{Validation Check}
+        E3[No Offer Accepted ❌]
+        E4[Error: 'Candidate must have<br/>accepted offer']
+        E5[Incomplete Candidate Data ❌]
+        E6[Error: 'Missing required fields:<br/>Phone, Address']
+        E7[No Start Date ❌]
+        E8[Error: 'Set start date in offer']
+        E9[Department Not Set ❌]
+        E10[Error: 'Assign department']
+        E11[User Fixes Issues]
+        E12[Complete Offer]
+        E13[Add Missing Data]
+        E14[Retry Conversion]
+        
+        E1 --> E2
+        E2 -->|No Offer| E3
+        E2 -->|Incomplete| E5
+        E2 -->|No Start Date| E7
+        E2 -->|No Department| E9
+        E3 --> E4
+        E5 --> E6
+        E7 --> E8
+        E9 --> E10
+        E4 --> E11
+        E6 --> E11
+        E8 --> E11
+        E10 --> E11
+        E11 --> E12
+        E12 --> E13
+        E13 --> E14
+    end
+    
+    %% 4. BUSINESS RULE ERROR: Position Capacity
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: BR-011 Position Filled"]
+        BR1[Converting Employee]
+        BR2[Step 19: Count Hired]
+        BR3[Current Hired: 2]
+        BR4[Position Headcount: 2]
+        BR5[Capacity Reached]
+        BR6{BR-011 Check}
+        BR7[Hired = Headcount ✓]
+        BR8[Auto-close Position]
+        BR9[position.status = Filled]
+        BR10[Find Other Active Applications]
+        BR11[12 Candidates Still Active]
+        BR12[Bulk Reject All]
+        BR13[Send Rejection Emails]
+        BR14[Reason: 'Position filled']
+        BR15[All Applications Closed]
+        
+        BR1 --> BR2
+        BR2 --> BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8
+        BR8 --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+        BR11 --> BR12
+        BR12 --> BR13
+        BR13 --> BR14
+        BR14 --> BR15
+    end
+    
+    %% Main Flow Connections
+    ENTRY_OFFER ==> H1
+    ENTRY_HIRED ==> H3
+    ENTRY_BULK ==> A1
+    
+    H24 --> STEP1
+    STEP20 --> STEP21
+    STEP21 --> STEP22
+    SUCCESS --> EXIT_EMP
+    
+    A19 --> EXIT_BULK
+    
+    B11 --> H9
+    
+    E2 -->|Valid| H24
+    E14 --> E1
+    
+    BR15 --> SUCCESS
+    
+    %% EXIT POINTS (Partial)
+    EXIT_EMP[("Employee Profile<br/>View New Employee")]
+    EXIT_BULK[("Bulk Summary<br/>Results")]
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef critical fill:#ff6b6b,color:white,stroke:#e03131,stroke-width:3px
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    
+    class ENTRY_OFFER,ENTRY_HIRED,ENTRY_BULK entry
+    class EXIT_EMP,EXIT_BULK exit
+    class H24,STEP1,STEP13,STEP23,SUCCESS critical
+    class SUCCESS,A17,B11 success
+    class E3,E5,E7,E9 error
+```
+
+**END OF PART 1 - Continue to Part 2 for remaining flow types...**

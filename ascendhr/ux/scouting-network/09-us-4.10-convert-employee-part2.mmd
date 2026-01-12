@@ -1,0 +1,548 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '11px'}}}%%
+flowchart TB
+    %% 5. RECOVERY PATH: Rollback on Failure
+    subgraph RECOVERY["5️⃣ RECOVERY: Transaction Rollback"]
+        R1[Conversion in Progress]
+        R2[Steps 1-12 Complete ✓]
+        R3[Step 13: Call Player Card API]
+        R4{API Response}
+        R5[API Error 500 ❌]
+        R6[Player Card Service Down]
+        R7[CRITICAL: Begin Rollback]
+        R8[Rollback Step 12: employee.status]
+        R9[Rollback Step 11: employee.salary]
+        R10[Rollback Steps 10-4]
+        R11[Rollback Step 3: Delete Employee Record]
+        R12[Rollback Step 2: Unlock Candidate]
+        R13[Database Transaction Rolled Back]
+        R14[Show Error to User]
+        R15[Message: 'Conversion failed - no data changed']
+        R16[Log Error Details]
+        R17[Alert Admin]
+        R18[Option: Retry Conversion]
+        R19{User Choice}
+        R20[Retry Now]
+        R21[Cancel - Fix Later]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R9 --> R10
+        R10 --> R11
+        R11 --> R12
+        R12 --> R13
+        R13 --> R14
+        R14 --> R15
+        R15 --> R16
+        R16 --> R17
+        R17 --> R18
+        R18 --> R19
+        R19 --> R20
+        R19 --> R21
+    end
+    
+    %% 6. PERMISSION PATH: HR Admin Only
+    subgraph PERMISSION["6️⃣ PERMISSION: HR Admin Access"]
+        P1[User Clicks 'Complete Hire']
+        P2{Check Role}
+        P3[Role: Recruiter ❌]
+        P4[Access Denied]
+        P5[Message: 'Only HR Admins can<br/>convert to employee']
+        P6[Suggest: Request HR Admin]
+        P7[Role: HR Admin ✓]
+        P8[Access Granted]
+        P9[Conversion Wizard Opens]
+        P10[Additional: Audit Log]
+        P11[Log: Admin performing conversion]
+        P12[Track: Who, When, Why]
+        
+        P1 --> P2
+        P2 -->|Not HR Admin| P3
+        P2 -->|HR Admin| P7
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P7 --> P8
+        P8 --> P9
+        P9 --> P10
+        P10 --> P11
+        P11 --> P12
+    end
+    
+    %% 7. LOOP PATH: Fix Data & Retry
+    subgraph LOOP["7️⃣ LOOP: Fix Issues & Retry"]
+        L1[Conversion Failed]
+        L2[Error: Missing Department]
+        L3[User Fixes Candidate Data]
+        L4[Add Department: Engineering]
+        L5[Retry Conversion]
+        L6[Validation Pass ✓]
+        L7[Conversion Proceeds]
+        L8[Another Error: Email Format]
+        L9[Fix Email Format]
+        L10[Retry Again]
+        L11[Validation Pass ✓]
+        L12[Conversion Success ✓]
+        L13[After 3 Retries]
+        L14[Suggest Manual Review]
+        L15[Escalate to Admin]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 --> L10
+        L10 --> L11
+        L11 --> L12
+        L5 -.-> L13
+        L13 --> L14
+        L14 --> L15
+    end
+    
+    %% 8. TIMEOUT PATH: Long Transaction
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Transaction Timeout"]
+        T1[Conversion Started]
+        T2[Processing 30 Steps]
+        T3[Step 23: Formation View Call]
+        T4[Formation API Slow]
+        T5[Response Time: 25 Seconds]
+        T6{Timeout Threshold}
+        T7[Timeout: 30 Seconds]
+        T8[Still Within Limit]
+        T9[Response Arrives]
+        T10[Continue Steps 24-30]
+        T11[Complete Successfully]
+        T12[If Timeout Exceeded]
+        T13[Rollback Transaction]
+        T14[Retry with Longer Timeout]
+        T15[Or: Skip Formation Update]
+        T16[Mark for Manual Sync]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 --> T6
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+        T6 -.->|Exceeded| T12
+        T12 --> T13
+        T13 --> T14
+        T14 --> T15
+        T15 --> T16
+    end
+    
+    %% 9. EMPTY STATE: No Eligible Candidates
+    subgraph EMPTY["9️⃣ EMPTY: No Candidates Ready"]
+        EM1[Navigate to 'Complete Hire']
+        EM2{Check Hired Stage}
+        EM3[No Candidates with Accepted Offers]
+        EM4[Empty State Display]
+        EM5[Message: 'No candidates ready<br/>for conversion']
+        EM6[Illustration: Empty Pipeline]
+        EM7[Checklist Shown]
+        EM8[• Send offers]
+        EM9[• Wait for acceptance]
+        EM10[• Then convert to employee]
+        EM11[Link: 'View Pending Offers']
+        EM12[Track Offer Status]
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 --> EM4
+        EM4 --> EM5
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+        EM10 --> EM11
+        EM11 --> EM12
+    end
+    
+    %% 10. CONCURRENT: Queue Management
+    subgraph CONCURRENT["🔟 CONCURRENT: Conversion Queue"]
+        C1[3 HR Admins Convert Simultaneously]
+        C2[Admin A: Converting Candidate 1]
+        C3[Admin B: Converting Candidate 2]
+        C4[Admin C: Converting Candidate 3]
+        C5[All Hit Player Card API]
+        C6{API Rate Limit}
+        C7[Queue System Activated]
+        C8[Process Sequentially]
+        C9[Candidate 1: Processing...]
+        C10[Candidate 1: Complete ✓]
+        C11[Candidate 2: Processing...]
+        C12[Candidate 2: Complete ✓]
+        C13[Candidate 3: Processing...]
+        C14[Candidate 3: Complete ✓]
+        C15[All 3 Successful]
+        C16[No Data Corruption]
+        C17[Formation View Updated Correctly]
+        
+        C1 --> C2
+        C1 --> C3
+        C1 --> C4
+        C2 --> C5
+        C3 --> C5
+        C4 --> C5
+        C5 --> C6
+        C6 --> C7
+        C7 --> C8
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11
+        C11 --> C12
+        C12 --> C13
+        C13 --> C14
+        C14 --> C15
+        C15 --> C16
+        C16 --> C17
+    end
+    
+    %% INTEGRATION A: Player Card System
+    subgraph INT_A["🔗 INTEGRATION: Player Card System API"]
+        IA1[Step 13: Create Employee]
+        IA2[Prepare API Request]
+        IA3[Payload: Employee Data]
+        IA4[POST /api/employees/create]
+        IA5{API Response}
+        IA6[Success: 201 Created]
+        IA7[Response Body: employee_id]
+        IA8[employee_id: EMP-2026-050]
+        IA9[Save to candidate.employee_id]
+        IA10[Continue Step 15]
+        IA11[Error: 500 Server Error]
+        IA12[Trigger Rollback]
+        IA13[Error: 409 Conflict]
+        IA14[Employee Already Exists]
+        IA15[Show: 'Duplicate employee']
+        
+        IA1 --> IA2
+        IA2 --> IA3
+        IA3 --> IA4
+        IA4 --> IA5
+        IA5 -->|Success| IA6
+        IA5 -->|500| IA11
+        IA5 -->|409| IA13
+        IA6 --> IA7
+        IA7 --> IA8
+        IA8 --> IA9
+        IA9 --> IA10
+        IA11 --> IA12
+        IA13 --> IA14
+        IA14 --> IA15
+    end
+    
+    %% INTEGRATION B: Formation View
+    subgraph INT_B["🔗 INTEGRATION: Formation View API"]
+        IB1[Step 23: Notify Formation View]
+        IB2[Check Position.formation_position_id]
+        IB3{Linked to Formation?}
+        IB4[Yes: position_id exists]
+        IB5[POST /api/formation/positions/{id}/assign]
+        IB6[Payload: employee_id, position_id]
+        IB7{API Response}
+        IB8[Success: 200 OK]
+        IB9[Formation Updated ✓]
+        IB10[Position Slot Filled]
+        IB11[Visible in Formation View]
+        IB12[Error: API Down]
+        IB13[Log Error]
+        IB14[Queue for Background Sync]
+        IB15[Continue Conversion]
+        IB16[No: Not Linked]
+        IB17[Skip Formation Update]
+        IB18[Continue Steps 24-30]
+        
+        IB1 --> IB2
+        IB2 --> IB3
+        IB3 -->|Linked| IB4
+        IB3 -->|Not Linked| IB16
+        IB4 --> IB5
+        IB5 --> IB6
+        IB6 --> IB7
+        IB7 -->|Success| IB8
+        IB7 -->|Error| IB12
+        IB8 --> IB9
+        IB9 --> IB10
+        IB10 --> IB11
+        IB12 --> IB13
+        IB13 --> IB14
+        IB14 --> IB15
+        IB16 --> IB17
+        IB17 --> IB18
+    end
+    
+    %% INTEGRATION C: Gap Analysis
+    subgraph INT_C["🔗 INTEGRATION: Gap Analysis Trigger"]
+        IC1[Step 25: Trigger Gap Analysis]
+        IC2[POST /api/formation/gap-analysis/recalculate]
+        IC3[Payload: team_id, position_id]
+        IC4{API Response}
+        IC5[Success: Recalculation Started]
+        IC6[Background Job Queued]
+        IC7[Team Strength Scores Updated]
+        IC8[Gap Indicators Refreshed]
+        IC9[Formation View Shows Changes]
+        IC10[Error: Service Unavailable]
+        IC11[Non-blocking Error]
+        IC12[Log for Later Sync]
+        IC13[Continue Conversion]
+        IC14[Admin Alert: Manual Recalc]
+        
+        IC1 --> IC2
+        IC2 --> IC3
+        IC3 --> IC4
+        IC4 -->|Success| IC5
+        IC4 -->|Error| IC10
+        IC5 --> IC6
+        IC6 --> IC7
+        IC7 --> IC8
+        IC8 --> IC9
+        IC10 --> IC11
+        IC11 --> IC12
+        IC12 --> IC13
+        IC13 --> IC14
+    end
+    
+    %% SUCCESS STATE
+    subgraph SUCCESS_FLOW["✅ CONVERSION SUCCESS"]
+        S1[All 30 Steps Complete]
+        S2[Employee Created: EMP-2026-050]
+        S3[Candidate Status: Hired]
+        S4[Position: Filled If Capacity Reached]
+        S5[Formation View: Updated]
+        S6[Gap Analysis: Recalculated]
+        S7[Welcome Email: Sent]
+        S8[Success Notification]
+        S9[Show Success Message]
+        S10[Display Employee Profile Link]
+        S11[Option: View New Employee]
+        S12[Option: View Formation View]
+        S13[Option: Return to Dashboard]
+        S14[Activity Log: Complete]
+        S15[Analytics: Updated]
+        
+        S1 --> S2
+        S2 --> S3
+        S3 --> S4
+        S4 --> S5
+        S5 --> S6
+        S6 --> S7
+        S7 --> S8
+        S8 --> S9
+        S9 --> S10
+        S10 --> S11
+        S11 --> S12
+        S12 --> S13
+        S13 --> S14
+        S14 --> S15
+    end
+    
+    %% EXIT POINTS
+    EXIT_EMP[("Employee Management<br/>View New Employee")]
+    EXIT_FORMATION[("Formation View<br/>Updated Team")]
+    EXIT_DASH[("Dashboard<br/>Return Home")]
+    EXIT_ANALYTICS[("Analytics<br/>Updated Metrics")]
+    EXIT_ERROR[("Error Log<br/>Review Failure")]
+    
+    %% Flow Connections
+    R20 --> IA1
+    R21 --> EXIT_ERROR
+    
+    P12 --> IA1
+    P6 --> EXIT_DASH
+    
+    L12 --> S1
+    L15 --> EXIT_ERROR
+    
+    T11 --> S1
+    T16 --> S1
+    
+    EM12 --> EXIT_DASH
+    
+    C17 --> S1
+    
+    IA10 --> IB1
+    IA12 --> R7
+    IA15 --> EXIT_ERROR
+    
+    IB11 --> IC1
+    IB15 --> IC1
+    IB18 --> IC1
+    
+    IC9 --> S1
+    IC14 --> S1
+    
+    S11 --> EXIT_EMP
+    S12 --> EXIT_FORMATION
+    S13 --> EXIT_DASH
+    S15 --> EXIT_ANALYTICS
+    
+    %% Styling
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef critical fill:#ff6b6b,color:white,stroke:#e03131,stroke-width:3px
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class EXIT_EMP,EXIT_FORMATION,EXIT_DASH,EXIT_ANALYTICS,EXIT_ERROR exit
+    class S1,S2,S9,L12,C17 success
+    class R5,R7,IA11,IB12,IC10 error
+    class IA1,IB1,IC1 critical
+    class R15,T12,EM5,IC14 warning
+    class IA4,IB5,IC2 integration
+```
+
+---
+
+## US-4.10: Convert Hired Candidate to Employee (Part 2)
+
+### Flow Type Coverage (Part 2): Remaining 6 of 10 Types
+
+5. **Recovery Paths** ✅ - Full transaction rollback on any failure
+6. **Permission Paths** ✅ - HR Admin only, audit logging
+7. **Loop Paths** ✅ - Fix data issues and retry conversion
+8. **Timeout Paths** ✅ - Handle slow API responses (30-second threshold)
+9. **Empty States** ✅ - No candidates ready for conversion
+10. **Concurrent Paths** ✅ - Queue management for simultaneous conversions
+
+### Complete Flow Type Coverage: ✅ All 10+ Types (Part 1 + Part 2)
+
+---
+
+## Critical BR-010: 30-Step Conversion Process
+
+**Transaction Integrity:** All-or-nothing (atomic)
+
+**Steps 1-12:** Local Database Operations
+1. Validate application status = offer_accepted
+2. Lock candidate record (prevent concurrent changes)
+3. Create employee record in database
+4-12. Set all employee fields (name, email, phone, dept, position, dates, salary, status)
+
+**Step 13-14:** 🔴 CRITICAL Player Card System Integration
+13. POST /api/employees/create
+14. Receive employee_id (e.g., EMP-2026-050)
+
+**Steps 15-18:** Update Candidate & Application
+15-17. Update candidate (status=Hired, link employee_id, timestamp)
+18. Update application status = Hired
+
+**Steps 19-22:** Position Management (BR-011)
+19. Count hired applications
+20. Check vs. position headcount
+21. If filled: Close position (status=Filled)
+22. Bulk reject remaining active applications
+
+**Steps 23-26:** 🔴 CRITICAL Formation View Integration
+23. POST /api/formation/positions/{id}/assign (employee_id)
+24. Formation View updates position slot
+25. Trigger Gap Analysis recalculation
+26. Gap Analysis updates team strength scores
+
+**Steps 27-30:** Notifications & Analytics
+27. Update department headcount
+28. Send welcome email to new employee
+29. Notify hiring manager
+30. Update recruitment analytics (time-to-hire, source metrics)
+
+---
+
+## Rollback Strategy
+
+**If ANY step fails:**
+1. Stop immediately
+2. Rollback all previous steps in reverse order
+3. Delete any created records
+4. Unlock any locked records
+5. Log error with full context
+6. Display error to user
+7. Provide retry option
+
+**Critical Rollback Points:**
+- Step 13 fails (Player Card API) → Delete employee record (Step 3)
+- Step 23 fails (Formation View API) → Consider non-blocking (continue conversion)
+- Step 25 fails (Gap Analysis) → Non-blocking, queue for background sync
+
+---
+
+## Integration Error Handling
+
+### Player Card System (CRITICAL - Blocking)
+- **Timeout:** 30 seconds
+- **Retry:** 3 attempts with exponential backoff
+- **Failure Action:** Full rollback, conversion fails
+- **Reason:** Cannot create employee without Player Card record
+
+### Formation View (IMPORTANT - Non-blocking)
+- **Timeout:** 30 seconds
+- **Retry:** 1 attempt
+- **Failure Action:** Log error, queue for background sync, conversion continues
+- **Reason:** Formation sync can happen asynchronously
+
+### Gap Analysis (NICE-TO-HAVE - Non-blocking)
+- **Timeout:** 60 seconds (background job)
+- **Retry:** Automatic via job queue
+- **Failure Action:** Log warning, alert admin, conversion continues
+- **Reason:** Gap analysis is informational, not critical for employee creation
+
+---
+
+## Success Criteria
+
+- ✅ **Zero data loss:** Rollback prevents partial conversions
+- ✅ **Transaction time:** <10 seconds for all 30 steps (happy path)
+- ✅ **Atomicity:** All 30 steps or none (no partial state)
+- ✅ **Integration reliability:** Player Card API success rate >99.9%
+- ✅ **Audit trail:** Complete log of all 30 steps
+- ✅ **Concurrent safety:** Queue prevents race conditions
+- ✅ **Formation sync:** >95% real-time, 100% eventual consistency
+- ✅ **Notification delivery:** Welcome email within 60 seconds
+
+---
+
+## Success Message
+
+```
+╔═══════════════════════════════════════╗
+║ ✅ Employee Conversion Successful     ║
+╠═══════════════════════════════════════╣
+║                                       ║
+║ Alex Chen has been successfully       ║
+║ converted to an employee!             ║
+║                                       ║
+║ Employee ID: EMP-2026-050             ║
+║ Position: Senior Backend Developer    ║
+║ Department: Engineering               ║
+║ Start Date: April 15, 2026            ║
+║                                       ║
+║ ✓ Employee profile created            ║
+║ ✓ Formation View updated              ║
+║ ✓ Gap Analysis recalculated           ║
+║ ✓ Welcome email sent                  ║
+║ ✓ Position filled (2/2 hired)         ║
+║ ✓ 12 other applications rejected      ║
+║                                       ║
+║ [View Employee Profile]               ║
+║ [View Formation View]                 ║
+║ [Return to Dashboard]                 ║
+╚═══════════════════════════════════════╝
+```
+
+**END OF US-4.10 COMPLETE FLOW (CRITICAL)**

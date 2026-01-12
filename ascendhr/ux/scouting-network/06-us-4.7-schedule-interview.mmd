@@ -1,0 +1,583 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_KANBAN[("Kanban Board<br/>Interview Stage")]
+    ENTRY_PROF[("Candidate Profile<br/>'Schedule Interview'")]
+    ENTRY_EMAIL[("Email Link<br/>'Schedule Interview'")]
+    ENTRY_LIST[("Interview List<br/>'New Interview'")]
+    
+    %% 1. HAPPY PATH
+    subgraph HAPPY["1️⃣ HAPPY PATH: Schedule Interview"]
+        H1[Candidate Moved to Interview Stage]
+        H2[Click 'Schedule Interview']
+        H3[Interview Form Opens]
+        H4[Select Interview Type]
+        H5[Technical Interview Selected]
+        H6[Select Date from Calendar]
+        H7[Date: 2026-03-20 Selected]
+        H8[Select Time Slot]
+        H9[Time: 2:00 PM Selected]
+        H10[Duration: 60 minutes]
+        H11[Add Interviewers]
+        H12[Search: 'John Doe']
+        H13[Add John Doe, Tech Lead]
+        H14[Add Meeting Link]
+        H15[Generate Zoom Link ✓]
+        H16[Add Agenda Optional]
+        H17{Validation}
+        H18[All Required Fields ✓]
+        H19[Preview Interview Details]
+        H20[Confirm & Send Invites]
+        H21[Create Interview Record]
+        H22[Generate Calendar Invites .ics]
+        H23[Send Email to Candidate]
+        H24[Send Email to Interviewers]
+        H25[Interview Scheduled ✓]
+        H26[View Interview List]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+        H16 --> H17
+        H17 --> H18
+        H18 --> H19
+        H19 --> H20
+        H20 --> H21
+        H21 --> H22
+        H22 --> H23
+        H23 --> H24
+        H24 --> H25
+        H25 --> H26
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Reschedule
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Reschedule Existing"]
+        A1[Interview Scheduled]
+        A2[Interviewer Unavailable]
+        A3[Open Interview Detail]
+        A4[Click 'Reschedule']
+        A5[Reason Required]
+        A6[Enter: 'Interviewer conflict']
+        A7[Show Original Details]
+        A8[Select New Date/Time]
+        A9[New: 2026-03-21 3:00 PM]
+        A10{Interviewers Changed?}
+        A11[Keep Same: John Doe]
+        A12[Confirm Reschedule]
+        A13[Send Updated Calendar Invites]
+        A14[Notify Candidate: Rescheduled]
+        A15[Notify Interviewers]
+        A16[Update Interview Record]
+        A17[Old Time Cancelled ✓]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 --> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+        A11 --> A12
+        A12 --> A13
+        A13 --> A14
+        A14 --> A15
+        A15 --> A16
+        A16 --> A17
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Cancel Interview
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Cancel Interview"]
+        B1[Interview Scheduled]
+        B2[Position Filled or Candidate Withdrew]
+        B3[Click 'Cancel Interview']
+        B4[Confirmation Modal]
+        B5[Warning: 'This will notify all participants']
+        B6[Cancellation Reason Required]
+        B7[Select: 'Position filled']
+        B8[Add Optional Message]
+        B9[Confirm Cancellation]
+        B10[Update Interview Status: Cancelled]
+        B11[Send Cancellation Emails]
+        B12[Remove from Calendars]
+        B13[Activity Log: Interview Cancelled]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 --> B6
+        B6 --> B7
+        B7 --> B8
+        B8 --> B9
+        B9 --> B10
+        B10 --> B11
+        B11 --> B12
+        B12 --> B13
+    end
+    
+    %% 3. ERROR PATH: Validation Failures
+    subgraph ERROR["3️⃣ ERROR PATH: Form Validation"]
+        E1[Fill Interview Form]
+        E2[Click Submit]
+        E3{Validation}
+        E4[Date in Past ❌]
+        E5[Show: 'Interview date must be in future']
+        E6[No Interviewer Selected ❌]
+        E7[Show: 'At least 1 interviewer required' BR-013]
+        E8[Invalid Time Slot ❌]
+        E9[Show: 'Time slot already booked']
+        E10[No Meeting Link ❌]
+        E11[Show: 'Add meeting link or location']
+        E12[User Fixes Errors]
+        E13[Resubmit]
+        
+        E1 --> E2
+        E2 --> E3
+        E3 -->|Date Error| E4
+        E3 -->|No Interviewer| E6
+        E3 -->|Time Conflict| E8
+        E3 -->|No Link| E10
+        E4 --> E5
+        E6 --> E7
+        E8 --> E9
+        E10 --> E11
+        E5 --> E12
+        E7 --> E12
+        E9 --> E12
+        E11 --> E12
+        E12 --> E13
+    end
+    
+    %% 4. BUSINESS RULE ERROR: BR-013 No Interviewer
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: BR-013 Violation"]
+        BR1[Attempt to Schedule]
+        BR2{BR-013 Check}
+        BR3[Interviewer Count = 0 ❌]
+        BR4[Error Modal]
+        BR5[Title: 'Interviewer Required']
+        BR6[Message: 'Interview must have<br/>at least 1 interviewer (BR-013)']
+        BR7[Options]
+        BR8A[Add Interviewer]
+        BR8B[Cancel Scheduling]
+        BR9[User Selects: Add Interviewer]
+        BR10[Interviewer Search Opens]
+        BR11[Select Interviewer]
+        BR12[Continue Scheduling]
+        
+        BR1 --> BR2
+        BR2 --> BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8A
+        BR7 --> BR8B
+        BR8A --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+        BR11 --> BR12
+    end
+    
+    %% 5. RECOVERY PATH: Email Send Failure
+    subgraph RECOVERY["5️⃣ RECOVERY: Email Service Down"]
+        R1[Interview Created ✓]
+        R2[Send Calendar Invites]
+        R3{Email Service}
+        R4[Service Unavailable ❌]
+        R5[Show Warning]
+        R6[Interview saved, emails pending]
+        R7[Emails Queued for Retry]
+        R8[Retry Every 10 Minutes]
+        R9{Retry Success?}
+        R10[Emails Sent ✓]
+        R11[After 3 Hours]
+        R12[Manual Action Required]
+        R13[Alert Admin]
+        R14[Option: Download .ics Manually]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 -->|Success| H23
+        R3 -->|Error| R4
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R9 -->|Success| R10
+        R9 -->|Still Failing| R11
+        R11 --> R12
+        R12 --> R13
+        R13 --> R14
+    end
+    
+    %% 6. PERMISSION PATH: Interviewer Assignment
+    subgraph PERMISSION["6️⃣ PERMISSION: Who Can Interview"]
+        P1[Adding Interviewer]
+        P2{Check Role}
+        P3[Role: Interviewer ✓]
+        P4[Can Be Added]
+        P5[Role: External Consultant]
+        P6[Warning: 'External user']
+        P7[Requires HR Approval]
+        P8[Send Approval Request]
+        P9{HR Decision}
+        P10[Approved ✓]
+        P11[Rejected ❌]
+        P12[Add to Interview]
+        P13[Cannot Add]
+        P14[Suggest Internal Alternative]
+        
+        P1 --> P2
+        P2 -->|Interviewer| P3
+        P2 -->|External| P5
+        P3 --> P4
+        P5 --> P6
+        P6 --> P7
+        P7 --> P8
+        P8 --> P9
+        P9 -->|Approved| P10
+        P9 -->|Rejected| P11
+        P10 --> P12
+        P11 --> P13
+        P13 --> P14
+    end
+    
+    %% 7. LOOP PATH: Multiple Interview Rounds
+    subgraph LOOP["7️⃣ LOOP: Multiple Rounds"]
+        L1[Round 1: Technical Interview Completed]
+        L2[Feedback Positive]
+        L3[Schedule Round 2]
+        L4[Click 'Add Another Interview']
+        L5[Form Pre-filled with Candidate]
+        L6[Type: Cultural Fit Interview]
+        L7[Different Interviewers]
+        L8[Schedule 1 Week Later]
+        L9[Round 2 Scheduled ✓]
+        L10{Pass Round 2?}
+        L11[Schedule Round 3: Executive]
+        L12[3 Rounds Total]
+        L13[All Completed]
+        L14[Move to Offer Stage]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 --> L10
+        L10 -->|Yes| L11
+        L10 -->|No| L1
+        L11 --> L12
+        L12 --> L13
+        L13 --> L14
+    end
+    
+    %% 8. TIMEOUT PATH: Calendar API Timeout
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Calendar Integration"]
+        T1[Generating Calendar Invite]
+        T2[Call Calendar API]
+        T3[API Response Timeout]
+        T4[15 Seconds Elapsed]
+        T5[Show Loading: 'Generating invite...']
+        T6{Timeout?}
+        T7[Timeout ⏰]
+        T8[Fallback: Generate .ics Locally]
+        T9[Basic .ics Created]
+        T10[Send Without Advanced Features]
+        T11[Show: 'Calendar invite sent (basic)']
+        T12[Log Issue for Review]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 --> T6
+        T6 -->|Timeout| T7
+        T6 -->|Success| H22
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+        T11 --> T12
+    end
+    
+    %% 9. EMPTY STATE: No Interviewers Available
+    subgraph EMPTY["9️⃣ EMPTY: No Interviewers"]
+        EM1[Search for Interviewer]
+        EM2[Enter Name: 'Smith']
+        EM3[Search Results]
+        EM4{Found?}
+        EM5[No Results ❌]
+        EM6[Empty State Display]
+        EM7[Message: 'No interviewers found']
+        EM8[Suggestions]
+        EM9[Try different search]
+        EM10[Request new interviewer be added]
+        EM11[Contact HR Admin]
+        EM12[Admin Adds New Interviewer]
+        EM13[Now Available ✓]
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 --> EM4
+        EM4 -->|No| EM5
+        EM4 -->|Yes| H13
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM8 --> EM10
+        EM10 --> EM11
+        EM11 --> EM12
+        EM12 --> EM13
+    end
+    
+    %% 10. CONCURRENT: Double Booking Prevention
+    subgraph CONCURRENT["🔟 CONCURRENT: Time Slot Conflict"]
+        C1[Recruiter A Scheduling Interview]
+        C2[Recruiter B Scheduling Interview]
+        C3[Both Select Same Interviewer]
+        C4[Both Select Same Time Slot]
+        C5[2026-03-20 2:00 PM]
+        C6[A Submits First]
+        C7[Slot Reserved for A]
+        C8[B Submits Second]
+        C9{Availability Check}
+        C10[Conflict Detected ⚠️]
+        C11[Error to B]
+        C12[Message: 'Interviewer unavailable<br/>at this time']
+        C13[Show A's Interview Details]
+        C14[Suggest Alternative Times]
+        C15[B Selects: 3:00 PM]
+        C16[No Conflict ✓]
+        C17[Both Interviews Scheduled]
+        
+        C1 --> C3
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+        C5 --> C6
+        C5 --> C8
+        C6 --> C7
+        C7 --> C9
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11
+        C11 --> C12
+        C12 --> C13
+        C13 --> C14
+        C14 --> C15
+        C15 --> C16
+        C16 --> C17
+    end
+    
+    %% INTEGRATION: Email Service
+    subgraph INTEGRATION["🔗 INTEGRATION: Email & Calendar"]
+        I1[Interview Confirmed]
+        I2[Generate Email Content]
+        I3[Candidate Email Template]
+        I4[Subject: Interview Invitation]
+        I5[Body: Date, Time, Link, Agenda]
+        I6[Attach .ics Calendar File]
+        I7[Call Email Service API]
+        I8{API Response}
+        I9[Success ✓]
+        I10[Email Sent to Candidate]
+        I11[Email Sent to Interviewers]
+        I12[Delivery Confirmed]
+        I13[API Error]
+        I14[Queue for Retry]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 --> I5
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 -->|Success| I9
+        I8 -->|Error| I13
+        I9 --> I10
+        I10 --> I11
+        I11 --> I12
+        I13 --> I14
+    end
+    
+    %% EXIT POINTS
+    EXIT_LIST[("Interview List<br/>All Scheduled")]
+    EXIT_DETAIL[("Interview Detail<br/>View Info")]
+    EXIT_KANBAN[("Kanban Board<br/>Updated")]
+    EXIT_FEEDBACK[("Collect Feedback<br/>After Interview")]
+    
+    %% Main Flow Connections
+    ENTRY_KANBAN ==> H1
+    ENTRY_PROF ==> H2
+    ENTRY_EMAIL ==> H3
+    ENTRY_LIST ==> H4
+    
+    H17 -->|Invalid| E3
+    H21 --> I1
+    H26 ==> EXIT_LIST
+    
+    A17 ==> EXIT_DETAIL
+    B13 ==> EXIT_KANBAN
+    
+    E3 -->|Valid| H18
+    E13 --> H17
+    
+    BR2 -->|Valid| H18
+    BR12 --> H11
+    BR8B ==> EXIT_KANBAN
+    
+    R10 ==> EXIT_LIST
+    R14 ==> EXIT_DETAIL
+    
+    P4 --> H13
+    P12 --> H13
+    P14 --> H11
+    
+    L14 ==> EXIT_FEEDBACK
+    
+    T12 ==> EXIT_LIST
+    
+    EM13 --> H12
+    
+    C17 ==> EXIT_LIST
+    
+    I12 ==> EXIT_LIST
+    I14 --> R7
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class ENTRY_KANBAN,ENTRY_PROF,ENTRY_EMAIL,ENTRY_LIST entry
+    class EXIT_LIST,EXIT_DETAIL,EXIT_KANBAN,EXIT_FEEDBACK exit
+    class H25,A17,R10,I12,C17 success
+    class E4,E6,E8,E10,BR3,C10 error
+    class R6,T7,EM6,C12 warning
+    class I1,I7,I10 integration
+```
+
+---
+
+## US-4.7: Schedule and Record Interview
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Schedule interview with date, time, interviewers, meeting link
+2. **Alternative Paths** ✅ - Reschedule existing, cancel interview, multiple rounds
+3. **Error Paths** ✅ - Validation errors (date, time, interviewer, link)
+4. **Business Rule Errors** ✅ - BR-013 (≥1 interviewer required)
+5. **Recovery Paths** ✅ - Email service failure with retry mechanism
+6. **Permission Paths** ✅ - Interviewer role verification, external user approval
+7. **Loop Paths** ✅ - Multiple interview rounds (technical → cultural → executive)
+8. **Timeout Paths** ✅ - Calendar API timeout with local .ics fallback
+9. **Empty States** ✅ - No interviewers found in search
+10. **Concurrent Paths** ✅ - Double booking prevention
+
+### Interview Types
+
+| Type | Purpose | Duration | Interviewers |
+|------|---------|----------|--------------|
+| Phone Screen | Initial assessment | 30 min | 1 (Recruiter) |
+| Technical | Skills evaluation | 60-90 min | 1-2 (Engineers) |
+| Cultural Fit | Team alignment | 45 min | 1-2 (Team members) |
+| Managerial | Leadership assessment | 60 min | 1 (Hiring Manager) |
+| Executive | Final approval | 30-45 min | 1 (Executive) |
+
+### Required Fields
+
+- **Date** - Must be future date
+- **Time** - Valid time slot (no conflicts)
+- **Duration** - 30, 45, 60, 90, 120 minutes
+- **Interviewer(s)** - ≥1 required (BR-013)
+- **Meeting Link** - Zoom/Teams/Google Meet URL
+
+### Optional Fields
+
+- **Interview Type** - Defaults to "General"
+- **Agenda** - Interview topics/questions
+- **Notes** - Internal notes (not visible to candidate)
+- **Recording Permission** - Checkbox
+
+### Calendar Integration
+
+**Generated .ics File Contains:**
+- Event title: "Interview: [Candidate Name] - [Position]"
+- Date/time with timezone
+- Duration
+- Meeting link (in description and location)
+- Attendees: Candidate + Interviewers
+- Reminder: 15 minutes before
+
+### Email Notifications
+
+**To Candidate:**
+```
+Subject: Interview Invitation - [Position Title]
+
+Hi [Candidate],
+
+We'd like to invite you for an interview!
+
+Interview Details:
+- Date: Friday, March 20, 2026
+- Time: 2:00 PM (GMT+7)
+- Duration: 60 minutes
+- Type: Technical Interview
+- Interviewer: John Doe, Tech Lead
+
+Join Meeting: [Zoom Link]
+[Add to Calendar .ics]
+
+Please confirm your availability by replying to this email.
+```
+
+**To Interviewers:**
+```
+Subject: Interview Scheduled - [Candidate Name]
+
+Hi [Interviewer],
+
+You've been scheduled as an interviewer.
+
+Candidate: Alex Chen
+Position: Senior Backend Developer
+Date: March 20, 2026 at 2:00 PM
+
+[View Candidate Profile] [Add to Calendar]
+```
+
+### Success Criteria
+
+- ✅ Schedule interview in <2 minutes (happy path)
+- ✅ Calendar invites sent within 30 seconds
+- ✅ Email delivery rate >99%
+- ✅ Double booking prevention 100% effective
+- ✅ Reschedule process <1 minute
+- ✅ Zero interviews scheduled without interviewers (BR-013)

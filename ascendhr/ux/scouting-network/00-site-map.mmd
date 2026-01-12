@@ -1,0 +1,213 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
+flowchart TB
+    %% External Entry Points
+    DASHBOARD[("🏠 Dashboard")]
+    FORMATION[("⚽ Formation View")]
+    EMAIL[("📧 Email Link")]
+    NOTIF[("🔔 Notification")]
+    DIRECT[("🔗 Direct URL")]
+    
+    %% Main Navigation
+    subgraph NAV["Main Navigation"]
+        HOME["Dashboard"]
+        RECRUITMENT["Recruitment"]
+        EMPLOYEES["Employees"]
+        FORMATION_NAV["Formation View"]
+        ANALYTICS["Analytics"]
+    end
+    
+    %% Scouting Network Feature
+    subgraph SCOUTING["Scouting Network (ATS-Lite)"]
+        
+        subgraph POSITIONS["Position Management"]
+            POS_LIST["Position List"]
+            POS_CREATE["Create Position"]
+            POS_DETAIL["Position Detail"]
+            POS_EDIT["Edit Position"]
+        end
+        
+        subgraph CANDIDATES["Candidate Management"]
+            CAND_LIST["Candidate List"]
+            CAND_ADD["Add Candidate"]
+            CAND_PROFILE["Candidate Profile"]
+            CAND_COMPARE["Compare Candidates"]
+        end
+        
+        subgraph PIPELINE["Pipeline View"]
+            KANBAN["Kanban Board"]
+            STAGE_MOVE["Move Stage"]
+            SCREENING["Screening Review"]
+            BULK_ACTIONS["Bulk Actions"]
+        end
+        
+        subgraph INTERVIEWS["Interview Management"]
+            INT_SCHEDULE["Schedule Interview"]
+            INT_LIST["Interview List"]
+            INT_DETAIL["Interview Detail"]
+            INT_FEEDBACK["Submit Feedback"]
+        end
+        
+        subgraph OFFERS["Offer Management"]
+            OFFER_CREATE["Create Offer"]
+            OFFER_LIST["Offer List"]
+            OFFER_DETAIL["Offer Detail"]
+            OFFER_TRACK["Track Offers"]
+        end
+        
+        subgraph CONVERSION["Employee Conversion"]
+            CONV_WIZARD["Conversion Wizard"]
+            CONV_REVIEW["Review & Confirm"]
+            CONV_SUCCESS["Success"]
+        end
+        
+    end
+    
+    %% Cross-Feature Integration
+    subgraph INTEGRATION["Integration Points"]
+        PLAYER_CARD[("🎴 Player Card System")]
+        FORMATION_SYS[("⚽ Formation View")]
+        EMAIL_SVC[("📧 Email Service")]
+        EMPLOYEE_SYS[("👥 Employee Management")]
+    end
+    
+    %% Entry Point Connections
+    DASHBOARD --> RECRUITMENT
+    FORMATION --> POS_CREATE
+    EMAIL --> INT_SCHEDULE
+    EMAIL --> OFFER_DETAIL
+    NOTIF --> KANBAN
+    DIRECT --> POS_LIST
+    DIRECT --> CAND_LIST
+    
+    %% Navigation Flow
+    RECRUITMENT --> POS_LIST
+    RECRUITMENT --> CAND_LIST
+    RECRUITMENT --> KANBAN
+    
+    %% Position Flow
+    POS_LIST --> POS_CREATE
+    POS_LIST --> POS_DETAIL
+    POS_DETAIL --> POS_EDIT
+    POS_CREATE --> POS_DETAIL
+    
+    %% Candidate Flow
+    CAND_LIST --> CAND_ADD
+    CAND_LIST --> CAND_PROFILE
+    CAND_ADD --> CAND_PROFILE
+    POS_DETAIL --> CAND_ADD
+    
+    %% Kanban Flow
+    KANBAN --> CAND_PROFILE
+    KANBAN --> STAGE_MOVE
+    KANBAN --> SCREENING
+    KANBAN --> BULK_ACTIONS
+    KANBAN --> CAND_COMPARE
+    
+    %% Interview Flow
+    STAGE_MOVE --> INT_SCHEDULE
+    INT_SCHEDULE --> INT_LIST
+    INT_LIST --> INT_DETAIL
+    INT_DETAIL --> INT_FEEDBACK
+    INT_FEEDBACK --> KANBAN
+    
+    %% Offer Flow
+    INT_FEEDBACK --> OFFER_CREATE
+    OFFER_CREATE --> OFFER_DETAIL
+    OFFER_DETAIL --> OFFER_TRACK
+    OFFER_LIST --> OFFER_DETAIL
+    
+    %% Conversion Flow
+    OFFER_DETAIL --> CONV_WIZARD
+    CONV_WIZARD --> CONV_REVIEW
+    CONV_REVIEW --> CONV_SUCCESS
+    
+    %% Integration Connections
+    CAND_ADD -.-> PLAYER_CARD
+    POS_CREATE -.-> FORMATION_SYS
+    INT_SCHEDULE -.-> EMAIL_SVC
+    OFFER_CREATE -.-> EMAIL_SVC
+    CONV_SUCCESS -.-> PLAYER_CARD
+    CONV_SUCCESS -.-> FORMATION_SYS
+    CONV_SUCCESS -.-> EMPLOYEE_SYS
+    
+    %% Exit Points
+    CONV_SUCCESS --> EMPLOYEE_SYS
+    CONV_SUCCESS --> FORMATION_NAV
+    KANBAN --> DASHBOARD
+    POS_LIST --> DASHBOARD
+    
+    %% Styling
+    classDef entryPoint fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef integration fill:#51cf66,color:white,stroke:#37b24d
+    classDef critical fill:#ff6b6b,color:white,stroke:#e03131
+    
+    class DASHBOARD,FORMATION,EMAIL,NOTIF,DIRECT entryPoint
+    class PLAYER_CARD,FORMATION_SYS,EMAIL_SVC,EMPLOYEE_SYS integration
+    class CONV_WIZARD,CONV_REVIEW,CONV_SUCCESS critical
+```
+
+---
+
+## Site Navigation Structure
+
+### Primary Navigation
+- **Dashboard** - Home page with widgets
+- **Recruitment** - Main entry to Scouting Network
+- **Employees** - Employee management (destination after conversion)
+- **Formation View** - Team structure and gaps
+- **Analytics** - Reports and metrics
+
+### Scouting Network Sections
+
+1. **Position Management**
+   - List all open positions
+   - Create new positions with requirements
+   - View/edit position details
+
+2. **Candidate Management**
+   - Browse candidate pool
+   - Add new candidates
+   - View candidate profiles
+   - Compare candidates
+
+3. **Pipeline View**
+   - Kanban board visualization
+   - Move candidates through stages
+   - Screening reviews
+   - Bulk operations
+
+4. **Interview Management**
+   - Schedule interviews
+   - View scheduled interviews
+   - Submit feedback
+   - Track interview status
+
+5. **Offer Management**
+   - Create job offers
+   - Track offer status
+   - Manage offer lifecycle
+
+6. **Employee Conversion** ⭐ CRITICAL
+   - Convert hired candidates to employees
+   - Integration with Player Card System
+   - Update Formation View
+
+### Entry Points
+- 🏠 Dashboard widgets
+- ⚽ Formation View "Add Position"
+- 📧 Email links (interviews, offers)
+- 🔔 Notifications
+- 🔗 Direct URLs
+
+### Exit Points
+- Return to Dashboard
+- Navigate to Employee Management
+- View updated Formation View
+- Logout
+
+### Integration Points
+- 🎴 Player Card System (attributes, employee creation)
+- ⚽ Formation View (positions, team gaps)
+- 📧 Email Service (notifications)
+- 👥 Employee Management (post-conversion)

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Position | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    /* Wizard Container */
+    .wizard-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      position: relative;
+    }
+    
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 60px;
+      right: 60px;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+    
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--muted);
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-bottom: 8px;
+      transition: all 0.3s;
+    }
+    
+    .step.active .step-number {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .step.completed .step-number {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .step.completed .step-number::before {
+      content: '✓';
+    }
+    
+    .step-label {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .step.active .step-label {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    /* Wizard Steps */
+    .wizard-step {
+      display: none !important;
+    }
+    
+    .wizard-step.active {
+      display: block !important;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Form Styles */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+    }
+    
+    .form-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .form-subtitle {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 32px;
+    }
+    
+    /* Requirements Grid */
+    .requirements-grid {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    
+    .requirements-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 100px 60px;
+      gap: 16px;
+      padding: 12px 16px;
+      background: var(--background);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+    }
+    
+    .requirement-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 100px 60px;
+      gap: 16px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+    
+    .requirement-row:last-child {
+      border-bottom: none;
+    }
+    
+    .requirement-row input[type="number"] {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+    }
+    
+    .btn-remove {
+      background: var(--destructive-light);
+      color: var(--destructive);
+      border: none;
+      padding: 8px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .btn-remove:hover {
+      background: var(--destructive);
+      color: white;
+    }
+    
+    /* Formation Preview */
+    .formation-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    .preview-card {
+      background: var(--background);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    
+    .preview-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .preview-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    
+    /* Actions */
+    .wizard-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    
+    .auto-save {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .auto-save.saving {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Create Position Wizard (3 Steps)
+    User Story: US-4.1
+    
+    INTERACTIVE: 
+    - Multi-step wizard with state management
+    - Click Next/Back to navigate steps
+    - Add/remove requirements dynamically
+    - Form validation on each step
+    - Auto-save draft functionality
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item">
+            <span class="icon">🎯</span> Recruitment Pipeline
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item active">
+            <span class="icon">➕</span> Create Position
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="wizard-container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+          <div class="step active" id="progress-step-1">
+            <div class="step-number">1</div>
+            <div class="step-label">Basic Info</div>
+          </div>
+          <div class="step" id="progress-step-2">
+            <div class="step-number">2</div>
+            <div class="step-label">Requirements</div>
+          </div>
+          <div class="step" id="progress-step-3">
+            <div class="step-number">3</div>
+            <div class="step-label">Review & Publish</div>
+          </div>
+        </div>
+
+        <!-- Step 1: Basic Information -->
+        <div class="wizard-step active" id="step-1">
+          <div class="form-card">
+            <h2 class="form-title">Create New Position</h2>
+            <p class="form-subtitle">Start by providing basic information about the position</p>
+            
+            <div class="form-group">
+              <label class="form-label">Position Title *</label>
+              <input type="text" class="form-input" id="positionTitle" placeholder="e.g., Senior Backend Developer" value="Senior Backend Developer">
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Department *</label>
+                <select class="form-select" id="department">
+                  <option>Engineering</option>
+                  <option>Product</option>
+                  <option>Design</option>
+                  <option>Marketing</option>
+                  <option>Sales</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Headcount *</label>
+                <input type="number" class="form-input" id="headcount" min="1" value="2" placeholder="Number of positions">
+                <span class="form-hint">Number of people to hire for this role</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Job Description</label>
+              <textarea class="form-textarea" rows="6" placeholder="Describe the role, responsibilities, and qualifications...">We are looking for a Senior Backend Developer to join our growing engineering team. You will be responsible for designing and implementing scalable backend services, mentoring junior developers, and contributing to architectural decisions.</textarea>
+            </div>
+            
+            <div class="auto-save" id="autoSaveStatus">
+              <span>💾</span> Draft saved automatically
+            </div>
+          </div>
+          
+          <div class="wizard-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='02-kanban-board.html'">Cancel</button>
+            <button class="btn btn-primary" onclick="goToStep(2)">Next: Requirements →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Requirements -->
+        <div class="wizard-step" id="step-2">
+          <div class="form-card">
+            <h2 class="form-title">Position Requirements</h2>
+            <p class="form-subtitle">Define the skills and attributes required for this position (1-20 scale)</p>
+            
+            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+              <button class="btn btn-outline" onclick="addRequirement()">➕ Add Requirement</button>
+              <button class="btn btn-outline" onclick="useTemplate()">📋 Use Template</button>
+            </div>
+            
+            <div class="requirements-grid">
+              <div class="requirements-header">
+                <div>Attribute</div>
+                <div>Min Score</div>
+                <div>Max Score</div>
+                <div>Mandatory</div>
+                <div>Action</div>
+              </div>
+              
+              <div class="requirement-row">
+                <div>
+                  <select class="form-select">
+                    <option>Backend Development</option>
+                    <option>Frontend Development</option>
+                    <option>Database Design</option>
+                    <option>System Architecture</option>
+                  </select>
+                </div>
+                <div><input type="number" min="1" max="20" value="16" class="form-input"></div>
+                <div><input type="number" min="1" max="20" value="20" class="form-input"></div>
+                <div style="text-align: center;">
+                  <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
+                </div>
+                <div>
+                  <button class="btn-remove" onclick="removeRequirement(this)">🗑️</button>
+                </div>
+              </div>
+              
+              <div class="requirement-row">
+                <div>
+                  <select class="form-select">
+                    <option>Database Design</option>
+                    <option>Backend Development</option>
+                    <option>Frontend Development</option>
+                  </select>
+                </div>
+                <div><input type="number" min="1" max="20" value="15" class="form-input"></div>
+                <div><input type="number" min="1" max="20" value="20" class="form-input"></div>
+                <div style="text-align: center;">
+                  <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
+                </div>
+                <div>
+                  <button class="btn-remove" onclick="removeRequirement(this)">🗑️</button>
+                </div>
+              </div>
+              
+              <div class="requirement-row">
+                <div>
+                  <select class="form-select">
+                    <option>System Architecture</option>
+                    <option>Backend Development</option>
+                  </select>
+                </div>
+                <div><input type="number" min="1" max="20" value="14" class="form-input"></div>
+                <div><input type="number" min="1" max="20" value="18" class="form-input"></div>
+                <div style="text-align: center;">
+                  <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                </div>
+                <div>
+                  <button class="btn-remove" onclick="removeRequirement(this)">🗑️</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="alert alert-info">
+              ℹ️ <strong>Tip:</strong> Define at least 3-5 requirements for better candidate matching. Scores range from 1 (basic) to 20 (expert).
+            </div>
+          </div>
+          
+          <div class="wizard-actions">
+            <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">Next: Review →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Review & Publish -->
+        <div class="wizard-step" id="step-3">
+          <div class="form-card">
+            <h2 class="form-title">Review & Publish</h2>
+            <p class="form-subtitle">Review your position details before publishing</p>
+            
+            <div style="background: var(--background); padding: 24px; border-radius: var(--radius-md); margin-bottom: 24px;">
+              <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">Position Summary</h3>
+              
+              <div style="display: grid; gap: 16px;">
+                <div>
+                  <div class="preview-label">Position Title</div>
+                  <div class="preview-value">Senior Backend Developer</div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                  <div>
+                    <div class="preview-label">Department</div>
+                    <div class="preview-value">Engineering</div>
+                  </div>
+                  <div>
+                    <div class="preview-label">Headcount</div>
+                    <div class="preview-value">2 positions</div>
+                  </div>
+                  <div>
+                    <div class="preview-label">Requirements</div>
+                    <div class="preview-value">3 attributes</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="preview-label">Requirements Defined</div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                    <span class="badge badge-primary">Backend Development (16-20)</span>
+                    <span class="badge badge-primary">Database Design (15-20)</span>
+                    <span class="badge badge-muted">System Architecture (14-18)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Link to Formation View (Optional)</label>
+              <select class="form-select">
+                <option>Select a formation position...</option>
+                <option>⚽ Engineering - Backend Developer (Position 8)</option>
+                <option>⚽ Engineering - Senior Developer (Position 9)</option>
+                <option>⚽ Product - Product Manager (Position 5)</option>
+              </select>
+              <span class="form-hint">Link this position to a specific role in your team formation</span>
+            </div>
+            
+            <div class="alert alert-success">
+              ✅ <strong>Ready to publish!</strong> Your position is complete and ready to start receiving candidates.
+            </div>
+          </div>
+          
+          <div class="wizard-actions">
+            <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+            <button class="btn btn-primary btn-lg" onclick="publishPosition()">✨ Publish Position</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    
+    // Navigate between steps
+    function goToStep(stepNumber) {
+      // Validate current step before proceeding
+      if (stepNumber > currentStep && !validateStep(currentStep)) {
+        return;
+      }
+      
+      // Hide current step
+      document.getElementById(`step-${currentStep}`).classList.remove('active');
+      document.getElementById(`progress-step-${currentStep}`).classList.remove('active');
+      
+      // Mark completed steps
+      if (stepNumber > currentStep) {
+        document.getElementById(`progress-step-${currentStep}`).classList.add('completed');
+      }
+      
+      // Show new step
+      document.getElementById(`step-${stepNumber}`).classList.add('active');
+      document.getElementById(`progress-step-${stepNumber}`).classList.add('active');
+      
+      currentStep = stepNumber;
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Auto-save
+      autoSave();
+    }
+    
+    // Validate step
+    function validateStep(step) {
+      if (step === 1) {
+        const title = document.getElementById('positionTitle').value.trim();
+        const headcount = parseInt(document.getElementById('headcount').value);
+        
+        if (!title) {
+          alert('Please enter a position title');
+          return false;
+        }
+        
+        if (headcount < 1) {
+          alert('Headcount must be at least 1');
+          return false;
+        }
+      }
+      
+      if (step === 2) {
+        const requirements = document.querySelectorAll('.requirement-row').length;
+        if (requirements === 0) {
+          alert('Please add at least one requirement');
+          return false;
+        }
+      }
+      
+      return true;
+    }
+    
+    // Add requirement row
+    function addRequirement() {
+      const grid = document.querySelector('.requirements-grid');
+      const newRow = document.createElement('div');
+      newRow.className = 'requirement-row';
+      newRow.innerHTML = `
+        <div>
+          <select class="form-select">
+            <option>Select attribute...</option>
+            <option>Backend Development</option>
+            <option>Frontend Development</option>
+            <option>Database Design</option>
+            <option>System Architecture</option>
+            <option>Problem Solving</option>
+            <option>Communication</option>
+            <option>Leadership</option>
+          </select>
+        </div>
+        <div><input type="number" min="1" max="20" value="10" class="form-input"></div>
+        <div><input type="number" min="1" max="20" value="15" class="form-input"></div>
+        <div style="text-align: center;">
+          <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--primary);">
+        </div>
+        <div>
+          <button class="btn-remove" onclick="removeRequirement(this)">🗑️</button>
+        </div>
+      `;
+      grid.appendChild(newRow);
+    }
+    
+    // Remove requirement row
+    function removeRequirement(button) {
+      button.closest('.requirement-row').remove();
+    }
+    
+    // Use template
+    function useTemplate() {
+      alert('Template Loaded!\n\n✓ Backend Development (15-20)\n✓ Database Design (12-18)\n✓ System Architecture (14-20)\n✓ Problem Solving (12-18)\n✓ Communication (10-15)');
+    }
+    
+    // Auto-save functionality
+    function autoSave() {
+      const status = document.getElementById('autoSaveStatus');
+      if (status) {
+        status.classList.add('saving');
+        status.innerHTML = '<span>💾</span> Saving draft...';
+        
+        setTimeout(() => {
+          status.classList.remove('saving');
+          status.innerHTML = '<span>💾</span> Draft saved automatically';
+        }, 1000);
+      }
+    }
+    
+    // Publish position
+    function publishPosition() {
+      if (confirm('Publish this position?\n\nThe position will be visible to all recruiters and ready to receive candidates.')) {
+        // Show success state
+        alert('✨ Position Published!\n\n"Senior Backend Developer" is now live.\n\nYou can now:\n• Add candidates to this position\n• View in the recruitment pipeline\n• Share with your team');
+        
+        // Navigate to kanban board (main hub)
+        setTimeout(() => {
+          window.location.href = '02-kanban-board.html';
+        }, 500);
+      }
+    }
+    
+    // Simulate auto-save every 30 seconds
+    setInterval(autoSave, 30000);
+    
+    console.log('Position Wizard initialized - 3 steps loaded');
+  </script>
+</body>
+</html>

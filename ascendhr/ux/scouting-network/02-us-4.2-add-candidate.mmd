@@ -1,0 +1,483 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '13px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_LIST[("Candidate List<br/>'Add Candidate'")]
+    ENTRY_POS[("Position Detail<br/>'Add to Position'")]
+    ENTRY_KANBAN[("Kanban Board<br/>'Quick Add'")]
+    ENTRY_URL[("Direct URL<br/>/candidates/new")]
+    
+    %% 1. HAPPY PATH: Manual Add
+    subgraph HAPPY["1️⃣ HAPPY PATH: Add Candidate Manually"]
+        H1[Candidate List]
+        H2[Click 'Add Candidate']
+        H3{Select Method}
+        H4[Manual Entry Selected]
+        H5[Enter Basic Info Form]
+        H6[Name, Email, Phone]
+        H7[Upload Resume PDF]
+        H8[Select Source]
+        H9[Rate Attributes Step]
+        H10[Rate Backend: 18/20]
+        H11[Rate Database: 17/20]
+        H12[Rate System Design: 16/20]
+        H13{Duplicate Check}
+        H14[No Duplicate Found ✓]
+        H15[Preview Candidate Profile]
+        H16[Submit]
+        H17[Candidate Created ✓]
+        H18[View Profile]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+        H16 --> H17
+        H17 --> H18
+    end
+    
+    %% 2. ALTERNATIVE PATH A: LinkedIn Import
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Import from LinkedIn"]
+        A1[Select Method: LinkedIn]
+        A2[Enter LinkedIn Profile URL]
+        A3[Click 'Import']
+        A4[Call LinkedIn API]
+        A5{API Response}
+        A6[Data Fetched ✓]
+        A7[Auto-populate Fields]
+        A8[Name, Experience, Skills]
+        A9[User Reviews Data]
+        A10[Adjust/Add Missing Info]
+        A11[Rate Attributes]
+        A12[Continue to Submit]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 -->|Success| A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+        A11 --> A12
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Quick Add from Position
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Quick Add for Position"]
+        B1[Position Detail Page]
+        B2[Click 'Add Candidate for This Position']
+        B3[Position Pre-selected]
+        B4[Form Opens]
+        B5[Add Basic Info]
+        B6[Auto-create Application]
+        B7[Candidate + Application Created]
+        B8[Immediately in Position Pipeline]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 --> B6
+        B6 --> B7
+        B7 --> B8
+    end
+    
+    %% 3. ERROR PATH: Validation Errors
+    subgraph ERROR["3️⃣ ERROR PATH: Validation Failures"]
+        E1[Submit Form]
+        E2{Validation}
+        E3[Email Invalid Format ❌]
+        E4[Show: 'Enter valid email']
+        E5[Resume Too Large ❌]
+        E6[Show: 'Max 5MB']
+        E7[No Source Selected ❌]
+        E8[Show: 'Select candidate source']
+        E9[Fix Errors]
+        E10[Resubmit]
+        
+        E1 --> E2
+        E2 -->|Invalid Email| E3
+        E2 -->|File Too Large| E5
+        E2 -->|Missing Source| E7
+        E3 --> E4
+        E5 --> E6
+        E7 --> E8
+        E4 --> E9
+        E6 --> E9
+        E8 --> E9
+        E9 --> E10
+    end
+    
+    %% 4. BUSINESS RULE ERROR: Duplicate Detection (BR-004)
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE ERROR: BR-004 Duplicate"]
+        BR1[Submit Candidate]
+        BR2{Duplicate Check}
+        BR3[Email Already Exists]
+        BR4[Show Duplicate Warning]
+        BR5[Display Existing Candidate]
+        BR6[Show Match: 'Alex Chen - CAN-2026-005']
+        BR7{User Decision}
+        BR8A[Merge - Update Existing]
+        BR8B[Create Anyway - Different Person]
+        BR8C[Cancel - Abandon]
+        BR9[Merge Process]
+        BR10[Update Existing Record]
+        BR11[Success: 'Candidate Updated']
+        
+        BR1 --> BR2
+        BR2 -->|Duplicate Found| BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8A
+        BR7 --> BR8B
+        BR7 --> BR8C
+        BR8A --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+    end
+    
+    %% 5. RECOVERY PATH: Resume Upload Failure
+    subgraph RECOVERY["5️⃣ RECOVERY PATH: Resume Upload Recovery"]
+        R1[Select Resume File]
+        R2[Upload Starts]
+        R3{Upload Status}
+        R4[Network Error ❌]
+        R5[Show: 'Upload failed']
+        R6[Retry Button Shown]
+        R7[User Clicks Retry]
+        R8[Upload Retries]
+        R9{Success?}
+        R10[Upload Complete ✓]
+        R11[After 3 Failures]
+        R12[Suggest: 'Try smaller file<br/>or different format']
+        R13[Continue Without Resume]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 -->|Error| R4
+        R3 -->|Success| R10
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R9 -->|Success| R10
+        R9 -->|Fail Again| R11
+        R11 --> R12
+        R12 --> R13
+    end
+    
+    %% 6. PERMISSION PATH: Recruiter Only
+    subgraph PERMISSION["6️⃣ PERMISSION: Role Access Control"]
+        P1[User Requests Add Candidate]
+        P2{Check Role}
+        P3[Role = Interviewer]
+        P4[Access Denied ⛔]
+        P5[Show: 'Only Recruiters can<br/>add candidates']
+        P6[Suggest: Contact HR]
+        P7[Role = Recruiter ✓]
+        P8[Access Granted]
+        P9[Form Opens]
+        
+        P1 --> P2
+        P2 -->|Not Recruiter| P3
+        P2 -->|Recruiter| P7
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P7 --> P8
+        P8 --> P9
+    end
+    
+    %% 7. LOOP PATH: Edit Attributes After Creation
+    subgraph LOOP["7️⃣ LOOP: Edit & Re-rate Cycle"]
+        L1[Candidate Created]
+        L2[View Profile]
+        L3[Realize: Incorrect Rating]
+        L4[Click 'Edit Attributes']
+        L5[Attribute Rating Modal]
+        L6[Adjust Backend: 18 → 19]
+        L7[Save Changes]
+        L8[Fit Score Recalculates]
+        L9[Show: 'Profile Updated']
+        L10{Continue?}
+        L11[Edit Again]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 --> L10
+        L10 -->|Edit More| L11
+        L11 --> L4
+        L10 -->|Done| L2
+    end
+    
+    %% 8. TIMEOUT PATH: Form Abandonment
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Session Management"]
+        T1[Form Open 30 Minutes]
+        T2[Half-filled Data]
+        T3[User Gets Call]
+        T4[Close Browser]
+        T5[Auto-save Draft to LocalStorage]
+        T6[Later: Return to Add Candidate]
+        T7[Show: 'Resume incomplete entry?']
+        T8[Click 'Resume']
+        T9[Form Restores]
+        T10[All Fields Populated]
+        T11[Continue from Where Left]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 -.-> T6
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+    end
+    
+    %% 9. EMPTY STATE: No Candidates Yet
+    subgraph EMPTY["9️⃣ EMPTY STATE: First Candidate"]
+        EM1[Navigate to Candidates]
+        EM2[Load List]
+        EM3{Has Candidates?}
+        EM4[Empty State Display]
+        EM5[Illustration: Empty Pool]
+        EM6[Message: 'No candidates yet']
+        EM7[CTA: 'Add First Candidate']
+        EM8[Tips: 'Import from LinkedIn<br/>or add manually']
+        EM9[Click CTA]
+        EM10[Open Add Form]
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 -->|No| EM4
+        EM4 --> EM5
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+    end
+    
+    %% 10. CONCURRENT MODIFICATION
+    subgraph CONCURRENT["🔟 CONCURRENT: Simultaneous Adds"]
+        C1[Recruiter A Adding 'Alex Chen']
+        C2[Recruiter B Adding 'Alex Chen']
+        C3[Both Enter Same Email]
+        C4[A Submits First]
+        C5[Candidate Created by A]
+        C6[B Submits Second]
+        C7{Duplicate Check}
+        C8[Email Conflict Detected]
+        C9[Show B: 'Candidate already added<br/>by User A 30 seconds ago']
+        C10[Options for B]
+        C11A[View Existing Candidate]
+        C11B[Add Different Candidate]
+        
+        C1 --> C3
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+        C3 --> C6
+        C6 --> C7
+        C7 --> C8
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11A
+        C10 --> C11B
+    end
+    
+    %% INTEGRATION: Player Card System
+    subgraph INTEGRATION["🔗 INTEGRATION: Player Card System"]
+        I1[Attribute Rating Step]
+        I2[Call Player Card API]
+        I3[GET /api/attributes/list]
+        I4{API Response}
+        I5[Load Attribute Definitions]
+        I6[Display Rating Sliders]
+        I7[Backend Dev 1-20]
+        I8[Database Design 1-20]
+        I9[System Architecture 1-20]
+        I10[User Rates All]
+        I11[POST /api/candidates/{id}/attributes]
+        I12[Save to Player Card]
+        I13[API Error]
+        I14[Show: 'Attributes temporarily<br/>unavailable']
+        I15[Save Candidate Without Attributes]
+        I16[Attributes Can Be Added Later]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 -->|Success| I5
+        I4 -->|Error| I13
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 --> I9
+        I9 --> I10
+        I10 --> I11
+        I11 --> I12
+        I13 --> I14
+        I14 --> I15
+        I15 --> I16
+    end
+    
+    %% EXIT POINTS
+    EXIT_PROFILE[("Candidate Profile<br/>View Created")]
+    EXIT_LIST[("Candidate List<br/>View All")]
+    EXIT_KANBAN[("Kanban Board<br/>View Pipeline")]
+    EXIT_DASH[("Dashboard<br/>Return")]
+    
+    %% Main Flow Connections
+    ENTRY_LIST ==> H1
+    ENTRY_POS ==> B1
+    ENTRY_KANBAN ==> H3
+    ENTRY_URL ==> H5
+    
+    H3 -->|LinkedIn| A1
+    H9 --> I1
+    H13 -->|Duplicate| BR2
+    H16 --> H17
+    H18 ==> EXIT_PROFILE
+    
+    A5 -->|Error| E2
+    A12 --> H13
+    
+    B8 ==> EXIT_KANBAN
+    
+    E10 --> H13
+    
+    BR2 -->|No Duplicate| H14
+    BR8B --> H17
+    BR8C ==> EXIT_LIST
+    BR11 ==> EXIT_PROFILE
+    
+    R10 --> H8
+    R13 --> H8
+    
+    P6 ==> EXIT_DASH
+    P9 --> H5
+    
+    L9 ==> EXIT_PROFILE
+    T11 --> H9
+    EM10 --> H5
+    
+    C11A ==> EXIT_PROFILE
+    C11B --> H1
+    
+    I12 --> H13
+    I16 --> H13
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class ENTRY_LIST,ENTRY_POS,ENTRY_KANBAN,ENTRY_URL entry
+    class EXIT_PROFILE,EXIT_LIST,EXIT_KANBAN,EXIT_DASH exit
+    class H17,A6,BR11,R10,I12 success
+    class E3,E5,E7,BR3,P4,R4 error
+    class BR4,T7,EM4,I14 warning
+    class I2,I3,I11 integration
+```
+
+---
+
+## US-4.2: Add Candidate to Scouting Network
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Manual candidate entry with all required fields
+2. **Alternative Paths** ✅ - LinkedIn import, quick add from position, bulk import
+3. **Error Paths** ✅ - Validation failures (email, file size, missing fields)
+4. **Business Rule Errors** ✅ - BR-004 duplicate candidate detection
+5. **Recovery Paths** ✅ - Resume upload retry, network failure handling
+6. **Permission Paths** ✅ - Recruiter-only access control
+7. **Loop Paths** ✅ - Edit attributes after creation, re-rate cycle
+8. **Timeout Paths** ✅ - Form abandonment with auto-save
+9. **Empty States** ✅ - First candidate onboarding
+10. **Concurrent Modification** ✅ - Simultaneous adds with duplicate prevention
+
+### Key Screens
+
+| Screen ID | Name | Purpose |
+|-----------|------|---------|
+| `candidate-list` | Candidate List | Browse candidates, entry point |
+| `candidate-form` | Add Candidate Form | Basic info input (name, email, phone) |
+| `candidate-import` | LinkedIn Import | Import from LinkedIn profile |
+| `attribute-rating` | Attribute Rating Grid | Rate 1-20 on multiple skills |
+| `resume-upload` | Resume Upload | File upload with validation |
+| `duplicate-warning` | Duplicate Modal | Handle duplicate candidates |
+| `candidate-profile` | Candidate Profile | View complete candidate data |
+
+### Validation Rules
+
+| Field | Rule | Error Message |
+|-------|------|---------------|
+| Name | Required, max 100 chars | "Full name is required" |
+| Email | Required, valid format | "Enter valid email address" |
+| Email | Unique (BR-004) | "Candidate with this email already exists" |
+| Phone | Optional, valid format | "Enter valid phone number" |
+| Resume | Optional, PDF/DOC, max 5MB | "File must be PDF/DOC and under 5MB" |
+| Source | Required | "Select candidate source" |
+| Attributes | Optional but recommended | "Add attributes for better fit scores" |
+
+### Integration Points
+
+- **Player Card System API**
+  - `GET /api/attributes/list` - Load attribute definitions
+  - `POST /api/candidates/{id}/attributes` - Save attribute ratings
+  - `PUT /api/candidates/{id}/attributes` - Update ratings
+  - Error handling: Allow candidate creation even if API unavailable
+
+- **LinkedIn Integration** (Optional)
+  - Import profile data to auto-populate fields
+  - Graceful degradation if unavailable
+
+### Business Rules
+
+- **BR-004: Duplicate Prevention**
+  - Check email uniqueness before save
+  - Offer merge/skip options
+  - Track duplicate attempts in audit log
+
+### State Management
+
+- **Auto-save Draft** - LocalStorage for form abandonment
+- **Resume Upload** - Progress tracking with retry
+- **Attribute Ratings** - Can be added/updated later if skipped
+
+### Success Criteria
+
+- ✅ Add candidate in <1 minute (happy path)
+- ✅ LinkedIn import works with fallback to manual
+- ✅ Duplicate detection prevents 100% of conflicts
+- ✅ Resume upload has 3 retry attempts before suggesting alternatives
+- ✅ Form state preserved on browser close

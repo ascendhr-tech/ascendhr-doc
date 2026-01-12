@@ -1,0 +1,493 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_NAV[("Main Nav<br/>'Recruitment'")]
+    ENTRY_DASH[("Dashboard<br/>'View Pipeline'")]
+    ENTRY_POS[("Position Detail<br/>'View Candidates'")]
+    ENTRY_NOTIF[("Notification<br/>'New Applicant'")]
+    
+    %% 1. HAPPY PATH
+    subgraph HAPPY["1️⃣ HAPPY PATH: View Kanban Board"]
+        H1[Navigate to Recruitment]
+        H2[Load Position List]
+        H3[Select Position:<br/>'Backend Developer']
+        H4[Load Kanban Board]
+        H5[Display 6 Columns]
+        H6[New: 5 candidates]
+        H7[Screening: 3 candidates]
+        H8[Interview: 2 candidates]
+        H9[Offer: 1 candidate]
+        H10[Hired: 0 candidates]
+        H11[Rejected: 2 candidates]
+        H12[Each Card Shows:<br/>Name, Score, Photo]
+        H13[Board Loaded ✓]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H5 --> H7
+        H5 --> H8
+        H5 --> H9
+        H5 --> H10
+        H5 --> H11
+        H6 --> H12
+        H7 --> H12
+        H8 --> H12
+        H9 --> H12
+        H12 --> H13
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Filter Candidates
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Filter & Sort"]
+        A1[Kanban Loaded: 13 candidates]
+        A2[Click 'Filter' Button]
+        A3[Filter Panel Opens]
+        A4[Select: Fit Score ≥ 90%]
+        A5[Apply Filter]
+        A6[Board Updates: 7 candidates]
+        A7[Only Green Badges Show]
+        A8[Click 'Sort by' Dropdown]
+        A9[Select: 'Highest Fit Score']
+        A10[Cards Reorder Within Columns]
+        A11[Top Matches First]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 --> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Quick Actions
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Quick Actions Menu"]
+        B1[Candidate Card Displayed]
+        B2[Hover Over Card]
+        B3[Quick Action Icons Appear]
+        B4[3 Actions Available]
+        B5A[👁️ View Profile]
+        B5B[✉️ Send Email]
+        B5C[⋮ More Options]
+        B6[Right-Click Card]
+        B7[Context Menu Opens]
+        B8[7 Options Listed]
+        B9[Move to Stage, Schedule Interview,<br/>View Details, Compare, etc.]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5A
+        B4 --> B5B
+        B4 --> B5C
+        B1 --> B6
+        B6 --> B7
+        B7 --> B8
+        B8 --> B9
+    end
+    
+    %% 3. ERROR PATH: Loading Failure
+    subgraph ERROR["3️⃣ ERROR PATH: Data Load Failure"]
+        E1[Load Kanban Board]
+        E2{API Call}
+        E3[Network Error ❌]
+        E4[Show Error Banner]
+        E5[Message: 'Failed to load candidates']
+        E6[Retry Button]
+        E7[User Clicks Retry]
+        E8[Reload Attempt]
+        E9{Success?}
+        E10[Board Loads ✓]
+        E11[After 3 Failures]
+        E12[Show: 'Service unavailable.<br/>Try again later']
+        
+        E1 --> E2
+        E2 -->|Error| E3
+        E2 -->|Success| H5
+        E3 --> E4
+        E4 --> E5
+        E5 --> E6
+        E6 --> E7
+        E7 --> E8
+        E8 --> E9
+        E9 -->|Success| E10
+        E9 -->|Fail| E11
+        E11 --> E12
+    end
+    
+    %% 4. BUSINESS RULE ERROR: Invalid Stage Count
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: Data Integrity"]
+        BR1[Board Loaded]
+        BR2{Data Validation}
+        BR3[Candidate in 2 Stages ⚠️]
+        BR4[Data Corruption Detected]
+        BR5[Show Warning Banner]
+        BR6[Message: 'Data inconsistency detected']
+        BR7[Auto-fix Triggered]
+        BR8[Keep Most Recent Stage]
+        BR9[Remove Duplicate]
+        BR10[Log Issue for Admin]
+        BR11[Board Corrected ✓]
+        
+        BR1 --> BR2
+        BR2 -->|Inconsistent| BR3
+        BR2 -->|Valid| H13
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8
+        BR8 --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+    end
+    
+    %% 5. RECOVERY PATH: Refresh Stale Data
+    subgraph RECOVERY["5️⃣ RECOVERY: Data Refresh"]
+        R1[Board Open 30 Minutes]
+        R2[Another Recruiter Moved Candidates]
+        R3[Board Data Stale]
+        R4[User Notices Mismatch]
+        R5[Click 'Refresh' Button]
+        R6[Show Loading Spinner]
+        R7[Fetch Latest Data]
+        R8[Board Updates]
+        R9[Show: '3 changes detected']
+        R10[Highlight Changed Cards]
+        R11[Auto-refresh: Every 2 Min]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R9 --> R10
+        R10 --> R11
+    end
+    
+    %% 6. PERMISSION PATH: View-Only Access
+    subgraph PERMISSION["6️⃣ PERMISSION: Interviewer View"]
+        P1[User Role: Interviewer]
+        P2[Access Kanban Board]
+        P3[Read-Only Mode ✓]
+        P4[Can View All Cards]
+        P5[Cannot Drag & Drop]
+        P6[Cannot Edit Candidates]
+        P7[Can Click to View Details]
+        P8[Tooltip: 'Contact recruiter<br/>to move candidates']
+        P9[Role: Recruiter ✓]
+        P10[Full Edit Access]
+        P11[Drag-Drop Enabled]
+        
+        P1 --> P2
+        P2 --> P3
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P6 --> P7
+        P7 --> P8
+        P9 --> P10
+        P10 --> P11
+    end
+    
+    %% 7. LOOP PATH: Switch Between Positions
+    subgraph LOOP["7️⃣ LOOP: Multi-Position Navigation"]
+        L1[Viewing Position A Board]
+        L2[Need to Check Position B]
+        L3[Click Position Dropdown]
+        L4[Select Position B]
+        L5[Board Switches]
+        L6[Position B Data Loads]
+        L7[Review Position B Candidates]
+        L8{Continue?}
+        L9[Switch to Position C]
+        L10[Back to Position A]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 -->|Check Another| L9
+        L8 -->|Go Back| L10
+        L9 --> L4
+        L10 --> L4
+    end
+    
+    %% 8. TIMEOUT PATH: Session Management
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Long Session"]
+        T1[Board Open 45 Minutes]
+        T2[Session Near Expiry]
+        T3[Show Warning: '5 min remaining']
+        T4{User Action}
+        T5[User Clicks 'Extend']
+        T6[Session Extended]
+        T7[Continue Working]
+        T8[No Response]
+        T9[Session Expires]
+        T10[Redirect to Login]
+        T11[After Login]
+        T12[Return to Same Board]
+        T13[State Preserved]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 -->|Active| T5
+        T4 -->|Idle| T8
+        T5 --> T6
+        T6 --> T7
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+        T11 --> T12
+        T12 --> T13
+    end
+    
+    %% 9. EMPTY STATE: No Candidates
+    subgraph EMPTY["9️⃣ EMPTY STATE: New Position"]
+        EM1[Open Kanban for Position]
+        EM2{Has Candidates?}
+        EM3[Empty Board Display]
+        EM4[All Columns Empty]
+        EM5[Central Message:<br/>'No candidates yet']
+        EM6[Illustration: Empty Pipeline]
+        EM7[CTA: 'Add First Candidate']
+        EM8[Quick Tips:<br/>'Start by adding candidates<br/>from your pool']
+        EM9[Click CTA]
+        EM10[Open Add Candidate Form]
+        
+        EM1 --> EM2
+        EM2 -->|No| EM3
+        EM2 -->|Yes| H5
+        EM3 --> EM4
+        EM4 --> EM5
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+    end
+    
+    %% 10. CONCURRENT: Real-Time Updates
+    subgraph CONCURRENT["🔟 CONCURRENT: Multi-User Board"]
+        C1[Recruiter A Viewing Board]
+        C2[Recruiter B Moves Candidate]
+        C3[Candidate 'Alex' New → Screening]
+        C4[WebSocket Update Sent]
+        C5{A's Board Active?}
+        C6[Real-Time Update]
+        C7[Card Animates to New Column]
+        C8[Show Notification:<br/>'B moved Alex to Screening']
+        C9[Board A Inactive]
+        C10[Update Queued]
+        C11[On Return: Show 'Updates available']
+        C12[Click to Refresh]
+        
+        C1 --> C4
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+        C5 -->|Active| C6
+        C5 -->|Inactive| C9
+        C6 --> C7
+        C7 --> C8
+        C9 --> C10
+        C10 --> C11
+        C11 --> C12
+    end
+    
+    %% INTEGRATION: Drag & Drop Preview
+    subgraph INTEGRATION["🔗 INTERACTION: Drag & Drop"]
+        I1[User Starts Drag]
+        I2[Card Opacity: 50%]
+        I3[Target Columns Highlight]
+        I4[Hover Over Target]
+        I5[Column Glows Blue]
+        I6[Drop Allowed Indicator]
+        I7[Release Mouse]
+        I8[Validation Check]
+        I9{Valid Move?}
+        I10[Card Animates to Column]
+        I11[Show Success Toast]
+        I12[Invalid Move]
+        I13[Card Snaps Back]
+        I14[Show Error: 'Cannot skip stages']
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 --> I5
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 --> I9
+        I9 -->|Valid| I10
+        I9 -->|Invalid| I12
+        I10 --> I11
+        I12 --> I13
+        I13 --> I14
+    end
+    
+    %% EXIT POINTS
+    EXIT_PROF[("Candidate Profile<br/>View Details")]
+    EXIT_MOVE[("Move Stage<br/>Update Pipeline")]
+    EXIT_COMP[("Compare<br/>Side-by-Side")]
+    EXIT_LIST[("Position List<br/>Return")]
+    
+    %% Main Flow Connections
+    ENTRY_NAV ==> H1
+    ENTRY_DASH ==> H3
+    ENTRY_POS ==> H4
+    ENTRY_NOTIF ==> H4
+    
+    H13 --> A1
+    A11 --> H13
+    
+    B5A ==> EXIT_PROF
+    B9 ==> EXIT_MOVE
+    
+    E10 --> H5
+    E12 --> EXIT_LIST
+    
+    BR11 --> H13
+    
+    R11 --> H13
+    
+    P8 --> EXIT_PROF
+    P11 --> I1
+    
+    L8 -->|Done| EXIT_LIST
+    T7 --> H13
+    T13 --> H13
+    
+    EM10 --> EXIT_PROF
+    
+    C8 --> H13
+    C12 --> R7
+    
+    I11 ==> EXIT_MOVE
+    I14 --> H13
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef interaction fill:#74c0fc,color:white,stroke:#339af0
+    
+    class ENTRY_NAV,ENTRY_DASH,ENTRY_POS,ENTRY_NOTIF entry
+    class EXIT_PROF,EXIT_MOVE,EXIT_COMP,EXIT_LIST exit
+    class H13,E10,BR11,I11 success
+    class E3,E12,I12 error
+    class T3,EM5,C8,I14 warning
+    class I1,I2,I10 interaction
+```
+
+---
+
+## US-4.4: View Candidates in Kanban Board
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Load Kanban board with all pipeline stages
+2. **Alternative Paths** ✅ - Filter by fit score, sort candidates, quick actions menu
+3. **Error Paths** ✅ - Network failures, data load errors with retry
+4. **Business Rule Errors** ✅ - Data integrity issues, duplicate stage assignments
+5. **Recovery Paths** ✅ - Refresh stale data, auto-refresh every 2 minutes
+6. **Permission Paths** ✅ - Read-only for interviewers, full access for recruiters
+7. **Loop Paths** ✅ - Switch between multiple position boards
+8. **Timeout Paths** ✅ - Session expiry with state preservation
+9. **Empty States** ✅ - No candidates in position
+10. **Concurrent Paths** ✅ - Real-time updates via WebSocket
+
+### Kanban Columns (BR-006 Pipeline Stages)
+
+| Column | Stage | Description | Color |
+|--------|-------|-------------|-------|
+| 1 | New | Just applied | Gray |
+| 2 | Screening | Under review | Blue |
+| 3 | Interview | Scheduled/conducted | Purple |
+| 4 | Offer | Offer sent | Orange |
+| 5 | Hired | Offer accepted | Green |
+| 6 | Rejected | Not selected | Red |
+
+### Candidate Card Components
+
+```
+┌────────────────────────┐
+│ 📷 [Photo]             │
+│ Alex Chen              │
+│ 95% Fit 🟢            │
+│ Backend Developer      │
+│ Applied: 5 days ago    │
+│ [👁️] [✉️] [⋮]         │
+└────────────────────────┘
+```
+
+### Key Screens
+
+| Screen ID | Name | Purpose |
+|-----------|------|---------|
+| `kanban-board` | Kanban Board | Main pipeline visualization |
+| `filter-panel` | Filter Sidebar | Filter by score, source, date |
+| `candidate-card` | Card Component | Show candidate summary |
+| `quick-actions` | Action Menu | Hover/context menu options |
+
+### Interactions
+
+1. **Drag & Drop**
+   - Visual feedback (opacity, highlighting)
+   - Validation before drop
+   - Smooth animations
+   - Undo option
+
+2. **Filter & Sort**
+   - Fit score ranges (≥90%, 70-89%, <70%)
+   - Source filter (LinkedIn, Referral, etc.)
+   - Date range filter
+   - Sort by score, date, name
+
+3. **Quick Actions**
+   - Hover: Show 3 primary actions
+   - Right-click: Show full context menu
+   - Keyboard shortcuts: Arrow keys to navigate
+
+### Real-Time Updates
+
+- **WebSocket Connection** for live updates
+- **Update Types:**
+  - Candidate moved by another user
+  - New candidate added
+  - Candidate rejected/hired
+- **Visual Indicators:**
+  - Animation for card movement
+  - Notification toast
+  - "Updates available" badge
+
+### Performance
+
+- **Lazy Loading:** Load visible cards first
+- **Virtual Scrolling:** For columns with >20 candidates
+- **Pagination:** Show 50 candidates per stage max
+- **Caching:** Cache board state for 5 minutes
+
+### Success Criteria
+
+- ✅ Board loads in <2 seconds with 100 candidates
+- ✅ Drag-drop response time <100ms
+- ✅ Real-time updates appear within 2 seconds
+- ✅ Filter/sort updates instant (<500ms)
+- ✅ Mobile responsive (stacked columns)

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Candidate | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    .form-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+    
+    .method-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .method-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .method-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .method-card.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .method-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    
+    .method-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .method-description {
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+    
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .file-upload {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      text-align: center;
+      background: var(--background);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .file-upload:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .file-upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    /* Attribute Rating Sliders */
+    .attributes-grid {
+      display: grid;
+      gap: 24px;
+    }
+    
+    .attribute-item {
+      display: grid;
+      grid-template-columns: 180px 1fr 60px;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .attribute-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+    
+    .attribute-slider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--border);
+      outline: none;
+      transition: background 0.3s;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      border: none;
+    }
+    
+    .slider.high {
+      background: linear-gradient(to right, var(--accent-light) 0%, var(--accent) 100%);
+    }
+    
+    .slider.medium {
+      background: linear-gradient(to right, var(--warning-light) 0%, var(--warning) 100%);
+    }
+    
+    .slider.low {
+      background: linear-gradient(to right, var(--destructive-light) 0%, var(--destructive) 100%);
+    }
+    
+    .attribute-value {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      min-width: 40px;
+    }
+    
+    .attribute-value.high {
+      color: var(--accent);
+    }
+    
+    .attribute-value.medium {
+      color: #B45309;
+    }
+    
+    .attribute-value.low {
+      color: var(--destructive);
+    }
+    
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+      padding: 0 180px 0 180px;
+    }
+    
+    .fit-score-preview {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      margin-top: 24px;
+    }
+    
+    .fit-score-value {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .fit-score-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Add Candidate Form
+    User Story: US-4.2, US-4.3
+    
+    INTERACTIVE: 
+    - Toggle between manual and LinkedIn import methods
+    - Drag & drop file upload
+    - Interactive attribute rating sliders (1-20 scale)
+    - Real-time fit score calculation preview
+    - Form validation
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item active">
+            <span class="icon">🎯</span> Recruitment Pipeline
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item">
+            <span class="icon">➕</span> Create Position
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="form-container">
+        <div class="page-header">
+          <h1 class="page-title">Add New Candidate</h1>
+          <p class="page-subtitle">Import from LinkedIn or manually add candidate details</p>
+        </div>
+
+        <!-- Method Selector -->
+        <div class="method-selector">
+          <div class="method-card active" onclick="selectMethod('manual')">
+            <div class="method-icon">✍️</div>
+            <div class="method-title">Manual Entry</div>
+            <div class="method-description">Enter candidate information manually</div>
+          </div>
+          
+          <div class="method-card" onclick="selectMethod('linkedin')">
+            <div class="method-icon">🔗</div>
+            <div class="method-title">LinkedIn Import</div>
+            <div class="method-description">Import from LinkedIn profile URL</div>
+          </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="form-card">
+          <h3 class="section-title">Basic Information</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" class="form-input" placeholder="Enter full name" value="Alex Chen">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Email *</label>
+              <input type="email" class="form-input" placeholder="candidate@email.com" value="alex.chen@email.com">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-input" placeholder="+66 XX XXX XXXX" value="+66 81 234 5678">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Current Position</label>
+              <input type="text" class="form-input" placeholder="Current role" value="Senior Backend Developer">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Years of Experience</label>
+              <input type="number" class="form-input" min="0" value="8">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Source *</label>
+              <select class="form-select">
+                <option>LinkedIn</option>
+                <option>Referral</option>
+                <option>Job Board</option>
+                <option>Direct Application</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resume Upload -->
+        <div class="form-card">
+          <h3 class="section-title">Resume / CV</h3>
+          
+          <div class="file-upload" onclick="document.getElementById('resume').click()">
+            <div class="file-upload-icon">📄</div>
+            <div style="font-weight: 600; margin-bottom: 4px;">Click to upload or drag and drop</div>
+            <div style="font-size: 13px; color: var(--muted-foreground);">PDF, DOC, DOCX (Max 5MB)</div>
+            <input type="file" id="resume" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleFileUpload(this)">
+          </div>
+          
+          <div id="uploadedFile" style="display: none; margin-top: 12px; padding: 12px; background: var(--accent-light); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 24px;">📄</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: var(--accent);">alex_chen_resume.pdf</div>
+              <div style="font-size: 12px; color: var(--muted-foreground);">2.3 MB</div>
+            </div>
+            <button class="btn btn-sm btn-outline" onclick="removeFile()">Remove</button>
+          </div>
+        </div>
+
+        <!-- Attribute Rating -->
+        <div class="form-card">
+          <h3 class="section-title">Attribute Rating (1-20 Scale)</h3>
+          <p style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 24px;">Rate the candidate's skills and abilities. This will calculate their fit score for positions.</p>
+          
+          <div class="attributes-grid">
+            <div class="attribute-item">
+              <div class="attribute-label">Backend Development</div>
+              <div class="attribute-slider">
+                <input type="range" min="1" max="20" value="18" class="slider high" oninput="updateAttribute(this, 'backend-value')">
+              </div>
+              <div class="attribute-value high" id="backend-value">18</div>
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-label">Database Design</div>
+              <div class="attribute-slider">
+                <input type="range" min="1" max="20" value="17" class="slider high" oninput="updateAttribute(this, 'database-value')">
+              </div>
+              <div class="attribute-value high" id="database-value">17</div>
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-label">System Architecture</div>
+              <div class="attribute-slider">
+                <input type="range" min="1" max="20" value="16" class="slider high" oninput="updateAttribute(this, 'architecture-value')">
+              </div>
+              <div class="attribute-value high" id="architecture-value">16</div>
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-label">Problem Solving</div>
+              <div class="attribute-slider">
+                <input type="range" min="1" max="20" value="15" class="slider high" oninput="updateAttribute(this, 'problem-value')">
+              </div>
+              <div class="attribute-value high" id="problem-value">15</div>
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-label">Communication</div>
+              <div class="attribute-slider">
+                <input type="range" min="1" max="20" value="14" class="slider medium" oninput="updateAttribute(this, 'communication-value')">
+              </div>
+              <div class="attribute-value medium" id="communication-value">14</div>
+            </div>
+            
+            <div class="attribute-item">
+              <div class="attribute-label">Leadership</div>
+              <div class="attribute-slider">
+                <input type="range" min="1" max="20" value="12" class="slider medium" oninput="updateAttribute(this, 'leadership-value')">
+              </div>
+              <div class="attribute-value medium" id="leadership-value">12</div>
+            </div>
+          </div>
+          
+          <div class="scale-labels">
+            <span>1 - Basic</span>
+            <span>10 - Proficient</span>
+            <span>20 - Expert</span>
+          </div>
+          
+          <!-- Fit Score Preview -->
+          <div class="fit-score-preview">
+            <div class="fit-score-value" id="fitScoreValue">95%</div>
+            <div class="fit-score-label">Predicted Fit Score for "Senior Backend Developer"</div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="window.location.href='02-kanban-board.html'">Cancel</button>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn btn-outline">Save as Draft</button>
+            <button class="btn btn-primary btn-lg" onclick="submitCandidate()">Add Candidate</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Method selector
+    function selectMethod(method) {
+      document.querySelectorAll('.method-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      event.target.closest('.method-card').classList.add('active');
+      
+      if (method === 'linkedin') {
+        alert('LinkedIn Import\n\nEnter a LinkedIn profile URL to automatically import candidate information.\n\nExample: https://linkedin.com/in/candidate-name');
+      }
+    }
+    
+    // File upload
+    function handleFileUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (file.size > maxSize) {
+          alert('File too large!\n\nMaximum file size is 5MB.');
+          return;
+        }
+        
+        // Show uploaded file
+        document.getElementById('uploadedFile').style.display = 'flex';
+      }
+    }
+    
+    function removeFile() {
+      document.getElementById('resume').value = '';
+      document.getElementById('uploadedFile').style.display = 'none';
+    }
+    
+    // Update attribute value and styling
+    function updateAttribute(slider, valueId) {
+      const value = parseInt(slider.value);
+      const valueElement = document.getElementById(valueId);
+      
+      // Update value display
+      valueElement.textContent = value;
+      
+      // Update color coding
+      valueElement.classList.remove('high', 'medium', 'low');
+      slider.classList.remove('high', 'medium', 'low');
+      
+      if (value >= 15) {
+        valueElement.classList.add('high');
+        slider.classList.add('high');
+      } else if (value >= 10) {
+        valueElement.classList.add('medium');
+        slider.classList.add('medium');
+      } else {
+        valueElement.classList.add('low');
+        slider.classList.add('low');
+      }
+      
+      // Update fit score
+      calculateFitScore();
+    }
+    
+    // Calculate fit score (simplified)
+    function calculateFitScore() {
+      const backend = parseInt(document.getElementById('backend-value').textContent);
+      const database = parseInt(document.getElementById('database-value').textContent);
+      const architecture = parseInt(document.getElementById('architecture-value').textContent);
+      
+      // Simplified calculation: average of top 3 attributes
+      const avgScore = (backend + database + architecture) / 3;
+      const fitScore = Math.round((avgScore / 20) * 100);
+      
+      document.getElementById('fitScoreValue').textContent = fitScore + '%';
+    }
+    
+    // Submit candidate
+    function submitCandidate() {
+      const name = document.querySelector('input[placeholder="Enter full name"]').value;
+      const email = document.querySelector('input[placeholder="candidate@email.com"]').value;
+      
+      if (!name || !email) {
+        alert('Please fill in required fields:\n• Full Name\n• Email');
+        return;
+      }
+      
+      // Simulate success
+      alert('✅ Candidate Added Successfully!\n\n"' + name + '" has been added to your candidate pool.\n\nFit Score: 95% for "Senior Backend Developer"\n\nNext steps:\n• Add to position pipeline\n• Schedule screening call');
+      
+      // Navigate back to kanban board (main hub)
+      window.location.href = '02-kanban-board.html';
+    }
+    
+    // Show uploaded file on load (demo)
+    setTimeout(() => {
+      document.getElementById('uploadedFile').style.display = 'flex';
+    }, 500);
+    
+    console.log('Candidate Form loaded - Interactive sliders and file upload ready');
+  </script>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Interview | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+    
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .candidate-preview {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--background);
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+    }
+    
+    .candidate-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 20px;
+    }
+    
+    .candidate-info {
+      flex: 1;
+    }
+    
+    .candidate-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .candidate-meta {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    
+    .calendar-day:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .calendar-day.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .calendar-day.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .time-slot {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .time-slot:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .time-slot.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .time-slot.unavailable {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: var(--muted);
+    }
+    
+    .interviewer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .interviewer-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--background);
+    }
+    
+    .interviewer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .interviewer-info {
+      flex: 1;
+    }
+    
+    .interviewer-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .interviewer-role {
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+    
+    .btn-remove-interviewer {
+      background: none;
+      border: none;
+      color: var(--destructive);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: var(--radius-md);
+    }
+    
+    .btn-remove-interviewer:hover {
+      background: var(--destructive-light);
+    }
+    
+    .meeting-link-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--accent-light);
+      border-radius: var(--radius-md);
+      margin-top: 12px;
+    }
+    
+    .meeting-link-text {
+      flex: 1;
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Schedule Interview
+    User Story: US-4.7
+    
+    INTERACTIVE: 
+    - Click calendar dates to select
+    - Choose time slots
+    - Add/remove interviewers
+    - Generate meeting links
+    - Form validation
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item active">
+            <span class="icon">🎯</span> Recruitment Pipeline
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item">
+            <span class="icon">➕</span> Create Position
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="form-container">
+        <div class="page-header">
+          <h1 class="page-title">Schedule Interview</h1>
+          <p style="color: var(--muted-foreground);">Book an interview with the candidate and your team</p>
+        </div>
+
+        <!-- Candidate Preview -->
+        <div class="candidate-preview">
+          <div class="candidate-avatar">JD</div>
+          <div class="candidate-info">
+            <div class="candidate-name">John Davis</div>
+            <div class="candidate-meta">Senior Architect • <span class="badge badge-success">92% Fit</span></div>
+          </div>
+          <span class="badge badge-primary">Interview Stage</span>
+        </div>
+
+        <!-- Interview Details -->
+        <div class="form-card">
+          <h3 class="section-title">Interview Details</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Interview Type *</label>
+              <select class="form-select">
+                <option>Technical Interview</option>
+                <option>Phone Screen</option>
+                <option>Cultural Fit</option>
+                <option>Managerial Interview</option>
+                <option>Final Interview</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Duration *</label>
+              <select class="form-select">
+                <option>30 minutes</option>
+                <option>45 minutes</option>
+                <option selected>60 minutes</option>
+                <option>90 minutes</option>
+                <option>120 minutes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Selection -->
+        <div class="form-card">
+          <h3 class="section-title">Select Date</h3>
+          <p style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px;">March 2026</p>
+          
+          <div class="calendar-grid">
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Mon</div>
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Tue</div>
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Wed</div>
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Thu</div>
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Fri</div>
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Sat</div>
+            <div style="font-size: 12px; font-weight: 600; text-align: center; color: var(--muted-foreground);">Sun</div>
+            
+            <div class="calendar-day disabled">17</div>
+            <div class="calendar-day disabled">18</div>
+            <div class="calendar-day disabled">19</div>
+            <div class="calendar-day selected" onclick="selectDate(this)">20</div>
+            <div class="calendar-day" onclick="selectDate(this)">21</div>
+            <div class="calendar-day disabled">22</div>
+            <div class="calendar-day disabled">23</div>
+            
+            <div class="calendar-day" onclick="selectDate(this)">24</div>
+            <div class="calendar-day" onclick="selectDate(this)">25</div>
+            <div class="calendar-day" onclick="selectDate(this)">26</div>
+            <div class="calendar-day" onclick="selectDate(this)">27</div>
+            <div class="calendar-day" onclick="selectDate(this)">28</div>
+            <div class="calendar-day disabled">29</div>
+            <div class="calendar-day disabled">30</div>
+          </div>
+          
+          <p style="font-size: 13px; color: var(--muted-foreground); margin-top: 12px;">📅 Selected: Thursday, March 20, 2026</p>
+        </div>
+
+        <!-- Time Selection -->
+        <div class="form-card">
+          <h3 class="section-title">Select Time</h3>
+          
+          <div class="time-slots">
+            <div class="time-slot unavailable">09:00 AM<br><span style="font-size: 11px; opacity: 0.7;">Unavailable</span></div>
+            <div class="time-slot" onclick="selectTime(this)">10:00 AM<br><span style="font-size: 11px; opacity: 0.7;">Available</span></div>
+            <div class="time-slot" onclick="selectTime(this)">11:00 AM<br><span style="font-size: 11px; opacity: 0.7;">Available</span></div>
+            <div class="time-slot unavailable">12:00 PM<br><span style="font-size: 11px; opacity: 0.7;">Lunch</span></div>
+            <div class="time-slot" onclick="selectTime(this)">01:00 PM<br><span style="font-size: 11px; opacity: 0.7;">Available</span></div>
+            <div class="time-slot selected" onclick="selectTime(this)">02:00 PM<br><span style="font-size: 11px; opacity: 0.7;">Selected</span></div>
+            <div class="time-slot" onclick="selectTime(this)">03:00 PM<br><span style="font-size: 11px; opacity: 0.7;">Available</span></div>
+            <div class="time-slot" onclick="selectTime(this)">04:00 PM<br><span style="font-size: 11px; opacity: 0.7;">Available</span></div>
+            <div class="time-slot unavailable">05:00 PM<br><span style="font-size: 11px; opacity: 0.7;">Unavailable</span></div>
+          </div>
+        </div>
+
+        <!-- Interviewers -->
+        <div class="form-card">
+          <h3 class="section-title">Add Interviewers *</h3>
+          <p style="font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px;">At least one interviewer is required</p>
+          
+          <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <input type="text" class="form-input" placeholder="Search employees..." id="interviewerSearch" style="flex: 1;">
+            <button class="btn btn-primary" onclick="addInterviewer()">Add</button>
+          </div>
+          
+          <div class="interviewer-list">
+            <div class="interviewer-item">
+              <div class="interviewer-avatar">JD</div>
+              <div class="interviewer-info">
+                <div class="interviewer-name">John Doe</div>
+                <div class="interviewer-role">Tech Lead • Engineering</div>
+              </div>
+              <button class="btn-remove-interviewer" onclick="removeInterviewer(this)">🗑️</button>
+            </div>
+            
+            <div class="interviewer-item">
+              <div class="interviewer-avatar" style="background: var(--zone-support);">SM</div>
+              <div class="interviewer-info">
+                <div class="interviewer-name">Sarah Miller</div>
+                <div class="interviewer-role">Senior Developer • Engineering</div>
+              </div>
+              <button class="btn-remove-interviewer" onclick="removeInterviewer(this)">🗑️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meeting Link -->
+        <div class="form-card">
+          <h3 class="section-title">Meeting Details</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Meeting Link *</label>
+            <div style="display: flex; gap: 12px;">
+              <input type="url" class="form-input" placeholder="https://zoom.us/j/..." value="https://zoom.us/j/1234567890">
+              <button class="btn btn-outline" onclick="generateMeetingLink()">Generate Zoom Link</button>
+            </div>
+          </div>
+          
+          <div class="meeting-link-preview">
+            <span>🔗</span>
+            <span class="meeting-link-text">Zoom meeting link will be included in calendar invites</span>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Agenda / Notes (Optional)</label>
+            <textarea class="form-textarea" rows="4" placeholder="Add interview topics, questions, or notes...">Technical Interview:
+- System design discussion
+- Code review challenge
+- Architecture decisions</textarea>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="window.location.href='02-kanban-board.html'">Cancel</button>
+          <button class="btn btn-primary btn-lg" onclick="scheduleInterview()">📅 Schedule Interview</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Date selection
+    function selectDate(element) {
+      if (element.classList.contains('disabled')) return;
+      
+      document.querySelectorAll('.calendar-day').forEach(day => {
+        day.classList.remove('selected');
+      });
+      element.classList.add('selected');
+    }
+    
+    // Time selection
+    function selectTime(element) {
+      if (element.classList.contains('unavailable')) return;
+      
+      document.querySelectorAll('.time-slot').forEach(slot => {
+        slot.classList.remove('selected');
+      });
+      element.classList.add('selected');
+    }
+    
+    // Add interviewer
+    function addInterviewer() {
+      const search = document.getElementById('interviewerSearch').value;
+      if (!search) {
+        alert('Please enter an employee name to search');
+        return;
+      }
+      
+      alert('Interviewer Search\n\nSearching for: "' + search + '"\n\nIn a real app, this would show a dropdown list of matching employees.');
+      document.getElementById('interviewerSearch').value = '';
+    }
+    
+    // Remove interviewer
+    function removeInterviewer(button) {
+      button.closest('.interviewer-item').remove();
+    }
+    
+    // Generate meeting link
+    function generateMeetingLink() {
+      const randomId = Math.floor(Math.random() * 9000000000) + 1000000000;
+      const link = 'https://zoom.us/j/' + randomId;
+      
+      document.querySelector('input[type="url"]').value = link;
+      
+      // Show toast
+      const toast = document.createElement('div');
+      toast.className = 'alert alert-success';
+      toast.style.position = 'fixed';
+      toast.style.top = '24px';
+      toast.style.right = '24px';
+      toast.style.zIndex = '9999';
+      toast.textContent = '✅ Zoom link generated!';
+      document.body.appendChild(toast);
+      
+      setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // Schedule interview
+    function scheduleInterview() {
+      const interviewers = document.querySelectorAll('.interviewer-item').length;
+      
+      if (interviewers === 0) {
+        alert('⚠️ Validation Error\n\nPlease add at least one interviewer (BR-013).');
+        return;
+      }
+      
+      // Success
+      alert('✅ Interview Scheduled!\n\nInterview Details:\n• Date: Thursday, March 20, 2026\n• Time: 2:00 PM (GMT+7)\n• Duration: 60 minutes\n• Type: Technical Interview\n• Interviewers: 2\n\n📧 Calendar invites sent to:\n• John Davis (Candidate)\n• John Doe (Interviewer)\n• Sarah Miller (Interviewer)\n\n🔗 Meeting link included in invites');
+      
+      // Navigate back to kanban board (main hub)
+      setTimeout(() => {
+        window.location.href = '02-kanban-board.html';
+      }, 500);
+    }
+    
+    console.log('Interview Schedule loaded - Interactive calendar and time selection ready');
+  </script>
+</body>
+</html>

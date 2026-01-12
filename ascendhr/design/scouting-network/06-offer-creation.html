@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Job Offer | AscendHR</title>
+  
+  <!-- SHARED CSS -->
+  <link rel="stylesheet" href="../_shared/base.css">
+  
+  <style>
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      background: var(--background);
+      min-height: 100vh;
+    }
+    
+    .form-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+    
+    .candidate-preview {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+    }
+    
+    .candidate-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 24px;
+    }
+    
+    .candidate-info {
+      flex: 1;
+    }
+    
+    .candidate-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .candidate-meta {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+    
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .salary-input-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .currency-prefix {
+      padding: 12px 16px;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    
+    .salary-range-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--background);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-top: 8px;
+    }
+    
+    .pdf-preview {
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      background: white;
+      min-height: 400px;
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .pdf-header {
+      text-align: center;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    
+    .pdf-logo {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .pdf-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+    
+    .pdf-section {
+      margin-bottom: 24px;
+    }
+    
+    .pdf-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    
+    .pdf-content {
+      font-size: 15px;
+      color: var(--foreground);
+      line-height: 1.6;
+    }
+    
+    .pdf-highlight {
+      background: var(--primary-light);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--primary);
+    }
+    
+    .approval-notice {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: var(--warning-light);
+      border: 1px solid var(--warning);
+      border-radius: var(--radius-md);
+      margin-top: 16px;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    MOCKUP: Create Job Offer
+    User Story: US-4.9
+    
+    INTERACTIVE: 
+    - Salary validation (BR-008: within position range)
+    - Approval workflow (BR-009: if salary ≥ ฿80k)
+    - PDF preview generation
+    - Expiration date validation
+    - Form validation
+  -->
+
+  <div class="app-container">
+    <!-- Unified Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">⚽</div>
+          <div class="brand-text">
+            <div class="brand-name">AscendHR</div>
+            <div class="brand-subtitle">Scouting Network</div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <a href="01-recruitment-dashboard.html" class="sidebar-item">
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="02-kanban-board.html" class="sidebar-item active">
+            <span class="icon">🎯</span> Recruitment Pipeline
+          </a>
+          <a href="../player-card-system/01-employee-list.html" class="sidebar-item">
+            <span class="icon">👥</span> Employees
+          </a>
+          <a href="../formation-view/05-formation-pitch.html" class="sidebar-item">
+            <span class="icon">🏟️</span> Formation View
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-label">Recruitment</div>
+          <a href="03-position-wizard.html" class="sidebar-item">
+            <span class="icon">➕</span> Create Position
+          </a>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-section">
+          <a href="../formation-view/01-department-management.html" class="sidebar-item">
+            <span class="icon">⚙️</span> Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-user">
+        <div class="user-avatar">HR</div>
+        <div class="user-info">
+          <div class="user-name">HR Admin</div>
+          <div class="user-role">Recruiter</div>
+        </div>
+        <div class="user-menu">⋮</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="form-container">
+        <div class="page-header">
+          <h1 class="page-title">Create Job Offer</h1>
+          <p style="color: var(--muted-foreground);">Prepare and send a formal job offer to the candidate</p>
+        </div>
+
+        <!-- Candidate Preview -->
+        <div class="candidate-preview">
+          <div class="candidate-avatar">EW</div>
+          <div class="candidate-info">
+            <div class="candidate-name">Emma Wilson</div>
+            <div class="candidate-meta">Senior Backend Developer • <span class="badge badge-success">88% Fit</span></div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <span class="badge badge-primary">All interviews completed</span>
+              <span class="badge badge-success">Recommended for hire</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offer Details -->
+        <div class="form-card">
+          <h3 class="section-title">Offer Details</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Position Title *</label>
+              <input type="text" class="form-input" value="Senior Backend Developer" readonly style="background: var(--background);">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              <input type="text" class="form-input" value="Engineering" readonly style="background: var(--background);">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Employment Type *</label>
+              <select class="form-select">
+                <option selected>Full-time</option>
+                <option>Part-time</option>
+                <option>Contract</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Start Date *</label>
+              <input type="date" class="form-input" value="2026-04-15">
+              <span class="form-hint">Proposed start date (must be future date)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compensation -->
+        <div class="form-card">
+          <h3 class="section-title">Compensation</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Monthly Salary (THB) *</label>
+            <div class="salary-input-group">
+              <span class="currency-prefix">฿</span>
+              <input type="number" class="form-input" id="salaryInput" value="90000" min="60000" max="100000" oninput="validateSalary(this)" style="flex: 1;">
+            </div>
+            <div class="salary-range-display">
+              <span>💡 Position range: ฿60,000 - ฿100,000</span>
+            </div>
+            <span class="form-hint" id="salaryHint">Salary must be within the position's approved range (BR-008)</span>
+          </div>
+          
+          <div id="approvalWarning" class="approval-notice">
+            <span style="font-size: 24px;">⚠️</span>
+            <div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Manager Approval Required</div>
+              <div style="font-size: 13px;">Salary ≥ ฿80,000 requires hiring manager approval before sending (BR-009)</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Benefits Package</label>
+            <textarea class="form-textarea" rows="4">• Health insurance (coverage for family)
+• Annual bonus (up to 3 months)
+• Flexible working hours
+• Remote work options
+• Learning & development budget (฿50,000/year)</textarea>
+          </div>
+        </div>
+
+        <!-- Offer Terms -->
+        <div class="form-card">
+          <h3 class="section-title">Offer Terms</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Offer Expiration *</label>
+              <input type="date" class="form-input" id="expirationDate" value="2026-03-27">
+              <span class="form-hint">Minimum 3 days from sending date</span>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Probation Period</label>
+              <select class="form-select">
+                <option>None</option>
+                <option>1 month</option>
+                <option>2 months</option>
+                <option selected>3 months</option>
+                <option>6 months</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Special Terms & Conditions (Optional)</label>
+            <textarea class="form-textarea" rows="3" placeholder="Add any special terms, signing bonus, relocation assistance, etc.">• Signing bonus: ฿30,000 (paid after 3 months)
+• Relocation assistance available if needed</textarea>
+          </div>
+        </div>
+
+        <!-- PDF Preview -->
+        <div class="form-card">
+          <h3 class="section-title">Offer Letter Preview</h3>
+          
+          <div class="pdf-preview">
+            <div class="pdf-header">
+              <div class="pdf-logo">AscendHR</div>
+              <div class="pdf-title">Job Offer Letter</div>
+            </div>
+            
+            <div class="pdf-section">
+              <div class="pdf-section-title">Candidate</div>
+              <div class="pdf-content">
+                <strong>Emma Wilson</strong><br>
+                alex.chen@email.com
+              </div>
+            </div>
+            
+            <div class="pdf-section">
+              <div class="pdf-section-title">Position Details</div>
+              <div class="pdf-content">
+                <strong>Position:</strong> Senior Backend Developer<br>
+                <strong>Department:</strong> Engineering<br>
+                <strong>Employment Type:</strong> Full-time<br>
+                <strong>Start Date:</strong> April 15, 2026
+              </div>
+            </div>
+            
+            <div class="pdf-section">
+              <div class="pdf-section-title">Compensation</div>
+              <div class="pdf-highlight">
+                <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">฿90,000 / month</div>
+                <div style="font-size: 14px; color: var(--muted-foreground);">Annual Compensation: ฿1,080,000</div>
+              </div>
+            </div>
+            
+            <div class="pdf-section">
+              <div class="pdf-section-title">Benefits</div>
+              <div class="pdf-content">
+                • Health insurance (coverage for family)<br>
+                • Annual bonus (up to 3 months)<br>
+                • Flexible working hours<br>
+                • Remote work options<br>
+                • Learning & development budget (฿50,000/year)
+              </div>
+            </div>
+            
+            <div class="pdf-section">
+              <div class="pdf-section-title">Offer Expiration</div>
+              <div class="pdf-content">
+                This offer expires on <strong>March 27, 2026</strong>. Please respond by this date.
+              </div>
+            </div>
+            
+            <div style="text-align: center; padding-top: 24px; border-top: 2px solid var(--border); color: var(--muted-foreground); font-size: 13px;">
+              Generated on March 20, 2026 • AscendHR Scouting Network
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <button class="btn btn-outline" onclick="downloadPDF()">📥 Download PDF</button>
+            <button class="btn btn-outline" onclick="printOffer()">🖨️ Print</button>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="window.location.href='02-kanban-board.html'">Cancel</button>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn btn-outline">Save as Draft</button>
+            <button class="btn btn-primary btn-lg" onclick="sendOffer()">📧 Send Offer</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Validate salary (BR-008: Within position range)
+    function validateSalary(input) {
+      const value = parseInt(input.value);
+      const min = 60000;
+      const max = 100000;
+      const approvalThreshold = 80000;
+      
+      const hint = document.getElementById('salaryHint');
+      const approval = document.getElementById('approvalWarning');
+      
+      // Validate range
+      if (value < min || value > max) {
+        input.style.borderColor = 'var(--destructive)';
+        hint.style.color = 'var(--destructive)';
+        hint.textContent = `⚠️ Salary must be between ฿${min.toLocaleString()} and ฿${max.toLocaleString()} (BR-008)`;
+      } else {
+        input.style.borderColor = 'var(--border)';
+        hint.style.color = 'var(--muted-foreground)';
+        hint.textContent = 'Salary is within approved range ✓';
+      }
+      
+      // Show/hide approval notice (BR-009)
+      if (value >= approvalThreshold) {
+        approval.style.display = 'flex';
+      } else {
+        approval.style.display = 'none';
+      }
+    }
+    
+    // Download PDF
+    function downloadPDF() {
+      alert('📥 Downloading PDF...\n\nFile: Emma_Wilson_Job_Offer.pdf\nSize: 245 KB\n\nIn a real app, this would generate and download the PDF file.');
+    }
+    
+    // Print offer
+    function printOffer() {
+      alert('🖨️ Opening print dialog...\n\nIn a real app, this would open the browser print dialog with the formatted offer letter.');
+    }
+    
+    // Send offer
+    function sendOffer() {
+      const salary = parseInt(document.getElementById('salaryInput').value);
+      const expirationDate = document.getElementById('expirationDate').value;
+      
+      // Validate salary range
+      if (salary < 60000 || salary > 100000) {
+        alert('⚠️ Validation Error\n\nSalary must be within ฿60,000 - ฿100,000 range (BR-008)');
+        return;
+      }
+      
+      // Check if approval needed (BR-009)
+      if (salary >= 80000) {
+        if (confirm('⚠️ Manager Approval Required\n\nThis offer requires hiring manager approval because the salary is ≥ ฿80,000.\n\nProceed to send for approval?')) {
+          alert('✅ Offer Sent for Approval!\n\nThe job offer has been sent to the hiring manager for review.\n\nStatus: Pending Approval\nOffer ID: OFF-2026-050\n\nYou will be notified once approved.\n\nNext steps after approval:\n• Offer will be sent to candidate\n• Candidate can accept/reject/negotiate\n• Track offer status in the pipeline');
+        }
+      } else {
+        // Direct send (no approval needed)
+        alert('✅ Offer Sent Successfully!\n\nThe job offer has been sent to Emma Wilson.\n\nOffer Details:\n• Salary: ฿90,000/month\n• Start Date: April 15, 2026\n• Expires: March 27, 2026 (7 days)\n\n📧 Email sent to: alex.chen@email.com\n📄 PDF attachment included\n\nNext steps:\n• Track offer status in pipeline\n• Candidate can accept/reject/negotiate\n• Proceed to conversion after acceptance');
+        
+        // Navigate to conversion wizard
+        setTimeout(() => {
+          if (confirm('Would you like to prepare for employee conversion?\n\nClick OK to open the conversion wizard (available after candidate accepts).')) {
+            window.location.href = '07-conversion-wizard.html';
+          } else {
+            window.location.href = '02-kanban-board.html';
+          }
+        }, 500);
+      }
+    }
+    
+    // Validate on load
+    validateSalary(document.getElementById('salaryInput'));
+    
+    console.log('Offer Creation loaded - Salary validation and approval workflow active');
+  </script>
+</body>
+</html>

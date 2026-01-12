@@ -1,0 +1,428 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% Entry Points
+    START_FORMATION[("Formation View<br/>Gap Identified")]
+    START_DASHBOARD[("Dashboard<br/>Recruitment Widget")]
+    START_DIRECT[("Direct URL<br/>/recruitment")]
+    START_EMAIL[("Email Link<br/>Interview/Offer")]
+    
+    %% US-4.1: Create Position with Requirements
+    subgraph US41["US-4.1: Create Position with Requirements"]
+        direction TB
+        S1_1[Position List]
+        S1_2[Create Position Form]
+        S1_3[Add Requirements Grid]
+        S1_4{Validation}
+        S1_5[Preview & Link to Formation]
+        S1_6[Position Created ✓]
+        S1_ERR[Validation Errors]
+        S1_DRAFT[Save as Draft]
+        
+        S1_1 --> S1_2
+        S1_2 --> S1_3
+        S1_3 --> S1_4
+        S1_4 -->|Valid| S1_5
+        S1_4 -->|Invalid| S1_ERR
+        S1_ERR --> S1_2
+        S1_5 --> S1_6
+        S1_2 -.->|Save Draft| S1_DRAFT
+        S1_DRAFT -.->|Resume| S1_2
+    end
+    
+    %% US-4.2: Add Candidate to Scouting Network
+    subgraph US42["US-4.2: Add Candidate to Scouting Network"]
+        direction TB
+        S2_1[Candidate List]
+        S2_2{Add Method}
+        S2_3A[Manual Form]
+        S2_3B[LinkedIn Import]
+        S2_4[Rate Attributes]
+        S2_5{Duplicate Check}
+        S2_6[Candidate Profile Created ✓]
+        S2_ERR[Show Errors]
+        
+        S2_1 --> S2_2
+        S2_2 -->|Manual| S2_3A
+        S2_2 -->|LinkedIn| S2_3B
+        S2_3A --> S2_4
+        S2_3B --> S2_4
+        S2_4 --> S2_5
+        S2_5 -->|Unique| S2_6
+        S2_5 -->|Duplicate| S2_ERR
+        S2_ERR -.->|Merge/Skip| S2_1
+    end
+    
+    %% US-4.3: Calculate and Display Fit Score
+    subgraph US43["US-4.3: Calculate and Display Fit Score"]
+        direction TB
+        S3_1[Auto-Calculate<br/>on Save]
+        S3_2[Display Fit Score Badge]
+        S3_3{User Action}
+        S3_4[View Breakdown Modal]
+        S3_5[Recalculate]
+        
+        S3_1 --> S3_2
+        S3_2 --> S3_3
+        S3_3 -->|Click Badge| S3_4
+        S3_3 -->|Refresh| S3_5
+        S3_5 --> S3_2
+    end
+    
+    %% US-4.4: View Candidates in Kanban Board
+    subgraph US44["US-4.4: View Candidates in Kanban Board"]
+        direction TB
+        S4_1[Navigate to Kanban]
+        S4_2[Load Board by Position]
+        S4_3{Board Actions}
+        S4_4[Filter/Sort]
+        S4_5[View Candidate Card]
+        S4_6[Quick Actions Menu]
+        S4_EMPTY[Empty State: Add Candidates]
+        
+        S4_1 --> S4_2
+        S4_2 -->|No Candidates| S4_EMPTY
+        S4_2 -->|Has Candidates| S4_3
+        S4_3 -->|Filter| S4_4
+        S4_3 -->|Click Card| S4_5
+        S4_3 -->|Right-Click| S4_6
+        S4_4 --> S4_3
+        S4_EMPTY -.-> S2_1
+    end
+    
+    %% US-4.5: Move Candidate Through Pipeline Stages
+    subgraph US45["US-4.5: Move Candidate Through Pipeline Stages"]
+        direction TB
+        S5_1[Select Candidate]
+        S5_2{Move Action}
+        S5_3A[Drag & Drop]
+        S5_3B[Bulk Select]
+        S5_3C[Context Menu]
+        S5_4{Target Stage}
+        S5_5[Screening Stage]
+        S5_6[Interview Stage]
+        S5_7[Offer Stage]
+        S5_8[Rejected]
+        S5_9[Rejection Reason Modal]
+        S5_10[Stage Updated ✓]
+        S5_UNDO[Undo Move]
+        
+        S5_1 --> S5_2
+        S5_2 -->|Drag| S5_3A
+        S5_2 -->|Bulk| S5_3B
+        S5_2 -->|Menu| S5_3C
+        S5_3A --> S5_4
+        S5_3B --> S5_4
+        S5_3C --> S5_4
+        S5_4 -->|Screening| S5_5
+        S5_4 -->|Interview| S5_6
+        S5_4 -->|Offer| S5_7
+        S5_4 -->|Reject| S5_8
+        S5_8 --> S5_9
+        S5_9 --> S5_10
+        S5_5 --> S5_10
+        S5_6 --> S5_10
+        S5_7 --> S5_10
+        S5_10 -.->|Undo| S5_UNDO
+        S5_UNDO --> S4_2
+    end
+    
+    %% US-4.7: Schedule and Record Interview
+    subgraph US47["US-4.7: Schedule and Record Interview"]
+        direction TB
+        S7_1[Interview Schedule Form]
+        S7_2[Select Date/Time]
+        S7_3[Add Interviewers]
+        S7_4[Add Meeting Link]
+        S7_5{Validation}
+        S7_6[Send Calendar Invites]
+        S7_7[Interview Scheduled ✓]
+        S7_8[Interview List View]
+        S7_RESCHED[Reschedule]
+        S7_CANCEL[Cancel Interview]
+        S7_ERR[Validation Error]
+        
+        S7_1 --> S7_2
+        S7_2 --> S7_3
+        S7_3 --> S7_4
+        S7_4 --> S7_5
+        S7_5 -->|Valid| S7_6
+        S7_5 -->|Invalid| S7_ERR
+        S7_ERR --> S7_1
+        S7_6 --> S7_7
+        S7_7 --> S7_8
+        S7_8 -.->|Reschedule| S7_RESCHED
+        S7_8 -.->|Cancel| S7_CANCEL
+        S7_RESCHED --> S7_1
+    end
+    
+    %% US-4.8: Collect Interview Feedback
+    subgraph US48["US-4.8: Collect Interview Feedback"]
+        direction TB
+        S8_1[Interview Detail]
+        S8_2[Feedback Form]
+        S8_3[Rate Candidate]
+        S8_4[Add Comments]
+        S8_5[Select Recommendation]
+        S8_6{Validation}
+        S8_7[Feedback Submitted ✓]
+        S8_8[View All Feedback]
+        S8_9[Aggregate Rating]
+        S8_DRAFT[Save Draft]
+        S8_ERR[Required Fields]
+        
+        S8_1 --> S8_2
+        S8_2 --> S8_3
+        S8_3 --> S8_4
+        S8_4 --> S8_5
+        S8_5 --> S8_6
+        S8_6 -->|Valid| S8_7
+        S8_6 -->|Invalid| S8_ERR
+        S8_ERR --> S8_2
+        S8_7 --> S8_8
+        S8_8 --> S8_9
+        S8_2 -.->|Save| S8_DRAFT
+        S8_DRAFT -.->|Resume| S8_2
+    end
+    
+    %% US-4.9: Create and Manage Job Offer
+    subgraph US49["US-4.9: Create and Manage Job Offer"]
+        direction TB
+        S9_1[Create Offer Form]
+        S9_2[Enter Salary & Terms]
+        S9_3[Set Expiration Date]
+        S9_4{Validation}
+        S9_5[Generate Offer Letter]
+        S9_6[Preview PDF]
+        S9_7{Approval Required?}
+        S9_8[Send for Approval]
+        S9_9[Send to Candidate]
+        S9_10[Track Offer Status]
+        S9_11{Candidate Response}
+        S9_12[Offer Accepted ✓]
+        S9_13[Offer Rejected]
+        S9_14[Offer Expired]
+        S9_REVISE[Revise Offer]
+        S9_ERR[Validation Error]
+        
+        S9_1 --> S9_2
+        S9_2 --> S9_3
+        S9_3 --> S9_4
+        S9_4 -->|Valid| S9_5
+        S9_4 -->|Invalid| S9_ERR
+        S9_ERR --> S9_1
+        S9_5 --> S9_6
+        S9_6 --> S9_7
+        S9_7 -->|Yes| S9_8
+        S9_7 -->|No| S9_9
+        S9_8 -->|Approved| S9_9
+        S9_9 --> S9_10
+        S9_10 --> S9_11
+        S9_11 -->|Accept| S9_12
+        S9_11 -->|Reject| S9_13
+        S9_11 -->|Timeout| S9_14
+        S9_13 -.->|Revise| S9_REVISE
+        S9_REVISE --> S9_1
+    end
+    
+    %% US-4.10: Convert Hired Candidate to Employee (CRITICAL)
+    subgraph US410["US-4.10: Convert Hired Candidate to Employee ⭐ CRITICAL"]
+        direction TB
+        S10_1[Accepted Offer Detected]
+        S10_2[Conversion Wizard Start]
+        S10_3[Review Candidate Data]
+        S10_4[Map to Employee Fields]
+        S10_5[Set Start Date & Department]
+        S10_6[Preview Employee Profile]
+        S10_7{Final Confirmation}
+        S10_8[Call Player Card API]
+        S10_9{API Response}
+        S10_10[Update Formation View]
+        S10_11[Update Gap Analysis]
+        S10_12[Send Welcome Email]
+        S10_13[Conversion Success ✓]
+        S10_14[View New Employee]
+        S10_ERR[Integration Error]
+        S10_ROLLBACK[Rollback Transaction]
+        S10_RETRY[Retry Conversion]
+        
+        S10_1 --> S10_2
+        S10_2 --> S10_3
+        S10_3 --> S10_4
+        S10_4 --> S10_5
+        S10_5 --> S10_6
+        S10_6 --> S10_7
+        S10_7 -->|Confirm| S10_8
+        S10_7 -->|Cancel| S4_2
+        S10_8 --> S10_9
+        S10_9 -->|Success| S10_10
+        S10_9 -->|Error| S10_ERR
+        S10_ERR --> S10_ROLLBACK
+        S10_ROLLBACK -.->|Retry| S10_RETRY
+        S10_RETRY --> S10_8
+        S10_10 --> S10_11
+        S10_11 --> S10_12
+        S10_12 --> S10_13
+        S10_13 --> S10_14
+    end
+    
+    %% Exit Points
+    EXIT_EMPLOYEE[("Employee Management<br/>View New Employee")]
+    EXIT_FORMATION[("Formation View<br/>Updated Team")]
+    EXIT_DASHBOARD[("Dashboard<br/>Return Home")]
+    EXIT_ANALYTICS[("Analytics<br/>View Metrics")]
+    
+    %% Main Flow Connections
+    START_FORMATION ==> S1_1
+    START_DASHBOARD ==> S1_1
+    START_DASHBOARD ==> S2_1
+    START_DASHBOARD ==> S4_1
+    START_DIRECT ==> S1_1
+    START_EMAIL ==> S7_8
+    START_EMAIL ==> S9_10
+    
+    S1_6 ==> S2_1
+    S2_6 ==> S3_1
+    S3_2 ==> S4_1
+    S4_5 ==> S5_1
+    S4_6 ==> S5_1
+    S5_6 ==> S7_1
+    S7_7 ==> S8_1
+    S8_9 ==> S9_1
+    S9_12 ==> S10_1
+    S10_14 ==> EXIT_EMPLOYEE
+    S10_13 ==> EXIT_FORMATION
+    
+    %% Alternative Loops
+    S4_2 -.->|Add More| S2_1
+    S5_10 -.->|View Board| S4_2
+    S7_8 -.->|Back to Pipeline| S4_2
+    S9_10 -.->|View Candidates| S4_2
+    
+    %% Exit Connections
+    S1_1 -.->|Exit| EXIT_DASHBOARD
+    S4_2 -.->|Exit| EXIT_DASHBOARD
+    S10_13 -.->|View Analytics| EXIT_ANALYTICS
+    
+    %% Integration Points (Dashed)
+    S1_5 -.->|"Integration"| FORMATION_INT
+    S2_4 -.->|"Integration"| PLAYER_INT
+    S7_6 -.->|"Integration"| EMAIL_INT
+    S9_9 -.->|"Integration"| EMAIL_INT
+    S10_8 -.->|"Integration"| PLAYER_INT
+    S10_10 -.->|"Integration"| FORMATION_INT
+    
+    FORMATION_INT[("⚽ Formation View API")]
+    PLAYER_INT[("🎴 Player Card API")]
+    EMAIL_INT[("📧 Email Service")]
+    
+    %% Styling
+    classDef entryPoint fill:#845ef7,color:white,stroke:#5f3dc4,stroke-width:3px
+    classDef exitPoint fill:#37b24d,color:white,stroke:#2b8a3e,stroke-width:3px
+    classDef critical fill:#ff6b6b,color:white,stroke:#e03131,stroke-width:3px
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef draft fill:#74c0fc,color:white,stroke:#339af0
+    classDef integration fill:#ffd93d,color:black,stroke:#f59f00
+    
+    class START_FORMATION,START_DASHBOARD,START_DIRECT,START_EMAIL entryPoint
+    class EXIT_EMPLOYEE,EXIT_FORMATION,EXIT_DASHBOARD,EXIT_ANALYTICS exitPoint
+    class S10_1,S10_2,S10_8,S10_13 critical
+    class S1_6,S2_6,S5_10,S7_7,S8_7,S9_12,S10_13 success
+    class S1_ERR,S2_ERR,S7_ERR,S8_ERR,S9_ERR,S10_ERR error
+    class S1_DRAFT,S8_DRAFT draft
+    class FORMATION_INT,PLAYER_INT,EMAIL_INT integration
+```
+
+---
+
+## Master Journey Overview
+
+### Complete Recruitment Loop (9 High/Critical Stories)
+
+**Entry → Position → Candidate → Fit Score → Kanban → Pipeline → Interview → Feedback → Offer → Conversion → Exit**
+
+### Story Sequence
+
+1. **US-4.1: Create Position** (3 days)
+   - Start: Formation View or Dashboard
+   - Create position with requirements
+   - Link to Formation View gaps
+   - End: Position published
+
+2. **US-4.2: Add Candidate** (2 days)
+   - Start: Position created
+   - Add candidates manually or via LinkedIn
+   - Rate attributes via Player Card System
+   - End: Candidate in pool
+
+3. **US-4.3: Fit Score** (2 days)
+   - Auto-calculate on candidate save
+   - Display score badge (color-coded)
+   - Breakdown modal for details
+
+4. **US-4.4: Kanban Board** (3 days)
+   - Visualize pipeline stages
+   - Filter and sort candidates
+   - View candidate cards with scores
+
+5. **US-4.5: Pipeline Management** (2 days)
+   - Move candidates through stages
+   - Drag-drop or bulk actions
+   - Rejection workflow with reasons
+
+6. **US-4.7: Schedule Interview** (3 days)
+   - Schedule from Interview stage
+   - Add interviewers and meeting link
+   - Send calendar invites via email service
+
+7. **US-4.8: Interview Feedback** (2 days)
+   - Collect structured feedback
+   - Rate candidates, add comments
+   - Aggregate multiple feedback
+
+8. **US-4.9: Job Offer** (3 days)
+   - Create offer with salary/terms
+   - Generate PDF offer letter
+   - Track candidate response (accept/reject)
+
+9. **US-4.10: Convert to Employee** ⭐ (4 days) **CRITICAL**
+   - Trigger on offer acceptance
+   - 30-step conversion process
+   - Integrate with Player Card System
+   - Update Formation View
+   - Send welcome email
+   - **Critical integration point**
+
+### Key Integration Points
+
+- **Formation View** (2 integrations)
+  - Position creation links to team gaps
+  - Employee conversion updates team structure
+
+- **Player Card System** (2 integrations)
+  - Candidate attribute management
+  - Employee profile creation
+
+- **Email Service** (3 integrations)
+  - Interview invitations
+  - Offer letters
+  - Welcome emails
+
+### Loop Points
+
+- Add more candidates → Return to US-4.2
+- View board after stage change → Return to US-4.4
+- Revise offer if rejected → Return to US-4.9
+- Undo stage move → Return to US-4.4
+
+### Error Handling & Recovery
+
+Each story includes:
+- Validation error paths with correction
+- Draft saving for abandonment
+- Undo/rollback for critical operations
+- Retry mechanisms for integration failures
+
+### Total Estimated Effort
+**24 days** for complete recruitment loop (9 stories)

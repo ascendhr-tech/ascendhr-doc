@@ -1,0 +1,564 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_EMAIL[("Email Link<br/>'Submit Feedback'")]
+    ENTRY_LIST[("Interview List<br/>'Add Feedback'")]
+    ENTRY_DETAIL[("Interview Detail<br/>'Feedback' Tab")]
+    ENTRY_NOTIF[("Notification<br/>'Interview Completed'")]
+    
+    %% 1. HAPPY PATH
+    subgraph HAPPY["1️⃣ HAPPY PATH: Submit Interview Feedback"]
+        H1[Interview Completed]
+        H2[Interviewer Receives Reminder]
+        H3[Click 'Submit Feedback']
+        H4[Feedback Form Opens]
+        H5[Pre-filled: Candidate, Interview Info]
+        H6[Rate Overall Performance]
+        H7[Select: ⭐⭐⭐⭐⭐ 5/5]
+        H8[Rate Technical Skills]
+        H9[Backend Dev: 4/5]
+        H10[Problem Solving: 5/5]
+        H11[Communication: 4/5]
+        H12[Add Comments Required]
+        H13[Enter: 'Strong technical background..']
+        H14[Select Recommendation]
+        H15[Choose: 'Strong Hire']
+        H16{Validation: BR-016, BR-017}
+        H17[All Required Fields ✓]
+        H18[Preview Feedback]
+        H19[Submit]
+        H20[Feedback Saved ✓]
+        H21[Aggregate Score Calculated]
+        H22[Notify Recruiter]
+        H23[Feedback Visible in Profile]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+        H16 --> H17
+        H17 --> H18
+        H18 --> H19
+        H19 --> H20
+        H20 --> H21
+        H21 --> H22
+        H22 --> H23
+    end
+    
+    %% 2. ALTERNATIVE PATH A: Save Draft
+    subgraph ALT_A["2️⃣ ALTERNATIVE: Save Feedback Draft"]
+        A1[Form Partially Filled]
+        A2[Need to Pause]
+        A3[Click 'Save Draft']
+        A4[Draft Saved]
+        A5[Show: 'Draft saved. Complete later']
+        A6[Later: Return to Interview List]
+        A7[See 'Draft' Badge]
+        A8[Click 'Resume Draft']
+        A9[Form Restores State]
+        A10[Complete Remaining Fields]
+        A11[Submit Final]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 -.-> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Multiple Interviewers
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Panel Interview Feedback"]
+        B1[Panel Interview: 3 Interviewers]
+        B2[Interviewer 1 Submits Feedback]
+        B3[Rating: 5/5, Strong Hire]
+        B4[Interviewer 2 Submits Feedback]
+        B5[Rating: 4/5, Hire]
+        B6[Interviewer 3 Submits Feedback]
+        B7[Rating: 3/5, Maybe]
+        B8[System Aggregates]
+        B9[Average: 4/5]
+        B10[Consensus: 'Hire']
+        B11[Show All Feedback]
+        B12[Hiring Manager Reviews]
+        B13[Final Decision Based on Aggregate]
+        
+        B1 --> B2
+        B2 --> B3
+        B1 --> B4
+        B4 --> B5
+        B1 --> B6
+        B6 --> B7
+        B3 --> B8
+        B5 --> B8
+        B7 --> B8
+        B8 --> B9
+        B9 --> B10
+        B10 --> B11
+        B11 --> B12
+        B12 --> B13
+    end
+    
+    %% 3. ERROR PATH: Missing Required Fields
+    subgraph ERROR["3️⃣ ERROR PATH: Validation Failures"]
+        E1[Submit Feedback]
+        E2{Validation}
+        E3[Comments Empty ❌]
+        E4[Show: 'Comments required (BR-017)']
+        E5[Rating Missing ❌]
+        E6[Show: 'Overall rating required (BR-016)']
+        E7[Recommendation Not Selected ❌]
+        E8[Show: 'Select recommendation']
+        E9[User Fixes Errors]
+        E10[Fill Comments]
+        E11[Select Rating]
+        E12[Choose Recommendation]
+        E13[Resubmit]
+        
+        E1 --> E2
+        E2 -->|No Comments| E3
+        E2 -->|No Rating| E5
+        E2 -->|No Recommendation| E7
+        E3 --> E4
+        E5 --> E6
+        E7 --> E8
+        E4 --> E9
+        E6 --> E9
+        E8 --> E9
+        E9 --> E10
+        E10 --> E11
+        E11 --> E12
+        E12 --> E13
+    end
+    
+    %% 4. BUSINESS RULE ERROR: BR-016 Missing Rating
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: BR-016 & BR-017"]
+        BR1[Attempt Submit]
+        BR2{BR-016 Check}
+        BR3[Rating Missing ❌]
+        BR4[Error: 'Interview feedback must<br/>include rating (BR-016)']
+        BR5{BR-017 Check}
+        BR6[Comments Missing ❌]
+        BR7[Error: 'Feedback must include<br/>rating + comments (BR-017)']
+        BR8[Both Required]
+        BR9[Show Inline Errors]
+        BR10[User Completes Both]
+        BR11[Validation Passes ✓]
+        
+        BR1 --> BR2
+        BR2 --> BR3
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8
+        BR8 --> BR9
+        BR9 --> BR10
+        BR10 --> BR11
+    end
+    
+    %% 5. RECOVERY PATH: Edit Submitted Feedback
+    subgraph RECOVERY["5️⃣ RECOVERY: Edit After Submit"]
+        R1[Feedback Submitted]
+        R2[Interviewer Realizes Error]
+        R3[Rated 3/5, Meant 4/5]
+        R4[Click 'Edit Feedback']
+        R5{Edit Window}
+        R6[Within 24 Hours ✓]
+        R7[Form Opens with Current Data]
+        R8[Adjust Rating: 3 → 4]
+        R9[Update Comments]
+        R10[Confirm Update]
+        R11[Feedback Updated ✓]
+        R12[Aggregate Recalculated]
+        R13[After 24 Hours]
+        R14[Edit Locked]
+        R15[Show: 'Contact HR to modify']
+        
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
+        R5 -->|Within 24h| R6
+        R5 -->|After 24h| R13
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+        R9 --> R10
+        R10 --> R11
+        R11 --> R12
+        R13 --> R14
+        R14 --> R15
+    end
+    
+    %% 6. PERMISSION PATH: Only Assigned Interviewers
+    subgraph PERMISSION["6️⃣ PERMISSION: Interviewer Access"]
+        P1[User Attempts Feedback]
+        P2{Check Permission}
+        P3[Not Assigned Interviewer ❌]
+        P4[Access Denied]
+        P5[Show: 'Only assigned interviewers<br/>can submit feedback']
+        P6[Assigned Interviewer ✓]
+        P7[Access Granted]
+        P8[Form Opens]
+        P9[Hiring Manager Access]
+        P10[Can View All Feedback]
+        P11[Cannot Edit Others' Feedback]
+        
+        P1 --> P2
+        P2 -->|Not Assigned| P3
+        P2 -->|Assigned| P6
+        P2 -->|Manager| P9
+        P3 --> P4
+        P4 --> P5
+        P6 --> P7
+        P7 --> P8
+        P9 --> P10
+        P10 --> P11
+    end
+    
+    %% 7. LOOP PATH: Request Additional Feedback
+    subgraph LOOP["7️⃣ LOOP: Request More Details"]
+        L1[Feedback Submitted]
+        L2[Hiring Manager Reviews]
+        L3[Feedback Too Brief]
+        L4[Click 'Request Details']
+        L5[Modal: Add Request Message]
+        L6[Enter: 'Please elaborate on<br/>technical assessment']
+        L7[Send Request]
+        L8[Interviewer Notified]
+        L9[Interviewer Opens Feedback]
+        L10[See Request: 'Add more details']
+        L11[Edit Feedback]
+        L12[Add: 'Solved 3 algorithms..']
+        L13[Resubmit]
+        L14[Manager Sees Update]
+        L15{Satisfied?}
+        L16[Approve]
+        L17[Request More Again]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 --> L10
+        L10 --> L11
+        L11 --> L12
+        L12 --> L13
+        L13 --> L14
+        L14 --> L15
+        L15 -->|Yes| L16
+        L15 -->|No| L17
+        L17 --> L4
+    end
+    
+    %% 8. TIMEOUT PATH: Auto-save Draft
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Session Management"]
+        T1[Form Open 30 Minutes]
+        T2[Partially Completed]
+        T3[User Distracted]
+        T4[Session Timeout Warning]
+        T5[Auto-save Draft]
+        T6[Session Expires]
+        T7[Redirect to Login]
+        T8[After Login]
+        T9[Show: 'Resume feedback draft?']
+        T10[Click 'Resume']
+        T11[Form Restored]
+        T12[All Data Preserved]
+        T13[Continue Editing]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 --> T6
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+        T11 --> T12
+        T12 --> T13
+    end
+    
+    %% 9. EMPTY STATE: No Feedback Yet
+    subgraph EMPTY["9️⃣ EMPTY: Awaiting Feedback"]
+        EM1[Interview Completed]
+        EM2[View Interview Detail]
+        EM3[Check Feedback Tab]
+        EM4{Feedback Submitted?}
+        EM5[Empty State Display]
+        EM6[Message: 'No feedback yet']
+        EM7[Show: '2 interviewers pending']
+        EM8[List: John Doe ✓, Jane Smith ⏳]
+        EM9[Reminder Button]
+        EM10[Click 'Send Reminder']
+        EM11[Email Sent to Pending]
+        EM12[Later: Feedback Arrives]
+        EM13[State Updates to Show Feedback]
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 --> EM4
+        EM4 -->|No| EM5
+        EM4 -->|Yes| H23
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+        EM10 --> EM11
+        EM11 -.-> EM12
+        EM12 --> EM13
+    end
+    
+    %% 10. CONCURRENT: Simultaneous Submissions
+    subgraph CONCURRENT["🔟 CONCURRENT: Multiple Submissions"]
+        C1[3 Interviewers Submit Feedback]
+        C2[All Submit Within 5 Minutes]
+        C3[Interviewer 1: 5/5]
+        C4[Interviewer 2: 4/5]
+        C5[Interviewer 3: 4/5]
+        C6[System Processes Sequentially]
+        C7[All Saved Successfully]
+        C8[Aggregate Calculation Triggered]
+        C9{Calculation Lock}
+        C10[Wait for Lock Release]
+        C11[Calculate: (5+4+4)/3 = 4.33]
+        C12[Round to: 4/5]
+        C13[Update Interview Record]
+        C14[All Interviewers See Final]
+        C15[Consistent Aggregate ✓]
+        
+        C1 --> C2
+        C2 --> C3
+        C2 --> C4
+        C2 --> C5
+        C3 --> C6
+        C4 --> C6
+        C5 --> C6
+        C6 --> C7
+        C7 --> C8
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11
+        C11 --> C12
+        C12 --> C13
+        C13 --> C14
+        C14 --> C15
+    end
+    
+    %% INTEGRATION: Aggregate Calculation
+    subgraph INTEGRATION["🔗 INTEGRATION: Aggregate Logic"]
+        I1[All Feedback Submitted]
+        I2[Trigger Aggregate Calculation]
+        I3[Fetch All Ratings]
+        I4[Rating 1: 5/5]
+        I5[Rating 2: 4/5]
+        I6[Rating 3: 4/5]
+        I7[Calculate Average]
+        I8[AVG = 4.33]
+        I9[Round to Nearest: 4/5]
+        I10[Count Recommendations]
+        I11[Strong Hire: 1, Hire: 2]
+        I12[Consensus: 'Hire']
+        I13[Save Aggregate]
+        I14[Update Candidate Profile]
+        I15[Display in Interview Detail]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 --> I5
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 --> I9
+        I9 --> I10
+        I10 --> I11
+        I11 --> I12
+        I12 --> I13
+        I13 --> I14
+        I14 --> I15
+    end
+    
+    %% EXIT POINTS
+    EXIT_PROF[("Candidate Profile<br/>View Feedback")]
+    EXIT_LIST[("Interview List<br/>All Interviews")]
+    EXIT_OFFER[("Create Offer<br/>Next Step")]
+    EXIT_DETAIL[("Interview Detail<br/>Complete View")]
+    
+    %% Main Flow Connections
+    ENTRY_EMAIL ==> H3
+    ENTRY_LIST ==> H4
+    ENTRY_DETAIL ==> H4
+    ENTRY_NOTIF ==> H3
+    
+    H16 -->|Invalid| E2
+    H21 --> I1
+    H23 ==> EXIT_PROF
+    
+    A11 --> H16
+    
+    B13 ==> EXIT_OFFER
+    
+    E2 -->|Valid| H17
+    E13 --> H16
+    
+    BR2 -->|Valid| H17
+    BR5 -->|Valid| H17
+    BR11 --> H17
+    
+    R12 ==> EXIT_DETAIL
+    R15 ==> EXIT_DETAIL
+    
+    P5 ==> EXIT_LIST
+    P8 --> H4
+    P11 --> EXIT_PROF
+    
+    L16 ==> EXIT_OFFER
+    
+    T13 --> H16
+    
+    EM13 ==> EXIT_DETAIL
+    
+    C15 ==> EXIT_DETAIL
+    
+    I15 ==> EXIT_DETAIL
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class ENTRY_EMAIL,ENTRY_LIST,ENTRY_DETAIL,ENTRY_NOTIF entry
+    class EXIT_PROF,EXIT_LIST,EXIT_OFFER,EXIT_DETAIL exit
+    class H20,A11,R11,I15,C15 success
+    class E3,E5,E7,BR3,BR6,P4 error
+    class A5,T4,EM6,L10 warning
+    class I1,I2,I13 integration
+```
+
+---
+
+## US-4.8: Collect Interview Feedback
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Submit complete feedback with rating, comments, recommendation
+2. **Alternative Paths** ✅ - Save draft, panel interview with multiple feedbacks
+3. **Error Paths** ✅ - Missing required fields (rating, comments, recommendation)
+4. **Business Rule Errors** ✅ - BR-016 (rating required), BR-017 (rating + comments)
+5. **Recovery Paths** ✅ - Edit feedback within 24-hour window
+6. **Permission Paths** ✅ - Only assigned interviewers can submit
+7. **Loop Paths** ✅ - Manager requests additional details, iterative refinement
+8. **Timeout Paths** ✅ - Auto-save draft on session expiry
+9. **Empty States** ✅ - No feedback submitted yet, awaiting interviewers
+10. **Concurrent Paths** ✅ - Multiple interviewers submit simultaneously
+
+### Required Fields (BR-016, BR-017)
+
+| Field | Type | Required | Rule |
+|-------|------|----------|------|
+| Overall Rating | 1-5 stars | ✅ Yes | BR-016 |
+| Comments | Text area | ✅ Yes | BR-017 (min 50 chars) |
+| Recommendation | Dropdown | ✅ Yes | BR-016 |
+| Technical Ratings | 1-5 per skill | Optional | Recommended |
+
+### Recommendation Options
+
+| Option | Meaning | Next Action |
+|--------|---------|-------------|
+| **Strong Hire** | Exceptional candidate | Move to Offer immediately |
+| **Hire** | Good candidate | Move to Offer after manager review |
+| **Maybe** | Uncertain, needs discussion | Schedule debrief meeting |
+| **No Hire** | Not suitable | Reject candidate |
+| **Strong No Hire** | Definitely not suitable | Reject immediately |
+
+### Feedback Components
+
+**Feedback Form Structure:**
+```
+┌─────────────────────────────────────┐
+│ Interview Feedback                  │
+├─────────────────────────────────────┤
+│ Candidate: Alex Chen                │
+│ Position: Senior Backend Developer  │
+│ Interview Date: March 20, 2026      │
+│ Interviewer: John Doe               │
+├─────────────────────────────────────┤
+│ Overall Rating: ⭐⭐⭐⭐⭐ (Required) │
+│                                     │
+│ Technical Skills:                   │
+│ • Backend Development: ⭐⭐⭐⭐☆   │
+│ • Problem Solving: ⭐⭐⭐⭐⭐       │
+│ • Communication: ⭐⭐⭐⭐☆         │
+│                                     │
+│ Comments (Required, min 50 chars):  │
+│ ┌─────────────────────────────────┐ │
+│ │Strong technical background...   │ │
+│ │                                 │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ Recommendation: [Strong Hire ▼]    │
+│                                     │
+│ [Save Draft] [Submit Feedback] ←   │
+└─────────────────────────────────────┘
+```
+
+### Aggregate Calculation (Panel Interviews)
+
+**When multiple interviewers:**
+1. Average all ratings: `SUM(ratings) / COUNT(interviewers)`
+2. Round to nearest 0.5 (3.7 → 4.0, 3.3 → 3.5)
+3. Determine consensus recommendation:
+   - If >50% "Strong Hire" or "Hire" → "Hire"
+   - If majority "No Hire" → "No Hire"
+   - If split → "Maybe" (requires discussion)
+
+### Edit Window
+
+- **24 hours** after submission
+- After 24h: Contact HR to modify
+- Edits recalculate aggregate immediately
+- Edit history logged in audit trail
+
+### Notification Triggers
+
+1. **To Recruiter:** When all feedback submitted
+2. **To Hiring Manager:** When aggregate >4/5 (fast-track offer)
+3. **To Interviewer:** Reminder if >3 days without feedback
+4. **To Admin:** If feedback violates policies
+
+### Success Criteria
+
+- ✅ Feedback submission <5 minutes (happy path)
+- ✅ 100% compliance with BR-016, BR-017 (no feedback without rating+comments)
+- ✅ Aggregate calculation accurate to 2 decimal places
+- ✅ Edit window enforced (24h only)
+- ✅ Draft auto-save every 30 seconds
+- ✅ Concurrent submissions handled without data loss

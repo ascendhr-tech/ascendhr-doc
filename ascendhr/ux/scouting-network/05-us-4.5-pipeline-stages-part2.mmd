@@ -1,0 +1,356 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    %% 7. LOOP PATH: Move Back to Earlier Stage
+    subgraph LOOP["7️⃣ LOOP: Move Back for Re-evaluation"]
+        L1[Candidate in Interview Stage]
+        L2[Poor Interview Performance]
+        L3[Manager Decides: More Screening Needed]
+        L4[Click 'Move Back to Screening']
+        L5{Confirmation Required}
+        L6[Warning: 'Moving backward in pipeline']
+        L7[Add Reason Required]
+        L8[Enter: 'Needs additional technical review']
+        L9[Confirm Move Back]
+        L10[Update Status: Interview → Screening]
+        L11[Notify Candidate: Next Steps]
+        L12[Activity Log: Backward Move]
+        L13[Later: Re-screen Complete]
+        L14[Move Forward Again: Screening → Interview]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 --> L10
+        L10 --> L11
+        L11 --> L12
+        L12 -.-> L13
+        L13 --> L14
+    end
+    
+    %% 8. REJECTION FLOW: Move to Rejected
+    subgraph REJECT["8️⃣ REJECTION: Candidate Not Selected"]
+        RJ1[Select Candidate to Reject]
+        RJ2[Click 'Reject' Button]
+        RJ3[Rejection Modal Opens]
+        RJ4[Select Rejection Reason Required]
+        RJ5[Dropdown: 12 Standard Reasons]
+        RJ6[User Selects: 'Insufficient experience']
+        RJ7[Add Optional Notes]
+        RJ8[Enter: 'Backend exp: 3y, required: 5y']
+        RJ9{Send Email Notification?}
+        RJ10[Checkbox: 'Send polite rejection email']
+        RJ11[Preview Email Template]
+        RJ12[Confirm Rejection]
+        RJ13[Update Status: Rejected]
+        RJ14[Move to Rejected Column]
+        RJ15[Email Sent to Candidate]
+        RJ16[Activity Logged]
+        RJ17[Position Filled Check: BR-011]
+        RJ18{All Other Candidates}
+        RJ19[Auto-reject If Position Filled]
+        
+        RJ1 --> RJ2
+        RJ2 --> RJ3
+        RJ3 --> RJ4
+        RJ4 --> RJ5
+        RJ5 --> RJ6
+        RJ6 --> RJ7
+        RJ7 --> RJ8
+        RJ8 --> RJ9
+        RJ9 --> RJ10
+        RJ10 --> RJ11
+        RJ11 --> RJ12
+        RJ12 --> RJ13
+        RJ13 --> RJ14
+        RJ14 --> RJ15
+        RJ15 --> RJ16
+        RJ16 --> RJ17
+        RJ17 --> RJ18
+        RJ18 -->|Position Filled| RJ19
+    end
+    
+    %% 9. TIMEOUT PATH: Session Expiry During Move
+    subgraph TIMEOUT["9️⃣ TIMEOUT: Session Expires Mid-Action"]
+        T1[User Dragging Card]
+        T2[Card Hovering Over Target]
+        T3[Session Expires (45 min idle)]
+        T4[WebSocket Disconnects]
+        T5[Show Warning Banner]
+        T6[Message: 'Session expired']
+        T7[Drop Action Fails]
+        T8[Card Returns to Original]
+        T9[Show: 'Please login to continue']
+        T10[Redirect to Login]
+        T11[After Re-login]
+        T12[Return to Kanban]
+        T13[Board State Preserved]
+        T14[Retry Move]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 --> T6
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+        T11 --> T12
+        T12 --> T13
+        T13 --> T14
+    end
+    
+    %% 10. EMPTY STATE: No Valid Next Stage
+    subgraph EMPTY["🔟 EMPTY: Dead-End Scenarios"]
+        EM1[Candidate in 'Hired' Stage]
+        EM2[User Attempts to Drag]
+        EM3[Card Won't Move (Locked)]
+        EM4[Tooltip: 'Candidate already hired']
+        EM5[No Valid Next Stages]
+        EM6[Only Action: View Profile]
+        EM7[Alternative: Candidate in 'Rejected']
+        EM8[Card Grayed Out]
+        EM9[Tooltip: 'Candidate rejected']
+        EM10[Cannot Move from Final States]
+        EM11[Exception: Admin Can Revert]
+        EM12[Admin Mode: 'Undo Rejection']
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 --> EM4
+        EM4 --> EM5
+        EM5 --> EM6
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+        EM10 --> EM11
+        EM11 --> EM12
+    end
+    
+    %% 11. CONCURRENT: Conflict Resolution
+    subgraph CONCURRENT["🔟 CONCURRENT: Multi-User Conflict"]
+        C1[Recruiter A Moving Candidate]
+        C2[Recruiter B Also Moving Same Candidate]
+        C3[A Moves: New → Screening]
+        C4[A's Move Saves First]
+        C5[Database Updated]
+        C6[B Attempts Move: New → Interview]
+        C7{Conflict Detection}
+        C8[Source State Mismatch]
+        C9[B's Move Rejected]
+        C10[Error to B: 'Candidate already moved']
+        C11[Show Current State: Screening]
+        C12[B's Options]
+        C13A[Refresh & Retry from Screening]
+        C13B[Cancel Action]
+        C14[WebSocket Sends Update to B]
+        C15[B's Board Auto-refreshes]
+        C16[Card Now in Screening Column]
+        
+        C1 --> C3
+        C2 --> C6
+        C3 --> C4
+        C4 --> C5
+        C5 --> C7
+        C6 --> C7
+        C7 --> C8
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11
+        C11 --> C12
+        C12 --> C13A
+        C12 --> C13B
+        C5 --> C14
+        C14 --> C15
+        C15 --> C16
+    end
+    
+    %% 12. INTEGRATION: Activity Timeline
+    subgraph INTEGRATION["🔗 INTEGRATION: Audit Trail"]
+        I1[Stage Move Completed]
+        I2[Create Activity Log Entry]
+        I3[Log Details]
+        I4[Timestamp: 2026-03-15 10:30:00]
+        I5[User: Recruiter Alex]
+        I6[Action: Stage Changed]
+        I7[From: New → To: Screening]
+        I8[Reason: Initial review passed]
+        I9[Save to Activity Timeline]
+        I10[Update Candidate Profile]
+        I11[Add to Activity Feed]
+        I12[Visible in Profile View]
+        I13[Send Webhook Event]
+        I14[External Systems Notified]
+        I15[Analytics Update]
+        I16[Pipeline Metrics Recalculated]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 --> I5
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 --> I9
+        I9 --> I10
+        I10 --> I11
+        I11 --> I12
+        I12 --> I13
+        I13 --> I14
+        I14 --> I15
+        I15 --> I16
+    end
+    
+    %% EXIT POINTS
+    EXIT_KANBAN[("Kanban Board<br/>Updated Pipeline")]
+    EXIT_PROF[("Candidate Profile<br/>View Timeline")]
+    EXIT_EMAIL[("Email Sent<br/>Notification")]
+    EXIT_ANALYTICS[("Analytics<br/>Updated Metrics")]
+    
+    %% Flow Connections
+    L14 --> EXIT_KANBAN
+    
+    RJ16 --> EXIT_KANBAN
+    RJ15 --> EXIT_EMAIL
+    RJ19 --> EXIT_ANALYTICS
+    
+    T14 --> EXIT_KANBAN
+    
+    EM6 --> EXIT_PROF
+    EM12 --> EXIT_KANBAN
+    
+    C13A --> EXIT_KANBAN
+    C13B --> EXIT_KANBAN
+    C16 --> EXIT_KANBAN
+    
+    I12 --> EXIT_PROF
+    I14 --> EXIT_ANALYTICS
+    I16 --> EXIT_ANALYTICS
+    
+    %% Styling
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class EXIT_KANBAN,EXIT_PROF,EXIT_EMAIL,EXIT_ANALYTICS exit
+    class L14,RJ16,I16 success
+    class C9,C10,T7 error
+    class L6,T5,EM4,C11 warning
+    class I2,I9,I13 integration
+```
+
+---
+
+## US-4.5: Move Candidate Through Pipeline Stages (Part 2)
+
+### Flow Type Coverage (Part 2): Remaining 4 of 10 Types
+
+7. **Loop Paths** ✅ - Move backward in pipeline for re-evaluation
+8. **Rejection Flow** ✅ - Structured rejection with reason and email (BR-015)
+9. **Timeout Paths** ✅ - Session expiry during drag-drop action
+10. **Empty States** ✅ - Final stages (Hired/Rejected) have no next moves
+11. **Concurrent Paths** ✅ - Conflict resolution when two users move same candidate
+
+### Complete Flow Type Coverage: ✅ All 10+ Types
+
+### Rejection Reasons (BR-015)
+
+**Standard Rejection Reasons:**
+1. Insufficient experience
+2. Skills mismatch
+3. Salary expectations too high
+4. Position filled
+5. Interview performance below standard
+6. Cultural fit concerns
+7. Failed technical assessment
+8. Withdrew application
+9. Did not respond to contact attempts
+10. Background check issues
+11. Availability doesn't match
+12. Other (requires custom reason)
+
+### Stage Move Validation Matrix
+
+| From | To | Valid? | Requires |
+|------|-----|--------|----------|
+| New | Screening | ✅ | None |
+| New | Interview | ❌ | Must go through Screening |
+| Screening | Interview | ✅ | None |
+| Interview | Offer | ⚠️ | Interview feedback (BR-014) |
+| Offer | Hired | ⚠️ | Offer accepted |
+| Any | Rejected | ✅ | Rejection reason (BR-015) |
+| Hired | Any | ❌ | Final state (Admin override only) |
+| Rejected | Any | ❌ | Final state (Admin override only) |
+
+### Activity Log Structure
+
+```json
+{
+  "id": "ACT-2026-001",
+  "candidate_id": "CAN-2026-050",
+  "timestamp": "2026-03-15T10:30:00Z",
+  "user_id": "USR-001",
+  "user_name": "Alex Chen",
+  "action": "stage_changed",
+  "from_stage": "New",
+  "to_stage": "Screening",
+  "reason": "Initial review passed",
+  "notes": "Strong technical background"
+}
+```
+
+### Undo Window
+
+- **Duration:** 5 seconds after action
+- **Visual:** Toast notification with "Undo" button
+- **Action:** Reverses database transaction, animates card back
+- **Limitation:** Only for last action, single-level undo
+
+### Concurrent Modification Handling
+
+**Optimistic Locking Strategy:**
+1. Capture source stage before move
+2. On save, verify source stage unchanged
+3. If mismatch: Reject move, notify user, refresh board
+4. WebSocket broadcasts all moves to connected users
+
+### Webhook Events
+
+Stage changes trigger webhooks for:
+- External ATS systems
+- Analytics platforms
+- Email automation services
+- Slack/Teams notifications
+
+**Event Payload:**
+```json
+{
+  "event": "candidate.stage_changed",
+  "candidate_id": "CAN-2026-050",
+  "position_id": "POS-2026-010",
+  "from_stage": "New",
+  "to_stage": "Screening",
+  "timestamp": "2026-03-15T10:30:00Z"
+}
+```
+
+### Success Criteria
+
+- ✅ Stage transition validation 100% accurate (no invalid moves)
+- ✅ Undo works 100% within 5-second window
+- ✅ Bulk move processes up to 50 candidates without timeout
+- ✅ Concurrent conflict detection prevents data corruption
+- ✅ Activity log captures all moves with full audit trail
+- ✅ Rejection email sent within 30 seconds of rejection
+- ✅ WebSocket updates appear on other users' boards within 2 seconds
+
+**END OF US-4.5 COMPLETE FLOW**

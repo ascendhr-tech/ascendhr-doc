@@ -1,0 +1,473 @@
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '13px'}}}%%
+flowchart TB
+    %% Entry Points
+    ENTRY_AUTO[("Auto-trigger<br/>Candidate Saved")]
+    ENTRY_PROF[("Candidate Profile<br/>Click Score Badge")]
+    ENTRY_KANBAN[("Kanban Card<br/>View Score")]
+    ENTRY_MANUAL[("Manual Recalculate")]
+    
+    %% 1. HAPPY PATH: Auto-Calculate on Save
+    subgraph HAPPY["1️⃣ HAPPY PATH: Auto-Calculate Fit Score"]
+        H1[Candidate Saved]
+        H2[Position Requirements Exist]
+        H3[Trigger Fit Score Calc]
+        H4[Fetch Candidate Attributes]
+        H5[Fetch Position Requirements]
+        H6[Apply Formula BR-003]
+        H7[Calculate Match %]
+        H8[Backend: 18/16 = 112%]
+        H9[Database: 17/15 = 113%]
+        H10[Architecture: 16/14 = 114%]
+        H11[Weighted Average = 95%]
+        H12{Determine Color}
+        H13[Score ≥ 90% = Green 🟢]
+        H14[Display Badge on Profile]
+        H15[Show: '95% Fit']
+        H16[Cache Result]
+        
+        H1 --> H2
+        H2 --> H3
+        H3 --> H4
+        H4 --> H5
+        H5 --> H6
+        H6 --> H7
+        H7 --> H8
+        H8 --> H9
+        H9 --> H10
+        H10 --> H11
+        H11 --> H12
+        H12 --> H13
+        H13 --> H14
+        H14 --> H15
+        H15 --> H16
+    end
+    
+    %% 2. ALTERNATIVE PATH A: View Score Breakdown
+    subgraph ALT_A["2️⃣ ALTERNATIVE: View Score Details"]
+        A1[User Sees Badge '95% 🟢']
+        A2[Curious About Calculation]
+        A3[Click Badge]
+        A4[Breakdown Modal Opens]
+        A5[Show Formula Explanation]
+        A6[Display Each Attribute]
+        A7[Backend: 18/16 = 112% ✓]
+        A8[Database: 17/15 = 113% ✓]
+        A9[Architecture: 16/14 = 114% ✓]
+        A10[Weighted Average = 95%]
+        A11[Color Coding Legend]
+        A12[Green ≥90%, Yellow 70-89%, Red <70%]
+        A13[User Understands]
+        
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+        A5 --> A6
+        A6 --> A7
+        A7 --> A8
+        A8 --> A9
+        A9 --> A10
+        A10 --> A11
+        A11 --> A12
+        A12 --> A13
+    end
+    
+    %% 2. ALTERNATIVE PATH B: Manual Recalculation
+    subgraph ALT_B["2️⃣ ALTERNATIVE: Force Recalculate"]
+        B1[Candidate Profile]
+        B2[Attributes Updated]
+        B3[Click 'Recalculate Fit Score']
+        B4[Clear Cache]
+        B5[Run Calculation Again]
+        B6[New Score: 97%]
+        B7[Badge Updates]
+        B8[Show: 'Score Updated']
+        B9[Timestamp Updated]
+        
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+        B5 --> B6
+        B6 --> B7
+        B7 --> B8
+        B8 --> B9
+    end
+    
+    %% 3. ERROR PATH: Missing Data
+    subgraph ERROR["3️⃣ ERROR PATH: Incomplete Data"]
+        E1[Attempt Calculation]
+        E2{Data Check}
+        E3[No Candidate Attributes ❌]
+        E4[Show: 'N/A - No attributes rated']
+        E5[CTA: 'Rate Attributes']
+        E6[No Position Requirements ❌]
+        E7[Show: 'N/A - Position has no requirements']
+        E8[Link to Position]
+        E9[Partial Attributes]
+        E10[Calculate with Available]
+        E11[Show: '~85% (partial)']
+        E12[Note: 'Based on 3 of 8 attributes']
+        
+        E1 --> E2
+        E2 -->|No Attributes| E3
+        E2 -->|No Requirements| E6
+        E2 -->|Partial| E9
+        E3 --> E4
+        E4 --> E5
+        E6 --> E7
+        E7 --> E8
+        E9 --> E10
+        E10 --> E11
+        E11 --> E12
+    end
+    
+    %% 4. BUSINESS RULE ERROR: BR-003 Formula Issues
+    subgraph BR_ERROR["4️⃣ BUSINESS RULE: BR-003 Edge Cases"]
+        BR1[Calculate Score]
+        BR2{Edge Case Check}
+        BR3[Candidate Score > Required]
+        BR4[Backend: 20/16 = 125%]
+        BR5[Cap at 150% Max]
+        BR6[All Scores Above 100%]
+        BR7[Result: 120% Overall]
+        BR8[Show: '120% Fit 🟢']
+        BR9[Note: 'Exceeds all requirements']
+        BR10[Candidate Below All]
+        BR11[Result: 45% Overall]
+        BR12[Show: '45% Fit 🔴']
+        BR13[Note: 'Below position requirements']
+        
+        BR1 --> BR2
+        BR2 -->|Over-qualified| BR3
+        BR2 -->|Under-qualified| BR10
+        BR3 --> BR4
+        BR4 --> BR5
+        BR5 --> BR6
+        BR6 --> BR7
+        BR7 --> BR8
+        BR8 --> BR9
+        BR10 --> BR11
+        BR11 --> BR12
+        BR12 --> BR13
+    end
+    
+    %% 5. RECOVERY PATH: Recalc After Data Fix
+    subgraph RECOVERY["5️⃣ RECOVERY: Fix Missing Data"]
+        R1[Score Shows 'N/A']
+        R2[User Realizes Missing Attributes]
+        R3[Click 'Rate Attributes']
+        R4[Rate All Required Attributes]
+        R5[Save Attributes]
+        R6[Auto-trigger Recalculation]
+        R7[Score Calculated: 92%]
+        R8[Badge Now Shows Value]
+        R9[Success Message]
+        
+        R1 --> R2
+        R2 --> R3
+        R3 --> R4
+        R4 --> R5
+        R5 --> R6
+        R6 --> R7
+        R7 --> R8
+        R8 --> R9
+    end
+    
+    %% 6. PERMISSION PATH: View Only
+    subgraph PERMISSION["6️⃣ PERMISSION: Score Visibility"]
+        P1[User Views Candidate]
+        P2{Check Role}
+        P3[Role = Interviewer]
+        P4[Can View Score ✓]
+        P5[Cannot Edit Attributes]
+        P6[Score Visible: '95%']
+        P7[Breakdown Modal Available]
+        P8[No 'Recalculate' Button]
+        P9[Role = Public/Guest]
+        P10[Score Hidden ⛔]
+        P11[Show: 'Login to view details']
+        
+        P1 --> P2
+        P2 -->|Interviewer| P3
+        P2 -->|Guest| P9
+        P3 --> P4
+        P4 --> P5
+        P5 --> P6
+        P6 --> P7
+        P7 --> P8
+        P9 --> P10
+        P10 --> P11
+    end
+    
+    %% 7. LOOP PATH: Optimize Score Iteratively
+    subgraph LOOP["7️⃣ LOOP: Improve Score Iteratively"]
+        L1[Initial Score: 75% 🟡]
+        L2[User Wants Better Match]
+        L3[Review Breakdown]
+        L4[Identify Low Areas]
+        L5[Database: 12/15 = 80% ⚠️]
+        L6[Interview Candidate]
+        L7[Discover: Actually 16/20]
+        L8[Update Attribute: 12 → 16]
+        L9[Recalculate]
+        L10[New Score: 88% 🟢]
+        L11{Satisfied?}
+        L12[Review Again]
+        
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> L8
+        L8 --> L9
+        L9 --> L10
+        L10 --> L11
+        L11 -->|No| L12
+        L11 -->|Yes| L1
+        L12 --> L3
+    end
+    
+    %% 8. TIMEOUT PATH: Cache Expiry
+    subgraph TIMEOUT["8️⃣ TIMEOUT: Cache Management"]
+        T1[Score Calculated: 95%]
+        T2[Cached for 24 Hours]
+        T3[Time Passes: 25 Hours]
+        T4[Cache Expires]
+        T5[User Views Profile]
+        T6[Score Shows: '95% (stale)']
+        T7[Auto-recalculate Triggered]
+        T8[Loading Indicator]
+        T9[New Score: 95%]
+        T10[Cache Refreshed]
+        T11[No Change - Still Valid]
+        
+        T1 --> T2
+        T2 --> T3
+        T3 --> T4
+        T4 --> T5
+        T5 --> T6
+        T6 --> T7
+        T7 --> T8
+        T8 --> T9
+        T9 --> T10
+        T10 --> T11
+    end
+    
+    %% 9. EMPTY STATE: No Positions to Compare
+    subgraph EMPTY["9️⃣ EMPTY STATE: No Context"]
+        EM1[View Candidate Profile]
+        EM2[No Applications Yet]
+        EM3[No Position Context]
+        EM4[Score Shows: 'N/A']
+        EM5[Message: 'Apply to position<br/>to see fit score']
+        EM6[CTA: 'Add to Position']
+        EM7[Position Selector Opens]
+        EM8[Select Position]
+        EM9[Application Created]
+        EM10[Score Calculates: 92%]
+        
+        EM1 --> EM2
+        EM2 --> EM3
+        EM3 --> EM4
+        EM4 --> EM5
+        EM5 --> EM6
+        EM6 --> EM7
+        EM7 --> EM8
+        EM8 --> EM9
+        EM9 --> EM10
+    end
+    
+    %% 10. CONCURRENT: Multiple Positions
+    subgraph CONCURRENT["🔟 CONCURRENT: Multi-Position Scores"]
+        C1[Candidate Applied to 3 Positions]
+        C2[Position A: Backend Developer]
+        C3[Position B: Full-Stack Developer]
+        C4[Position C: Senior Architect]
+        C5[Calculate Scores in Parallel]
+        C6[Score A: 95% 🟢]
+        C7[Score B: 78% 🟡]
+        C8[Score C: 62% 🔴]
+        C9[Display All in Profile]
+        C10[Sort by Best Fit]
+        C11[Recommend Position A]
+        
+        C1 --> C2
+        C1 --> C3
+        C1 --> C4
+        C2 --> C5
+        C3 --> C5
+        C4 --> C5
+        C5 --> C6
+        C5 --> C7
+        C5 --> C8
+        C6 --> C9
+        C7 --> C9
+        C8 --> C9
+        C9 --> C10
+        C10 --> C11
+    end
+    
+    %% INTEGRATION: Player Card System
+    subgraph INTEGRATION["🔗 INTEGRATION: Player Card API"]
+        I1[Fit Score Calculation]
+        I2[Call Player Card API]
+        I3[GET /api/candidates/{id}/attributes]
+        I4{API Response}
+        I5[Attributes Retrieved]
+        I6[Backend: 18]
+        I7[Database: 17]
+        I8[System: 16]
+        I9[Use in Formula]
+        I10[API Error]
+        I11[Show: 'Score unavailable']
+        I12[Cache Last Known]
+        I13[Display Cached: '95% (cached)']
+        I14[Retry in Background]
+        
+        I1 --> I2
+        I2 --> I3
+        I3 --> I4
+        I4 -->|Success| I5
+        I4 -->|Error| I10
+        I5 --> I6
+        I6 --> I7
+        I7 --> I8
+        I8 --> I9
+        I10 --> I11
+        I11 --> I12
+        I12 --> I13
+        I13 --> I14
+    end
+    
+    %% EXIT POINTS
+    EXIT_PROF[("Candidate Profile<br/>View Complete")]
+    EXIT_KANBAN[("Kanban Board<br/>See All Scores")]
+    EXIT_COMP[("Compare Candidates<br/>Side-by-Side")]
+    
+    %% Main Flow Connections
+    ENTRY_AUTO ==> H1
+    ENTRY_PROF ==> A1
+    ENTRY_KANBAN ==> A1
+    ENTRY_MANUAL ==> B3
+    
+    H3 --> I1
+    H16 ==> EXIT_PROF
+    
+    A13 --> EXIT_PROF
+    B9 ==> EXIT_PROF
+    
+    E2 -->|Valid| H4
+    E5 --> R3
+    E8 --> EXIT_PROF
+    
+    BR9 ==> EXIT_PROF
+    BR13 ==> EXIT_COMP
+    
+    R9 ==> EXIT_PROF
+    
+    P8 --> EXIT_PROF
+    P11 --> EXIT_PROF
+    
+    L11 -->|Done| EXIT_KANBAN
+    T11 --> EXIT_PROF
+    EM10 ==> EXIT_PROF
+    C11 ==> EXIT_COMP
+    
+    I9 --> H7
+    I14 --> H3
+    
+    %% Styling
+    classDef entry fill:#845ef7,color:white,stroke:#5f3dc4
+    classDef exit fill:#37b24d,color:white,stroke:#2b8a3e
+    classDef success fill:#51cf66,color:white,stroke:#37b24d
+    classDef warning fill:#ffd93d,color:black,stroke:#f59f00
+    classDef error fill:#ff6b6b,color:white,stroke:#e03131
+    classDef integration fill:#e599f7,color:white,stroke:#be4bdb
+    
+    class ENTRY_AUTO,ENTRY_PROF,ENTRY_KANBAN,ENTRY_MANUAL entry
+    class EXIT_PROF,EXIT_KANBAN,EXIT_COMP exit
+    class H13,H15,R8,L10,C6 success
+    class E4,E7,BR12,P10,I11 error
+    class E11,T6,EM5,I13 warning
+    class I2,I3 integration
+```
+
+---
+
+## US-4.3: Calculate and Display Fit Score
+
+### Flow Type Coverage: ✅ All 10 Types
+
+1. **Happy Path** ✅ - Auto-calculate on candidate save, display color-coded badge
+2. **Alternative Paths** ✅ - View breakdown modal, manual recalculation
+3. **Error Paths** ✅ - Missing attributes, no requirements, partial data
+4. **Business Rule Errors** ✅ - BR-003 edge cases (over/under qualified)
+5. **Recovery Paths** ✅ - Fix missing data and recalculate
+6. **Permission Paths** ✅ - Role-based score visibility
+7. **Loop Paths** ✅ - Iterative score improvement
+8. **Timeout Paths** ✅ - Cache expiry and refresh
+9. **Empty States** ✅ - No position context for scoring
+10. **Concurrent Paths** ✅ - Multiple position scores simultaneously
+
+### Fit Score Formula (BR-003)
+
+```
+For each attribute:
+  Match% = (Candidate Score / Required Score) × 100%
+  Capped at 150% maximum
+
+Overall Fit Score = Weighted Average of all attributes
+```
+
+### Color Coding
+
+| Range | Color | Badge | Meaning |
+|-------|-------|-------|---------|
+| ≥ 90% | Green 🟢 | High fit | Strong match |
+| 70-89% | Yellow 🟡 | Medium fit | Acceptable match |
+| < 70% | Red 🔴 | Low fit | Poor match |
+
+### Key Screens
+
+| Screen ID | Name | Purpose |
+|-----------|------|---------|
+| `fit-score-badge` | Score Badge | Display score on profile/card |
+| `fit-score-breakdown` | Breakdown Modal | Show detailed calculation |
+| `score-comparison` | Multi-Position View | Compare scores across positions |
+
+### Calculation Triggers
+
+1. **Auto-triggers:**
+   - Candidate attributes saved/updated
+   - Position requirements changed
+   - Application created (links candidate to position)
+
+2. **Manual triggers:**
+   - User clicks "Recalculate" button
+   - Cache expired (24 hours)
+
+### Integration Points
+
+- **Player Card System API**
+  - `GET /api/candidates/{id}/attributes` - Fetch candidate scores
+  - Error handling: Show cached score if API unavailable
+  - Retry: Background refresh every 5 minutes on failure
+
+### Cache Strategy
+
+- **Cache Duration:** 24 hours
+- **Cache Key:** `fit_score:{candidate_id}:{position_id}`
+- **Invalidation:** On attribute update, requirement change
+- **Stale Indicator:** Show "(cached)" if >23 hours old
+
+### Success Criteria
+
+- ✅ Score displays within 1 second of candidate save
+- ✅ Breakdown modal explains formula clearly
+- ✅ 100% accuracy in score calculation (no rounding errors)
+- ✅ Handles edge cases (over-qualified, under-qualified)
+- ✅ Graceful degradation if Player Card API unavailable
